@@ -295,7 +295,7 @@ def get_inversion(iterable):
 
 
 def smart_calculate(dict_in: dict, details: str) -> str:
-    """Smart handling inputs and printing out available information"""
+    """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
     out_msg = ["Mr = {}".format(str(mr))]
     element, element_percentages, mass, mol, oxidation = [None for _ in range(5)]
@@ -339,6 +339,8 @@ def smart_calculate(dict_in: dict, details: str) -> str:
 
 
 def process_and_balance_equation(equation: str) -> str:
+    """processes input string chemical equation into a matrix and return the least 
+    significant integer solution to that matrix which is the balanced equation"""
     error_messages = ["Invalid syntax: no '->' found",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
@@ -643,6 +645,7 @@ def partition(n, k):
 
 
 def main(state):
+    """Interactive shell"""
     active = state
     while active:
         print("===START===")
@@ -689,4 +692,4 @@ def main(state):
 # print(bug)
 
 if __name__ == '__main__':
-    main(0)
+    main(1)
