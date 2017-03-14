@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Python 3.5.2
+"""Python 3.6.0
 Chemistry Calculator (2016-2017)
 Functionality:
     - relative formula mass (Mr), percentage by mass, empirical formula, number of moles, mass calculation
@@ -619,6 +619,7 @@ class Alkane:
         """Initialize an alkane according to the input size"""
         self.size = size
         self.name = ["meth", "eth", "prop", "but", "pent", "hex"][size - 1] + "ane"
+        self.molecular_formula = f"C{self.size}H{2 * self.size + 2}"
 
     def __str__(self) -> str:
         """Return lewis structure of the alkane"""
@@ -685,7 +686,8 @@ def main(state):
         print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
         # Debugging 2 - oxidation number (expected: LI +1; Al -5; H +1)
         print(calculate_oxidation(process_formula("LiAlH4 ^ ", signed=True), return_string=True))
-        print(Alkane(3).calculate_isomer_numbers())
+        # Debugging 3 - hexane number of isomers (expected: 5)
+        print(Alkane(6).calculate_isomer_numbers())
 
 # TODO: resolve bugs:
 # bug = get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})  # returns K7I7O20 instead of KIO3
