@@ -200,8 +200,8 @@ def process_formula(str_in: str, signed=False) -> dict:
             else:
                 return {}
             quantity = get_quantity(end, str_in)
-            if end in quantity_ratio:
-                quantity *= quantity_ratio[end]
+            if index in quantity_ratio:
+                quantity *= quantity_ratio[index]
             add_to_dict(element, quantity, dict_out)
         index += 1
     return dict_out
@@ -378,6 +378,7 @@ def process_and_balance_equation(equation: str) -> str:
             matrix.assign_new_value(i, j, sign * atom_count)
     # print(matrix)
     solution = matrix.solve(homogeneous=True, integer_minimal=True)
+
     # print(solution)
 
     def format_string(index, molecule_string):
@@ -555,7 +556,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
                 dict_out['H'] = 1
                 other_elements = dict_processing.keys() - {'H'}
                 if len(other_elements) == 1:
-                    (other_element, ) = other_elements
+                    (other_element,) = other_elements
                     if other_element not in non_metals:  # directly bonded with metals
                         dict_out['H'] = -1
                 sign -= dict_out['H'] * quantity
@@ -581,7 +582,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
                 continue
             # break loop prematurely if process is finished
             if len(dict_processing) == len(dict_out) + 1:
-                (other_element, ) = dict_processing.keys() - dict_out.keys()
+                (other_element,) = dict_processing.keys() - dict_out.keys()
                 dict_out[other_element] = fractions.Fraction(sign, dict_processing[other_element])
                 break
         else:
@@ -590,7 +591,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
                 dict_out['O'] = -2
                 sign -= (-2) * dict_processing['O']
                 if len(remaining) == 2:
-                    (other_element, ) = remaining - dict_out.keys()
+                    (other_element,) = remaining - dict_out.keys()
                     dict_out[other_element] = fractions.Fraction(sign, dict_processing[other_element])
 
     def match_str_with_charge(to_match):
@@ -618,21 +619,35 @@ class Alkane:
     def __init__(self, size):
         """Initialize an alkane according to the input size"""
         self.size = size
-        self.name = ["meth", "eth", "prop", "but", "pent", "hex"][size - 1] + "ane"
+        self.name = (["meth", "eth", "prop", "but", "pent", "hex"][size - 1] if size <= 6 else str(size)) + "ane"
         self.molecular_formula = f"C{self.size}H{2 * self.size + 2}"
 
     def __str__(self) -> str:
-        """Return lewis structure of the alkane"""
-        structure = [" " + "   H" * self.size, " " + "   |" * self.size,
-                     "H" + " - C" * self.size + " - H", " " + "   |" * self.size, " " + "   H" * self.size]
-        return self.name + '\n' + '\n'.join(structure)
+        """Return information on the alkane"""
+        return """name: {}
+molecular_formula: {}
+number of isomers: {}
+lewis structure:
+{}""".format(self.name, self.molecular_formula, self.isomers(), self.lewis())
 
-    def calculate_isomer_numbers(self) -> int:
-        """Return the number of total possible configurations of the isomer of the alkane"""
+    def isomers(self):
+        """Return the number of different structural isomers of the alkane"""
+        if self.size <= 2:
+            count = 1
+        else:
+            count = sum([partition(self.size - 2, k + 1) for k in range(self.size - 2)])
         '''the number of partitions of n into k non-negative (including zero) parts is
         equivalent to number of partitions of n + k into k non-zero parts
         where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)'''
-        return sum([partition(self.size - 2, s + 1) for s in range(self.size - 2)]) if self.size > 2 else 1
+        return count
+
+    def lewis(self):
+        """Draw lewis structure of the basic alkane"""
+        return '\n'.join([" " + "   H" * self.size,
+                          " " + "   |" * self.size,
+                          "H" + " - C" * self.size + " - H",
+                          " " + "   |" * self.size,
+                          " " + "   H" * self.size])  # looks quite pleasing ey?
 
 
 def partition(n, k):
@@ -654,6 +669,11 @@ def main(state):
         start = time.process_time()
         if '->' in formula:
             print(process_and_balance_equation(formula))
+        elif "alkane" in formula.lower():
+            formula = formula.replace(" ", "")
+            size = int(formula.split(":")[1])
+            alkane = Alkane(size)
+            print(alkane)
         elif formula:
             ion_signed = "^" in formula  # "^" denotes the presence of a sign
             formula_processed = process_formula(formula, signed=ion_signed)
@@ -686,8 +706,9 @@ def main(state):
         print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
         # Debugging 2 - oxidation number (expected: LI +1; Al -5; H +1)
         print(calculate_oxidation(process_formula("LiAlH4 ^ ", signed=True), return_string=True))
-        # Debugging 3 - hexane number of isomers (expected: 5)
-        print(Alkane(6).calculate_isomer_numbers())
+        # Debugging 3 - alkane inspection: hexane (expected: C6H14, 5, and lewis structures)
+        print(Alkane(6))
+
 
 # TODO: resolve bugs:
 # bug = get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})  # returns K7I7O20 instead of KIO3
