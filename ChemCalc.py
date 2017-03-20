@@ -13,7 +13,7 @@ import fractions
 import functools
 import time
 
-atoms = {
+relative_atomic_mass = {
     'H': 1.01,
     'He': 4.00,
     'Li': 6.94,
@@ -155,14 +155,14 @@ def get_quantity(num_index: int, str_in: str) -> int:
     return quantity
 
 
-def process_formula(str_in: str, signed=False) -> dict:
+def process_formula(str_in: str) -> dict:
     """Process string formula to dictionary containing atom and corresponding quantity.
     i.e. process_formula('(KI)3O') = {'K': 3, 'I': 3, 'O': 1}"""
     dict_out = {}
     quantity_ratio = {}  # handling parenthesises
     index = 0
     str_in = str_in.replace(" ", '')
-    if signed:
+    if "^" in str_in:
         str_in, sign = str_in.split("^")
         if len(sign):
             if sign[-1] == "+":
@@ -175,9 +175,10 @@ def process_formula(str_in: str, signed=False) -> dict:
                 dict_out["sign"] = charge * int(sign[:-1])
             else:
                 dict_out["sign"] = charge
-
         else:
             dict_out["sign"] = 0
+    else:
+        dict_out["sign"] = 0
     while index < len(str_in):
         char = str_in[index]
         if char == '(':
@@ -193,9 +194,9 @@ def process_formula(str_in: str, signed=False) -> dict:
             while end < len(str_in) and str_in[end] in string.ascii_lowercase:
                 end += 1
             atom_alt = str_in[index:end]
-            if atom_alt in atoms:
+            if atom_alt in relative_atomic_mass:
                 element = atom_alt
-            elif char in atoms:
+            elif char in relative_atomic_mass:
                 element = char
             else:
                 return {}
@@ -219,8 +220,7 @@ def mr_calc(dict_in: dict) -> float:
     """Calculate relative formula mass for dictionary input processed by function process_formula."""
     out = 0
     for element, quantity in dict_in.items():
-        if element != "sign":
-            out += atoms[element] * quantity
+        out += relative_atomic_mass[element] * quantity if element != "sign" else 0
     return out
 
 
@@ -247,10 +247,12 @@ def get_ratio(dict_in: dict) -> dict:
     dict_processing = {}
     dict_out = {}
     for elem, ele_weight in dict_in.items():
-        dict_processing[elem] = ele_weight / atoms[elem]
+        dict_processing[elem] = ele_weight / relative_atomic_mass[elem]
         dict_processing[elem] = fractions.Fraction(dict_processing[elem]).limit_denominator(16)
         if dict_processing[elem] == 0:
-            dict_processing[elem] = fractions.Fraction(ele_weight / atoms[elem] * 10).limit_denominator(16)
+            dict_processing[elem] = fractions.Fraction(
+                ele_weight / relative_atomic_mass[elem] * 10
+            ).limit_denominator(16)
     denominators = [_.denominator for _ in dict_processing.values()]
     multiple = lcm_multiple(denominators)
     modelling = False
@@ -313,7 +315,7 @@ def smart_calculate(dict_in: dict, details: str) -> str:
             mol = eval(value)
         elif formula_property == "oxidation":
             oxidation = value
-    if element is not None and (element in atoms.keys() or element == '*'):
+    if element is not None and (element in relative_atomic_mass.keys() or element == '*'):
         if element == '*':
             elements = dict_in.keys()
         else:
@@ -376,10 +378,10 @@ def process_and_balance_equation(equation: str) -> str:
             else:
                 products_list_copy.remove(molecule)
             matrix.assign_new_value(i, j, sign * atom_count)
-    # print(matrix)
     solution = matrix.solve(homogeneous=True, integer_minimal=True)
 
-    # print(solution)
+    if all(entry == 0 for entry in solution):  # trivial solution: infeasible reaction
+        return error_messages[2]
 
     def format_string(index, molecule_string):
         return "{} {}".format(
@@ -538,9 +540,6 @@ class Matrix:
 def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
     """Return the oxidation number of all elements in the input dictionary
     'Bear in mind: this is merely a model'  - Mr. Osler"""
-    if not dict_in or "sign" not in dict_in:  # handling null
-        return "Error: symbol '^' denoting charge is missing"
-
     sign = dict_in["sign"]
     dict_processing = dict_in
     dict_out = {}
@@ -587,7 +586,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
                 break
         else:
             remaining = dict_processing.keys() - dict_out.keys()
-            if 'O' in remaining:  # TODO: fix potential bugs
+            if 'O' in remaining:
                 dict_out['O'] = -2
                 sign -= (-2) * dict_processing['O']
                 if len(remaining) == 2:
@@ -671,12 +670,14 @@ def main(state):
             print(process_and_balance_equation(formula))
         elif "alkane" in formula.lower():
             formula = formula.replace(" ", "")
-            size = int(formula.split(":")[1])
-            alkane = Alkane(size)
-            print(alkane)
+            if ":" not in formula:
+                print("expected input format: 'Alkane: <size>'")
+            else:
+                size = int(formula.split(":")[1])
+                alkane = Alkane(size)
+                print(alkane)
         elif formula:
-            ion_signed = "^" in formula  # "^" denotes the presence of a sign
-            formula_processed = process_formula(formula, signed=ion_signed)
+            formula_processed = process_formula(formula)
             option = input("Enter all known details in this format:\n"
                            "element: <element>; mass: <mass>\n"
                            "Available arguments: element, mass, mol, oxidation\n"
@@ -690,7 +691,7 @@ def main(state):
                 ele = input("Element: ")
                 if ele == '':
                     break
-                weight = input(ele + " (" + str(atoms[ele]) + "): ")
+                weight = input(ele + " (" + str(relative_atomic_mass[ele]) + "): ")
                 elements[ele] = eval(weight)
             start = time.process_time()
             result = get_ratio(elements)
@@ -704,8 +705,8 @@ def main(state):
     else:
         # Debugging 1 - balancing equation (expected: CH4 + 2 O2 ->  CO2 + 2 H2O)
         print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
-        # Debugging 2 - oxidation number (expected: LI +1; Al -5; H +1)
-        print(calculate_oxidation(process_formula("LiAlH4 ^ ", signed=True), return_string=True))
+        # Debugging 2 - oxidation number (expected: Li +1; Al -5; H +1)
+        print(calculate_oxidation(process_formula("LiAlH4 ^ "), return_string=True))
         # Debugging 3 - alkane inspection: hexane (expected: C6H14, 5, and lewis structures)
         print(Alkane(6))
 
