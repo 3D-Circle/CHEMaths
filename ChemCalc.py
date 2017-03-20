@@ -139,7 +139,7 @@ halogens = ['F', 'Cl', 'Br', 'I', 'At']
 non_metals = ['H', 'He', 'C', 'N', 'O', 'F', 'Ne', 'P', 'S', 'Cl', 'Ar', 'Se', 'Br', 'Kr', 'I', 'Xe', 'Rn']
 
 
-def get_quantity(num_index: int, str_in: str) -> int:
+def get_quantity(num_index, str_in):
     """Used in function process_formula to get quantity of atom from string input."""
     quantity = []
     while num_index < len(str_in):
@@ -155,11 +155,11 @@ def get_quantity(num_index: int, str_in: str) -> int:
     return quantity
 
 
-def process_formula(str_in: str) -> dict:
+def process_formula(str_in):
     """Process string formula to dictionary containing atom and corresponding quantity.
     i.e. process_formula('(KI)3O') = {'K': 3, 'I': 3, 'O': 1}"""
     dict_out = {}
-    quantity_ratio = {}  # handling parenthesises
+    quantity_ratio = {}  # handling parentheses
     index = 0
     str_in = str_in.replace(" ", '')
     if "^" in str_in:
@@ -208,7 +208,7 @@ def process_formula(str_in: str) -> dict:
     return dict_out
 
 
-def add_to_dict(new_item: str, new_value: int, target_dict: dict):
+def add_to_dict(new_item, new_value, target_dict):
     """Used in process_formula to get correct quantity of atoms."""
     if new_item not in target_dict:
         target_dict[new_item] = new_value
@@ -216,7 +216,7 @@ def add_to_dict(new_item: str, new_value: int, target_dict: dict):
         target_dict[new_item] += new_value
 
 
-def mr_calc(dict_in: dict) -> float:
+def mr_calc(dict_in):
     """Calculate relative formula mass for dictionary input processed by function process_formula."""
     out = 0
     for element, quantity in dict_in.items():
@@ -224,7 +224,7 @@ def mr_calc(dict_in: dict) -> float:
     return out
 
 
-def percentage_calc(element: str, dict_in: dict) -> float:
+def percentage_calc(element, dict_in):
     """Calculate the percentage by mass of an element in the compound. """
     element_mass = mr_calc({element: dict_in[element]})
     total_mass = mr_calc(dict_in)
@@ -232,17 +232,17 @@ def percentage_calc(element: str, dict_in: dict) -> float:
     return round(percentage, 6)
 
 
-def get_mass(rel_mass: float, num_mole: float) -> float:
+def get_mass(rel_mass, num_mole):
     """Calculate mass of compound given its relative formula mass and number of moles."""
     return round(num_mole * rel_mass, 6)
 
 
-def get_mole(rel_mass: float, mass: float) -> float:
+def get_mole(rel_mass, mass):
     """Calculate number of moles of compound given its relative formula mass and mass."""
     return round(mass / rel_mass, 6)
 
 
-def get_ratio(dict_in: dict) -> dict:
+def get_ratio(dict_in):
     """Calculate empirical formula of a compound given its atoms' mass or percentage of mass in the compound."""
     dict_processing = {}
     dict_out = {}
@@ -271,17 +271,17 @@ def get_ratio(dict_in: dict) -> dict:
     return dict_out
 
 
-def lcm(a: int, b: int) -> int:
+def lcm(a, b):
     """Return lowest common multiple."""
     return a * b // math.gcd(a, b)
 
 
-def gcd_multiple(list_in: list) -> int:
+def gcd_multiple(list_in):
     """Return greatest common divisor of integers in list_in."""
     return functools.reduce(math.gcd, list_in)
 
 
-def lcm_multiple(list_in: list) -> int:
+def lcm_multiple(list_in):
     """Return lowest common multiple of integers in list_in."""
     return functools.reduce(lcm, list_in)
 
@@ -296,7 +296,7 @@ def get_inversion(iterable):
     return total
 
 
-def smart_calculate(dict_in: dict, details: str) -> str:
+def smart_calculate(dict_in, details):
     """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
     out_msg = ["Mr = {}".format(str(mr))]
@@ -340,7 +340,7 @@ def smart_calculate(dict_in: dict, details: str) -> str:
     return '\n'.join(out_msg)
 
 
-def process_and_balance_equation(equation: str) -> str:
+def process_and_balance_equation(equation):
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
     error_messages = ["Invalid syntax: no '->' found",
@@ -396,12 +396,12 @@ def process_and_balance_equation(equation: str) -> str:
 
 
 class Matrix:
-    def __init__(self, m: int, n: int):
+    def __init__(self, m, n):
         """Initiate a m*n zero matrix"""
         self.matrix = [[0] * n for _ in range(m)]
         self.size = [m, n]
 
-    def __str__(self) -> str:
+    def __str__(self):
         """String representation of a matrix"""
         return "[\n" + '\n'.join(['  ' + ' '.join([str(num) for num in row]) for row in self.matrix]) + "\n]"
 
@@ -411,7 +411,7 @@ class Matrix:
         A.matrix = [row.copy() for row in self.matrix]
         return A
 
-    def assign_new_value(self, i: int, j: int, value):
+    def assign_new_value(self, i, j, value):
         """Assign value to position (i, j) in the matrix"""
         self.matrix[i][j] = value
 
@@ -537,7 +537,7 @@ class Matrix:
                 return solution_lists
 
 
-def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
+def calculate_oxidation(dict_in, return_string=False, return_type='*'):
     """Return the oxidation number of all elements in the input dictionary
     'Bear in mind: this is merely a model'  - Mr. Osler"""
     sign = dict_in["sign"]
@@ -621,7 +621,7 @@ class Alkane:
         self.name = (["meth", "eth", "prop", "but", "pent", "hex"][size - 1] if size <= 6 else str(size)) + "ane"
         self.molecular_formula = f"C{self.size}H{2 * self.size + 2}"
 
-    def __str__(self) -> str:
+    def __str__(self):
         """Return information on the alkane"""
         return """name: {}
 molecular_formula: {}
