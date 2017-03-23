@@ -14,6 +14,7 @@ import functools
 import time
 
 relative_atomic_mass = {
+    'e': 0,
     'H': 1.01,
     'He': 4.00,
     'Li': 6.94,
@@ -139,7 +140,7 @@ halogens = ['F', 'Cl', 'Br', 'I', 'At']
 non_metals = ['H', 'He', 'C', 'N', 'O', 'F', 'Ne', 'P', 'S', 'Cl', 'Ar', 'Se', 'Br', 'Kr', 'I', 'Xe', 'Rn']
 
 
-def get_quantity(num_index, str_in):
+def get_quantity(num_index: int, str_in: str) -> int:
     """Used in function process_formula to get quantity of atom from string input."""
     quantity = []
     while num_index < len(str_in):
@@ -155,11 +156,11 @@ def get_quantity(num_index, str_in):
     return quantity
 
 
-def process_formula(str_in):
+def process_formula(str_in: str) -> dict:
     """Process string formula to dictionary containing atom and corresponding quantity.
     i.e. process_formula('(KI)3O') = {'K': 3, 'I': 3, 'O': 1}"""
     dict_out = {}
-    quantity_ratio = {}  # handling parentheses
+    quantity_ratio = {}  # handling parenthesises
     index = 0
     str_in = str_in.replace(" ", '')
     if "^" in str_in:
@@ -208,7 +209,7 @@ def process_formula(str_in):
     return dict_out
 
 
-def add_to_dict(new_item, new_value, target_dict):
+def add_to_dict(new_item: str, new_value: int, target_dict: dict):
     """Used in process_formula to get correct quantity of atoms."""
     if new_item not in target_dict:
         target_dict[new_item] = new_value
@@ -216,7 +217,7 @@ def add_to_dict(new_item, new_value, target_dict):
         target_dict[new_item] += new_value
 
 
-def mr_calc(dict_in):
+def mr_calc(dict_in: dict) -> float:
     """Calculate relative formula mass for dictionary input processed by function process_formula."""
     out = 0
     for element, quantity in dict_in.items():
@@ -224,7 +225,7 @@ def mr_calc(dict_in):
     return out
 
 
-def percentage_calc(element, dict_in):
+def percentage_calc(element: str, dict_in: dict) -> float:
     """Calculate the percentage by mass of an element in the compound. """
     element_mass = mr_calc({element: dict_in[element]})
     total_mass = mr_calc(dict_in)
@@ -232,18 +233,19 @@ def percentage_calc(element, dict_in):
     return round(percentage, 6)
 
 
-def get_mass(rel_mass, num_mole):
+def get_mass(rel_mass: float, num_mole: float) -> float:
     """Calculate mass of compound given its relative formula mass and number of moles."""
     return round(num_mole * rel_mass, 6)
 
 
-def get_mole(rel_mass, mass):
+def get_mole(rel_mass: float, mass: float) -> float:
     """Calculate number of moles of compound given its relative formula mass and mass."""
     return round(mass / rel_mass, 6)
 
 
-def get_ratio(dict_in):
+def get_ratio(dict_in: dict) -> dict:
     """Calculate empirical formula of a compound given its atoms' mass or percentage of mass in the compound."""
+    # TODO: resolve bug
     dict_processing = {}
     dict_out = {}
     for elem, ele_weight in dict_in.items():
@@ -271,22 +273,22 @@ def get_ratio(dict_in):
     return dict_out
 
 
-def lcm(a, b):
+def lcm(a: int, b: int) -> int:
     """Return lowest common multiple."""
     return a * b // math.gcd(a, b)
 
 
-def gcd_multiple(list_in):
+def gcd_multiple(list_in: list) -> int:
     """Return greatest common divisor of integers in list_in."""
     return functools.reduce(math.gcd, list_in)
 
 
-def lcm_multiple(list_in):
+def lcm_multiple(list_in: list) -> int:
     """Return lowest common multiple of integers in list_in."""
     return functools.reduce(lcm, list_in)
 
 
-def get_inversion(iterable):
+def get_inversion(iterable: iter) -> int:
     number_list = iterable
     total = 0
     for index, number in enumerate(number_list):
@@ -296,7 +298,7 @@ def get_inversion(iterable):
     return total
 
 
-def smart_calculate(dict_in, details):
+def smart_calculate(dict_in: dict, details: str) -> str:
     """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
     out_msg = ["Mr = {}".format(str(mr))]
@@ -340,17 +342,17 @@ def smart_calculate(dict_in, details):
     return '\n'.join(out_msg)
 
 
-def process_and_balance_equation(equation):
+def process_and_balance_equation(equation: str) -> str:
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
     error_messages = ["Invalid syntax: no '->' found",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
-    equation = equation.replace(' ', '')
+    # equation = equation.replace(' ', '')
     equation_split = equation.split('->')
     if len(equation_split) != 2:
         return error_messages[0]
-    reactants, products = [sum_atoms.split('+') for sum_atoms in equation_split]
+    reactants, products = [sum_atoms.split(' + ') for sum_atoms in equation_split]
     if len(reactants) == 0 or len(products) == 0:
         return error_messages[1]
     reactants_list = [process_formula(reactant) for reactant in reactants]
@@ -380,10 +382,11 @@ def process_and_balance_equation(equation):
             matrix.assign_new_value(i, j, sign * atom_count)
     solution = matrix.solve(homogeneous=True, integer_minimal=True)
 
-    if all(entry == 0 for entry in solution):  # trivial solution: infeasible reaction
+    # trivial solution: infeasible reaction
+    if all(entry == 0 for entry in solution) or any(entry < 0 for entry in solution):
         return error_messages[2]
 
-    def format_string(index, molecule_string):
+    def format_string(index: int, molecule_string: str) -> str:
         return "{} {}".format(
             str(solution[index] if solution[index] != 1 else ""), molecule_string if solution[index] != 0 else ""
         )
@@ -396,12 +399,12 @@ def process_and_balance_equation(equation):
 
 
 class Matrix:
-    def __init__(self, m, n):
+    def __init__(self, m: int, n: int):
         """Initiate a m*n zero matrix"""
         self.matrix = [[0] * n for _ in range(m)]
         self.size = [m, n]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation of a matrix"""
         return "[\n" + '\n'.join(['  ' + ' '.join([str(num) for num in row]) for row in self.matrix]) + "\n]"
 
@@ -411,16 +414,16 @@ class Matrix:
         A.matrix = [row.copy() for row in self.matrix]
         return A
 
-    def assign_new_value(self, i, j, value):
+    def assign_new_value(self, i: int, j: int, value):
         """Assign value to position (i, j) in the matrix"""
         self.matrix[i][j] = value
 
-    def swap_rows(self, row_index1, row_index2):
+    def swap_rows(self, row_index1: int, row_index2: int):
         """Elementary row operation:
         Swap two rows inside a matrix"""
         self.matrix[row_index1], self.matrix[row_index2] = self.matrix[row_index2], self.matrix[row_index1]
 
-    def multiply_row(self, row_index, constant):
+    def multiply_row(self, row_index: int, constant):
         """Elementary row operation:
         Multiply a row in the matrix by a non-zero constant"""
         if constant != 0:
@@ -428,7 +431,7 @@ class Matrix:
             for col_index in range(self.size[1]):
                 row[col_index] *= constant
 
-    def add_row(self, row_index, row_to_add_index, coefficient=1):
+    def add_row(self, row_index: int, row_to_add_index: int, coefficient=1):
         """Elementary row operation:
         Add a multiple of a row to another row in the matrix"""
         for col_index in range(self.size[1]):
@@ -495,7 +498,7 @@ class Matrix:
         else:
             return
 
-    def rank(self, pre_processed=None):
+    def rank(self, pre_processed=None) -> int:
         """Returns the rank of this matrix
         after reducing the matrix to reduced row echelon form"""
         if not pre_processed:
@@ -537,7 +540,7 @@ class Matrix:
                 return solution_lists
 
 
-def calculate_oxidation(dict_in, return_string=False, return_type='*'):
+def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
     """Return the oxidation number of all elements in the input dictionary
     'Bear in mind: this is merely a model'  - Mr. Osler"""
     sign = dict_in["sign"]
@@ -621,7 +624,7 @@ class Alkane:
         self.name = (["meth", "eth", "prop", "but", "pent", "hex"][size - 1] if size <= 6 else str(size)) + "ane"
         self.molecular_formula = f"C{self.size}H{2 * self.size + 2}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return information on the alkane"""
         return """name: {}
 molecular_formula: {}
@@ -629,7 +632,7 @@ number of isomers: {}
 lewis structure:
 {}""".format(self.name, self.molecular_formula, self.isomers(), self.lewis())
 
-    def isomers(self):
+    def isomers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
         if self.size <= 2:
             count = 1
@@ -640,7 +643,7 @@ lewis structure:
         where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)'''
         return count
 
-    def lewis(self):
+    def lewis(self) -> str:
         """Draw lewis structure of the basic alkane"""
         return '\n'.join([" " + "   H" * self.size,
                           " " + "   |" * self.size,
@@ -649,7 +652,7 @@ lewis structure:
                           " " + "   H" * self.size])  # looks quite pleasing ey?
 
 
-def partition(n, k):
+def partition(n, k) -> int:
     """return number of partitions of integer n into k strictly positive parts"""
     if n == k:
         return 1
@@ -659,7 +662,7 @@ def partition(n, k):
         return partition(n - k, k) + partition(n - 1, k - 1)
 
 
-def main(state):
+def launch_shell(state):
     """Interactive shell"""
     active = state
     while active:
@@ -703,6 +706,8 @@ def main(state):
         time_taken = round(time_end - start, 6)
         print("===END:", time_taken, "seconds===\n")
     else:
+        # Debugging 0 - balancing equation with charge
+        print(process_and_balance_equation("MnO4^- + Fe^2+ + H^+ -> Mn^2+ + Fe^3+ + H2O"))
         # Debugging 1 - balancing equation (expected: CH4 + 2 O2 ->  CO2 + 2 H2O)
         print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
         # Debugging 2 - oxidation number (expected: Li +1; Al -5; H +1)
@@ -716,4 +721,4 @@ def main(state):
 # print(bug)
 
 if __name__ == '__main__':
-    main(1)
+    launch_shell(True)

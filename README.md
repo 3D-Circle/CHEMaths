@@ -1,6 +1,32 @@
 # ChemCalc
 **Chem**istry **Calc**ulator for high school level
 
+## How to use
+0. If you haven't already, download _python 3.6_ from [Python.org](https://www.python.org/downloads/release/python-360/)
+1. Open **Terminal** or **command lines** (depending on your OS)
+2. `cd` to the location of this folder  
+   for example, if you put the folder on your desktop, type:  
+    ```sh
+    cd Desktop/ChemCalc
+    ```
+3. There are two possible ways to use **ChemCalc**: 
+   - through an `interactive shell` (_text console_):
+   ```sh
+   python ChemCalc.py
+   ```  
+   - through a `GUI` (_graphical user interface_):
+    ```sh
+    pip install -r requirements.txt
+    python ChemCalc_GUI.py
+    ```
+    [PyQt5](https://riverbankcomputing.com/software/pyqt/) and [Matplotlib](http://matplotlib.org/)
+    are needed to activate the graphical user interface.
+    The commands above will install these packages for you, 
+    and might ask you to enter your password.  
+    Running the program for the first time will take some time
+    to set everything up.
+     
+  
 ## Functionality:
 ### Interactive shell
 `main(state)`

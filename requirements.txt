@@ -1,0 +1,2 @@
+matplotlib
+PyQt5==5.8.1
