@@ -157,6 +157,7 @@ def get_quantity(num_index: int, str_in: str) -> int:
 
 
 def process_formula(str_in: str) -> dict:
+    # TODO: redesign parser
     """Process string formula to dictionary containing atom and corresponding quantity.
     i.e. process_formula('(KI)3O') = {'K': 3, 'I': 3, 'O': 1}"""
     dict_out = {}
@@ -706,19 +707,21 @@ def launch_shell(state):
         time_taken = round(time_end - start, 6)
         print("===END:", time_taken, "seconds===\n")
     else:
-        # Debugging 0 - balancing equation with charge
+        # ---Debugging 1 - balancing equation with charge
+        # expected: MnO4^- + 5 Fe^2+ + 8 H^+ -> Mn^2+ + 5 Fe^3+ + 4 H2O
         print(process_and_balance_equation("MnO4^- + Fe^2+ + H^+ -> Mn^2+ + Fe^3+ + H2O"))
-        # Debugging 1 - balancing equation (expected: CH4 + 2 O2 ->  CO2 + 2 H2O)
+        # ---Debugging 2 - balancing equation
+        # expected: CH4 + 2 O2 ->  CO2 + 2 H2O
         print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
-        # Debugging 2 - oxidation number (expected: Li +1; Al -5; H +1)
+        # ---Debugging 3 - oxidation number
+        # expected: Li +1; Al -5; H +1
         print(calculate_oxidation(process_formula("LiAlH4 ^ "), return_string=True))
-        # Debugging 3 - alkane inspection: hexane (expected: C6H14, 5, and lewis structures)
+        # ---Debugging 4 - alkane inspection: hexane
+        # expected: C6H14, 5, and lewis structures
         print(Alkane(6))
+        # ---Debugging 5 - determine empirical formula
+        print(get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}))
 
-
-# TODO: resolve bugs:
-# bug = get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})  # returns K7I7O20 instead of KIO3
-# print(bug)
 
 if __name__ == '__main__':
-    launch_shell(True)
+    launch_shell(False)

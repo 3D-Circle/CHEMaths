@@ -1,5 +1,5 @@
-# ChemCalc
-**Chem**istry **Calc**ulator for high school level
+# CHEMaths
+Chemistry Calculator for high school level
 
 ## How to use
 0. If you haven't already, download _python 3.6_ from [Python.org](https://www.python.org/downloads/release/python-360/)
@@ -7,19 +7,19 @@
 2. `cd` to the location of this folder  
    for example, if you put the folder on your desktop, type:  
     ```sh
-    cd Desktop/ChemCalc
+    cd Desktop/CHEMaths
     ```
-3. There are two possible ways to use **ChemCalc**: 
+3. There are two possible ways to use **CHEMaths**: 
    - through an `interactive shell` (_text console_):
    ```sh
-   python ChemCalc.py
+   python CHEMaths.py
    ```  
    - through a `GUI` (_graphical user interface_):
     ```sh
     pip install -r requirements.txt
-    python ChemCalc_GUI.py
+    python CHEMaths_GUI.py
     ```
-    [PyQt5](https://riverbankcomputing.com/software/pyqt/) and [Matplotlib](http://matplotlib.org/)
+    [PyQt5](https://riverbankcomputing.com/software/pyqt/) and [Sympy](https://www.sympy.org/)
     are needed to activate the graphical user interface.
     The commands above will install these packages for you, 
     and might ask you to enter your password.  
@@ -27,9 +27,11 @@
     to set everything up.
      
   
-## Functionality:
+## Functionality (_CHEMaths.py_):
 ### Interactive shell
-`main(state)`
+`lauch_shell(state)`  
+where the shell is activated if state evaluates to `True`  
+and prints out debugging information otherwise
 
 - interactive shell
 - example (user input is *H2 + O2 -> H2O*):
@@ -39,6 +41,7 @@
 		Enter a formula or equation to balance (enter if you don't): H2 + O2 -> H2O
 		2 H2 +  O2 -> 2 H2O
 		===END: 0.000621 seconds===
+
 ### process chemical formula
 `process_formula(str_in)`  
 

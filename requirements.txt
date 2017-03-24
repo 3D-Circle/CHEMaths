@@ -1,2 +1,2 @@
-matplotlib
 PyQt5==5.8.1
+sympy==1.0
