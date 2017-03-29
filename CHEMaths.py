@@ -12,132 +12,15 @@ import string
 import fractions
 import functools
 import time
+import json
 
-relative_atomic_mass = {
-    'e': 0,
-    'H': 1.01,
-    'He': 4.00,
-    'Li': 6.94,
-    'Be': 9.01,
-    'B': 10.81,
-    'C': 12.01,
-    'N': 14.01,
-    'O': 16.00,
-    'F': 19.00,
-    'Ne': 20.18,
-    'Na': 22.99,
-    'Mg': 24.31,
-    'Al': 26.98,
-    'Si': 28.09,
-    'P': 30.97,
-    'S': 32.07,
-    'Cl': 35.45,
-    'Ar': 39.95,
-    'K': 39.10,
-    'Ca': 40.08,
-    'Sc': 44.96,
-    'Ti': 47.78,
-    'V': 50.94,
-    'Cr': 52.00,
-    'Mn': 54.94,
-    'Fe': 55.85,
-    'Co': 58.93,
-    'Ni': 58.69,
-    'Cu': 63.55,
-    'Zn': 65.38,
-    'Ga': 69.72,
-    'Ge': 72.63,
-    'As': 74.92,
-    'Se': 78.92,
-    'Br': 79.90,
-    'Kr': 83.90,
-    'Rb': 85.47,
-    'Sr': 87.62,
-    'Y': 88.91,
-    'Zr': 91.22,
-    'Nb': 92.91,
-    'Mo': 95.96,
-    'Tc': 98,  # (98)
-    'Ru': 101.07,
-    'Rh': 106.42,
-    'Pd': 106.42,
-    'Ag': 107.87,
-    'Cd': 112.41,
-    'In': 114.82,
-    'Sn': 118.71,
-    'Sb': 121.76,
-    'Te': 127.60,
-    'I': 126.90,
-    'Xe': 131.29,
-    'Cs': 132.91,
-    'Ba': 137.33,
-    'La': 138.91,
-    'Ce': 140.12,
-    'Pr': 140.91,
-    'Nd': 144.24,
-    'Pm': 145,  # (145)
-    'Sm': 150.36,
-    'Eu': 151.96,
-    'Gd': 157.25,
-    'Tb': 158.93,
-    'Dy': 162.50,
-    'Ho': 164.93,
-    'Er': 167.26,
-    'Tm': 168.93,
-    'Yb': 173.05,
-    'Lu': 174.97,
-    'Hf': 178.49,
-    'Ta': 180.95,
-    'W': 183.84,
-    'Re': 186.21,
-    'Os': 190.23,
-    'Ir': 192.22,
-    'Pt': 195.08,
-    'Au': 196.97,
-    'Hg': 200.59,
-    'Tl': 204.38,
-    'Pb': 207.20,
-    'Bi': 208.98,
-    'Po': 209,  # (209)
-    'At': 210,  # (210)
-    'Rn': 222,  # (222)
-    'Fr': 223,  # (223)
-    'Ra': 226,  # (226)
-    'Ac': 227,  # (227)
-    'Th': 232.04,
-    'Pa': 231.04,
-    'U': 238.03,
-    'Np': 237,  # (237)
-    'Pu': 244,  # (244)
-    'Am': 243,  # (243)
-    'Cm': 247,  # (247)
-    'Bk': 247,  # (247)
-    'Cf': 251,  # (251)
-    'Es': 252,  # (252)
-    'Fm': 257,  # (257)
-    'Md': 258,  # (258)
-    'No': 259,  # (259)
-    'Lr': 262,  # (262)
-    'Rf': 267,  # (267)
-    'Db': 268,  # (268)
-    'Sg': 269,  # (269)
-    'Bh': 270,  # (270)
-    'Hs': 269,  # (269)
-    'Mt': 278,  # (262)
-    'Ds': 281,  # (281)
-    'Rg': 281,  # (281)
-    'Cn': 285,  # (285)
-    'Uut': 286,  # (286)
-    'Uuq': 289,  # (289)
-    'Uup': 288,  # (288)
-    'Uuh': 293,  # (293)
-    'Uus': 294,  # (294)
-    'Uuo': 294  # (294)
-}
-alkali_metals = ['Li', 'Na', 'K', 'Rb', 'Cs', 'Fr']
-alkali_earth_metals = ['Be', 'Mg', 'Ca', 'Sr', 'Ba', 'Ra']
-halogens = ['F', 'Cl', 'Br', 'I', 'At']
-non_metals = ['H', 'He', 'C', 'N', 'O', 'F', 'Ne', 'P', 'S', 'Cl', 'Ar', 'Se', 'Br', 'Kr', 'I', 'Xe', 'Rn']
+with open("src/data.json") as data:
+    data_dict = json.loads(data.read())
+    relative_atomic_mass, alkali_metals, alkali_earth_metals, halogens, non_metals = [
+        data_dict[key] for key in [
+            "relative atomic mass", "alkali metals", "alkali earth metals", "halogens", "non-metals"
+        ]
+    ]
 
 
 def get_quantity(num_index: int, str_in: str) -> int:
@@ -157,7 +40,6 @@ def get_quantity(num_index: int, str_in: str) -> int:
 
 
 def process_formula(str_in: str) -> dict:
-    # TODO: redesign parser
     """Process string formula to dictionary containing atom and corresponding quantity.
     i.e. process_formula('(KI)3O') = {'K': 3, 'I': 3, 'O': 1}"""
     dict_out = {}
@@ -343,7 +225,7 @@ def smart_calculate(dict_in: dict, details: str) -> str:
     return '\n'.join(out_msg)
 
 
-def process_and_balance_equation(equation: str) -> str:
+def process_and_balance_equation(equation: str, parser=process_formula) -> str:
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
     error_messages = ["Invalid syntax: no '->' found",
@@ -356,8 +238,8 @@ def process_and_balance_equation(equation: str) -> str:
     reactants, products = [sum_atoms.split(' + ') for sum_atoms in equation_split]
     if len(reactants) == 0 or len(products) == 0:
         return error_messages[1]
-    reactants_list = [process_formula(reactant) for reactant in reactants]
-    products_list = [process_formula(product) for product in products]
+    reactants_list = [parser(reactant) for reactant in reactants]
+    products_list = [parser(product) for product in products]
     atoms_list_raw = reactants_list + products_list
     atoms_list = []
     for atom_dict in atoms_list_raw:
@@ -650,7 +532,7 @@ lewis structure:
                           " " + "   |" * self.size,
                           "H" + " - C" * self.size + " - H",
                           " " + "   |" * self.size,
-                          " " + "   H" * self.size])  # looks quite pleasing ey?
+                          " " + "   H" * self.size])  # looks quite pleasing ey? :)
 
 
 def partition(n, k) -> int:
@@ -724,4 +606,4 @@ def launch_shell(state):
 
 
 if __name__ == '__main__':
-    launch_shell(False)
+    launch_shell(True)
