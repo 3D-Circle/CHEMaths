@@ -19,11 +19,11 @@ Chemistry Calculator for high school level
     pip install -r requirements.txt
     python CHEMaths_GUI.py
     ```
-    [PyQt5](https://riverbankcomputing.com/software/pyqt/) and [Sympy](https://www.sympy.org/)
-    are needed to activate the graphical user interface.
-    The commands above will install these packages for you, 
-    and might ask you to enter your password.  
-    Running the program for the first time will take some time
+    [PyQt5](https://riverbankcomputing.com/software/pyqt/)
+    is needed to activate the graphical user interface.
+    The commands above will install the package for you, 
+    and might ask you to enter your password for the installation.  
+    Running the program for the first time could take some time
     to set everything up.
      
   
