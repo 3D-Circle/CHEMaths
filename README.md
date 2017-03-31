@@ -14,12 +14,13 @@ Chemistry Calculator for high school level
    ```sh
    python CHEMaths.py
    ```  
-   - through a `GUI` (_graphical user interface_):
+   - through a `website` (_local server_):
     ```sh
     pip install -r requirements.txt
-    python CHEMaths_GUI.py
     ```
-    [PyQt5](https://riverbankcomputing.com/software/pyqt/)
+    and click on CHEMaths.html
+      
+    [Flask]()
     is needed to activate the graphical user interface.
     The commands above will install the package for you, 
     and might ask you to enter your password for the installation.  
