@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>ChemInput</title>
-    <link rel="stylesheet" href="src/MathQuill/mathquill.css"/>
-    <link rel="stylesheet" href="src/ChemInput.css"/>
-    <link rel="shortcut icon" type="image/png" href="src/icon.png"/>
-    <script src="src/jQuery/jquery-3.2.0.js"></script>
-    <script src="src/MathQuill/mathquill.js"></script>
-    <script src="src/ChemInput.js"></script>
+    <link rel="stylesheet" href="/static/MathQuill/mathquill.css"/>
+    <link rel="stylesheet" href="/static/ChemInput.css"/>
+    <link rel="shortcut icon" type="image/png" href="/static/icon.png"/>
+    <script src="/static/jQuery/jquery-3.2.0.js"></script>
+    <script src="/static/MathQuill/mathquill.js"></script>
+    <script src="/static/ChemInput.js"></script>
     </head>
 <body>
-    <center><p id='input'><span></span></p></center>
+    <form action="." method="POST" id="confirm">
+        <center>
+            <p type="text" name="text" id='input'></p>
+            <input type="button" value="enter" id='enter'/>
+        </center>
+    </form>
     
     <center>
         <div class='buttons'>
@@ -23,30 +28,29 @@
         <button id='plus'>+</button>
         <button id='colon'>:</button>
         <button id='semi-colon'>;</button>
-        <button id='confirm'>enter</button>
         </div>
     </center>
     
     <div id="molecule">
-        <div class="label">
+        <div class="status">
             ?
         </div>
     </div>
     
     <div id="equation">
-        <div class="label">
+        <div class="status">
             ->
         </div>
     </div>
     
     <div id="empirical">
-        <div class="label">
+        <div class="status">
             g
         </div>
     </div>
     
     <div id="alkane">
-        <div class="label">
+        <div class="status">
             CH
         </div>
     </div>

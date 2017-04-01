@@ -14,7 +14,7 @@ import functools
 import time
 import json
 
-with open("src/data.json") as data:
+with open("static/data.json") as data:
     data_dict = json.loads(data.read())
     relative_atomic_mass, alkali_metals, alkali_earth_metals, halogens, non_metals = [
         data_dict[key] for key in [

@@ -20,7 +20,7 @@ Chemistry Calculator for high school level
     ```
     and click on CHEMaths.html
       
-    [Flask]()
+    [Flask](http://flask.pocoo.org/)
     is needed to activate the graphical user interface.
     The commands above will install the package for you, 
     and might ask you to enter your password for the installation.  
