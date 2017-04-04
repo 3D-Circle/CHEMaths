@@ -1,32 +1,117 @@
+* {
+    box-sizing: border-box;
+}
+
+/*For you the reader of my code (bonjour Mr Trak),
+Why not make a js for this? 
+Don't forget about your tasks on heroku and float point :) */
+.col-1_24 {width: 4.17%;}
+.col-11_96 {width: 11.46%;}
+.col-1_8 {width: 12.5%};
+
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+
+[class*="col-"] {
+    float: left;
+    padding: 8px;
+}
+
+.row {
+    display: flex;
+    margin-top: 2.5px;
+    margin-bottom: 2px;
+    padding-left: 2.5px;
+}
+
 #input {
-    
+    height: 27px;
 }
 
-.buttons {
-    padding-bottom: 1em
+#enter {
+    border-radius: 25px;
+    height: 27px;
+    background-color: aquamarine;
+    width: 100%;
 }
 
-.buttons button {
+#enter:hover {
+    animation: rainbow 3s linear 0s infinite;
+}
+
+@keyframes rainbow {
+    from {
+        background-color: rgb(127, 255, 212);
+    }
+    16.6% {
+        background-color: rgb(0, 255, 255);
+    }
+    33.3% {
+        background-color: rgb(0, 255, 0);
+    }
+    50% {
+        background-color: rgb(255, 255, 0);
+    }
+    66.6% {
+        background-color: rgb(255, 0, 0);
+    }
+    83.3% {
+        background-color: rgb(255, 0, 255);
+    }
+    to {
+        background-color: rgb(127, 255, 212);
+    }
+}
+
+#buttons button {
     border-radius: 5px;
     background-color: burlywood;
-    width: 7.5em;
 }
 
-#confirm #enter {
-    border-radius: 10px;
-    background-color: aquamarine
+#buttons button:hover {
+    opacity: 0.8;
+}
+
+#buttons {
+    margin: 0.5em 0.25em 1em 0.5em;
 }
 
 .status {
-    background-color: #B43;
+    color: white;
+    text-shadow: 1px 1px #888888;
     text-align: center;
-    color: #ffffff;
-    width: 5em;
-    margin-left: 0.5em;
-    height: 3em;
-    
-    padding-top: 0.75em;
-    padding-bottom: 0.75em;
+    background-color: #B43;
+    transition: background-color 0.25s;
+}
 
-    margin-bottom: 2em
+.mode.selected .status {
+    background-color: #00B540;
+}
+
+.status:hover {
+    opacity: 0.8;
+}
+
+.tooltip {
+    text-align: center;
+    color: white;
+    background-color: darkgrey;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.status:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
 }

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
 app = Flask(__name__)
 
 
-def latex2chem(latex):
+def latex2chem(latex: str) -> dict:
     """parses latex input for future uses"""
-    return latex
+
+    return {}
 
 
 @app.route("/")
@@ -18,10 +19,25 @@ def home():
 @app.route("/", methods=['POST'])
 def process():
     """processes input from home page"""
-    chem_input = request.form['input']
+    raw_input = request.form['input']
+    print(raw_input)
     # processed_input = latex2chem(chem_input)
-    print(chem_input)
-    return render_template('index.html', name="result")  # TODO: render new result
+    mode, latex_input = raw_input.split("||")
+    if mode == "molecule":
+        pass
+    elif mode == "equation":
+        return process_and_balance_equation(latex_input, latex2chem)
+    elif mode == "empirical":
+        pass
+    elif mode == "alkane":
+        input_arguments = latex_input.split("::")
+        size = int(input_arguments[1]) if len(input_arguments) == 2 else 1
+        return "<div style='font-family: courier'>"\
+               + Alkane(size).__str__().replace('\n', '<br/>')\
+               + "</div>"
+    else:
+        return render_template('index.html', name="homepage")
+    # return redirect('index.html', code=302, Response=None)  # TODO render results
 
 if __name__ == "__main__":
     app.run()

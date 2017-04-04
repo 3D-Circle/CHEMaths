@@ -1,57 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>ChemInput</title>
+    <meta name="description" content="Doing Chemistry with Maths"/>
+    <meta name="keywords" content="Chemistry,Maths,Calculator"/>
+    <meta name="author" content="Jingjie YANG (j.yang19@ejm.org)"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHEMaths</title>
     <link rel="stylesheet" href="/static/MathQuill/mathquill.css"/>
     <link rel="stylesheet" href="/static/ChemInput.css"/>
     <link rel="shortcut icon" type="image/png" href="/static/icon.png"/>
     <script src="/static/jQuery/jquery-3.2.0.js"></script>
     <script src="/static/MathQuill/mathquill.js"></script>
     <script src="/static/ChemInput.js"></script>
-    </head>
+</head>
+
 <body>
-    <form action="." method="POST" id="confirm">
-        <center>
-            <p type="text" name="text" id='input'></p>
-            <input type="button" value="enter" id='enter'/>
-        </center>
+    <!--Main input field-->
+    <form action="." method="POST" id="mainField">
+        <div class="row">
+            <div class="col-1_24"></div>
+            <div class="col-9">
+                <span id='input'></span>
+            </div>
+            <div class="col-2">
+                <input type="submit" value="Maths!" id="enter"/>
+            </div>
+            <div class="col-1_24"></div>
+        </div>
     </form>
-    
-    <center>
-        <div class='buttons'>
-        <button id='rightarrow'>-></button>
-        <button id='sup'>^</button>
-        <button id='sub'>_</button>
-        <button id='left-parenthesis'>(</button>
-        <button id='right-parenthesis'>)</button>
-        <button id='plus'>+</button>
-        <button id='colon'>:</button>
-        <button id='semi-colon'>;</button>
-        </div>
-    </center>
-    
-    <div id="molecule">
-        <div class="status">
-            ?
+
+    <!--Buttons for input field-->
+    <div id="buttons" class="row">
+        <div class="col-1_24"></div>
+        <button id='rightarrow' class="col-11_96">-></button>
+        <button id='sup' class="col-11_96">^</button>
+        <button id='sub' class="col-11_96">_</button>
+        <button id='left-parenthesis' class="col-11_96">(</button>
+        <button id='right-parenthesis' class="col-11_96">)</button>
+        <button id='plus' class="col-11_96">+</button>
+        <button id='colon' class="col-11_96">:</button>
+        <button id='semi-colon' class="col-11_96">;</button>
+        <div class="col-1_24" class="col-11_96"></div>
+    </div>
+
+    <div id="molecule" class="mode">
+        <div class="row">
+            
+            <div class="status col-1_8">
+                ?
+                <p class="tooltip">
+                    Information on Molecule
+                </p>
+            </div>
         </div>
     </div>
-    
-    <div id="equation">
-        <div class="status">
-            ->
+
+    <div id="equation" class="mode">
+        <div class="row">
+            <div class="status col-1_8">
+                ->
+                <p class="tooltip">
+                    Balance Equation
+                </p>
+            </div>
         </div>
     </div>
-    
-    <div id="empirical">
-        <div class="status">
-            g
+
+    <div id="empirical" class="mode">
+        <div class="row">
+            <div class="status col-1_8">
+                g
+                <p class="tooltip">
+                    Determine Empirical Formula
+                </p>
+            </div>
         </div>
     </div>
-    
-    <div id="alkane">
-        <div class="status">
-            CH
+
+    <div id="alkane" class="mode">
+        <div class="row">
+            <div class="status col-1_8">
+                CH
+                <p class="tooltip">
+                    Alkane
+                </p>
+            </div>
         </div>
     </div>
 </body>

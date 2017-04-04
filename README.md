@@ -1,7 +1,12 @@
 # CHEMaths
-Chemistry Calculator for high school level
+**CHEMaths** (pronounced as *Chemist*) 
+is a chemistry calculator for educational uses
+suited for high school level chemistry.
 
-## How to use
+## Use Online
+**Website**: [Coming soon!]()
+
+## Use Locally
 0. If you haven't already, download _python 3.6_ from [Python.org](https://www.python.org/downloads/release/python-360/)
 1. Open **Terminal** or **command lines** (depending on your OS)
 2. `cd` to the location of this folder  
@@ -9,16 +14,22 @@ Chemistry Calculator for high school level
     ```sh
     cd Desktop/CHEMaths
     ```
-3. There are two possible ways to use **CHEMaths**: 
+3. There are three possible ways to use **CHEMaths**: 
    - through an `interactive shell` (_text console_):
    ```sh
    python CHEMaths.py
    ```  
-   - through a `website` (_local server_):
+   - through a `local server` (_browser_):
     ```sh
     pip install -r requirements.txt
+    python CHEMaths_website.py
     ```
-    and click on CHEMaths.html
+    If the commands are executed successfully, 
+    you'll have a message looking like 
+    `* Running on http://127.0.0.1:5000/` 
+    displayed on your screen.   
+    You can then use **CHEMaths** 
+    by clicking on that link.
       
     [Flask](http://flask.pocoo.org/)
     is needed to activate the graphical user interface.
@@ -26,7 +37,6 @@ Chemistry Calculator for high school level
     and might ask you to enter your password for the installation.  
     Running the program for the first time could take some time
     to set everything up.
-     
   
 ## Functionality (_CHEMaths.py_):
 ### Interactive shell
@@ -92,3 +102,20 @@ returns a 2D plain text illustration of the molecule
 
 #### `self.calculate_isomer_numbers()`
 - Return the number of total possible configurations of the isomer of the alkane
+
+## To do:
+### Visual
+- [x] grid
+- [ ] tooltip for modes
+- [ ] move out of sub / sup box when alphabet is entered 
+- [ ] render results based on url
+- [ ] css enhancement for input fields
+- [ ] enable(expand) / disable(collapse) input fields based on mode
+- [ ] Sync mode-specific input fields with main input field
+
+### Server
+- [ ] Latex parser
+- [ ] Deploy to Heroku
+
+### Core
+- [ ] fix issues caused by float point precision (while determining empirical formula)
