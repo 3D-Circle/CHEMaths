@@ -4,7 +4,7 @@ is a chemistry calculator for educational uses
 suited for high school level chemistry.
 
 ## Use Online
-**Website**: [Coming soon!]()
+**Website**: [Here!](https://chemaths.herokuapp.com/)
 
 ## Use Locally
 0. If you haven't already, download _python 3.6_ from [Python.org](https://www.python.org/downloads/release/python-360/)
@@ -115,7 +115,7 @@ returns a 2D plain text illustration of the molecule
 
 ### Server
 - [ ] Latex parser
-- [ ] Deploy to Heroku
+- [x] Deploy to Heroku
 
 ### Core
 - [ ] fix issues caused by float point precision (while determining empirical formula)
