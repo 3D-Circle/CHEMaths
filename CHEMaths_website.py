@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+"""Web version for CHEMaths"""
 from flask import Flask, render_template, request, redirect
-from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
+from CHEMaths import process_formula, smart_calculate, process_and_balance_equation, get_ratio, Alkane
 app = Flask(__name__)
 
 
 def latex2chem(latex: str) -> dict:
     """parses latex input for future uses"""
-
-    return {}
+    # TODO: BETTER HANDLING! (i.e. handle braces rather than omit them AND SO ON)
+    latex = latex.replace('{', '').replace('}', '').replace('_', '')
+    return process_formula(latex)
 
 
 @app.route("/")
@@ -26,7 +28,7 @@ def process():
     if mode == "molecule":
         pass
     elif mode == "equation":
-        return process_and_balance_equation(latex_input, latex2chem)
+        return process_and_balance_equation(latex_input, parser=latex2chem, split_token=("+", "\\rightarrow"))
     elif mode == "empirical":
         pass
     elif mode == "alkane":

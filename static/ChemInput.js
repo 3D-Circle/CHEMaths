@@ -1,5 +1,5 @@
 var modes = [
-    "molecule", "equation", "empirical", "alkane"
+    "this", "molecule", "equation", "empirical", "alkane"
 ];
 var currentMode = "equation";
 
@@ -8,8 +8,28 @@ function render(mode) {
     for (var i = 0; i < modes.length; i++) {
         var option = modes[i];
         if (option == mode) {
+        // update status label
             $("#" +  option).addClass("selected");
+            // update right panel for additional information
+            var $target = $("#info-" + option);
+            var $other = $target.siblings('.active');
+
+            if (!$target.hasClass('active')) {
+                $other.each(function(index, self) {
+                    var $this = $(self);
+                    $this.removeClass('active').animate({
+                        left: $(window).width()
+                    }, 500);
+                });
+
+                $target.addClass('active').show().css({
+                    right: -($target.width())
+                }).animate({
+                    left: 0
+                }, 500);
+            }
         } else {
+            // update status label
             $('#' + option).removeClass("selected");
         }
     } 
@@ -38,17 +58,15 @@ $(document).ready(function () {
                 ) {
                     currentMode = "molecule";
                 } else {
-                    currentMode = null;
+                    currentMode = "this"; // shows information on website
                 }
                 render(currentMode);
             }
         }
     });
     
-    mainField.latex("C_6H_6");
     mainField.focus();
-    mainField.select();
-
+    render("this");
                    
     // confirm input
     $('#mainField').submit(function (event) {
@@ -96,7 +114,7 @@ $(document).ready(function () {
     
     // show template when status label is clicked
     $('.status').click(function () {
-        var mode = $(this).parent().parent().attr('id');
+        var mode = $(this).attr('id');
         var text;
         switch(mode) {
             case "molecule":
@@ -112,7 +130,7 @@ $(document).ready(function () {
                 text = "alkane::5";
                 break;
             default:
-                text = "H_2O";
+                text = "";
         }
         mainField.latex(text);
         mainField.focus();

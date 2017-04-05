@@ -14,7 +14,7 @@ suited for high school level chemistry.
     ```sh
     cd Desktop/CHEMaths
     ```
-3. There are three possible ways to use **CHEMaths**: 
+3. There are 2 possible ways to use **CHEMaths** locally (i.e. without internet): 
    - through an `interactive shell` (_text console_):
    ```sh
    python CHEMaths.py

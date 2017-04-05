@@ -7,7 +7,8 @@ Why not make a js for this?
 Don't forget about your tasks on heroku and float point :) */
 .col-1_24 {width: 4.17%;}
 .col-11_96 {width: 11.46%;}
-.col-1_8 {width: 12.5%};
+.col-1_8 {width: 12.5%;}
+.col-7_8 {width: 87.5%;}
 
 .col-1 {width: 8.33%;}
 .col-2 {width: 16.66%;}
@@ -36,7 +37,7 @@ Don't forget about your tasks on heroku and float point :) */
 
 #input {
     height: 27px;
-	width: 100%;
+    width: 100%;
 }
 
 #enter {
@@ -77,25 +78,24 @@ Don't forget about your tasks on heroku and float point :) */
 #buttons button {
     border-radius: 5px;
     background-color: burlywood;
+    margin: 0.5em 0.25em 1em 0.5em;
 }
 
 #buttons button:hover {
     opacity: 0.8;
 }
 
-#buttons {
-    margin: 0.5em 0.25em 1em 0.5em;
-}
-
 .status {
+    overflow: hidden;
     color: white;
     text-shadow: 1px 1px #888888;
     text-align: center;
     background-color: #B43;
+    border-bottom: 1px dashed gray;
     transition: background-color 0.25s;
 }
 
-.mode.selected .status {
+.status.selected {
     background-color: #00B540;
 }
 
@@ -117,4 +117,73 @@ Don't forget about your tasks on heroku and float point :) */
     opacity: 1;
 }
 
+#mode, #results {
+    position: relative;
+    height: 512px;
+}
 
+.panel {
+	position: absolute;
+    height: 100%;
+    width: 100%;
+    display: none;
+}
+
+#info-this {
+    background-color: ivory;
+}
+
+#info-this h1 {
+    font-size: 32px;
+    font-family: cursive;
+    text-align: center;
+    text-shadow: 2px 2px darkslateblue;
+}
+
+#info-this h3 {
+    font-size: 16px;
+    font-family: Book Antiqua;
+    text-align: center;
+}
+
+#info-this #authors {
+    font-family: monospace;
+    text-align: center;
+}
+
+#info-this #icon {
+    display: block;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
+
+#info-this #yellow {
+    color: yellow;
+}
+
+#info-this #green {
+    color: limegreen;
+}
+
+#info-this #blue {
+    color: cornflowerblue;
+}
+
+#info-molecule {
+    background-color: darksalmon;
+}
+
+#info-equation {
+    background-color: lightgreen;
+}
+
+#info-empirical {
+	background-color: khaki;
+}
+
+#info-alkane {
+    background-color: skyblue;
+}

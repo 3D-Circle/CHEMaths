@@ -102,10 +102,11 @@ def add_to_dict(new_item: str, new_value: int, target_dict: dict):
 
 def mr_calc(dict_in: dict) -> float:
     """Calculate relative formula mass for dictionary input processed by function process_formula."""
-    out = 0
-    for element, quantity in dict_in.items():
-        out += relative_atomic_mass[element] * quantity if element != "sign" else 0
-    return out
+    return sum(
+        relative_atomic_mass[element] * quantity
+        if element != "sign" else 0
+        for element, quantity in dict_in.items()
+    )
 
 
 def percentage_calc(element: str, dict_in: dict) -> float:
@@ -225,17 +226,17 @@ def smart_calculate(dict_in: dict, details: str) -> str:
     return '\n'.join(out_msg)
 
 
-def process_and_balance_equation(equation: str, parser=process_formula) -> str:
+def process_and_balance_equation(equation: str, parser=process_formula, split_token=(' + ', '->')) -> str:
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
-    error_messages = ["Invalid syntax: no '->' found",
+    error_messages = [f"Invalid syntax: no '{split_token}' found",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
     # equation = equation.replace(' ', '')
-    equation_split = equation.split('->')
+    equation_split = equation.split(split_token[1])
     if len(equation_split) != 2:
         return error_messages[0]
-    reactants, products = [sum_atoms.split(' + ') for sum_atoms in equation_split]
+    reactants, products = [sum_atoms.split(split_token[0]) for sum_atoms in equation_split]
     if len(reactants) == 0 or len(products) == 0:
         return error_messages[1]
     reactants_list = [parser(reactant) for reactant in reactants]
@@ -275,8 +276,8 @@ def process_and_balance_equation(equation: str, parser=process_formula) -> str:
         )
 
     out_msg = ' -> '.join([
-        ' + '.join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
-        ' + '.join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
+        split_token[0].join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
+        split_token[0].join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
     ])
     return out_msg
 

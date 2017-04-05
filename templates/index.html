@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="description" content="Doing Chemistry with Maths"/>
     <meta name="keywords" content="Chemistry,Maths,Calculator"/>
-    <meta name="author" content="Jingjie YANG (j.yang19@ejm.org)"/>
+    <meta name="author" content="Jingjie YANG (j.yang19@ejm.org), Théo Takla (t.takla19@ejm.org)"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHEMaths</title>
     <link rel="stylesheet" href="/static/MathQuill/mathquill.css"/>
@@ -42,50 +42,73 @@
         <button id='plus' class="col-11_96">+</button>
         <button id='colon' class="col-11_96">:</button>
         <button id='semi-colon' class="col-11_96">;</button>
-        <div class="col-1_24" class="col-11_96"></div>
+        <div class="col-1_24"></div>
     </div>
 
-    <div id="molecule" class="mode">
-        <div class="row">
-            
-            <div class="status col-1_8">
+    <!--Additional information and results-->
+    <div class="row">
+
+        <!--Status labels-->
+        <div id="mode" class="col-1_8">
+            <!--Molecule-->
+            <div class="status" id="molecule">
                 ?
                 <p class="tooltip">
                     Information on Molecule
                 </p>
             </div>
-        </div>
-    </div>
-
-    <div id="equation" class="mode">
-        <div class="row">
-            <div class="status col-1_8">
-                ->
+            
+            <!--Equation-->
+            <div class="status" id="equation">
+                &rarr;
                 <p class="tooltip">
                     Balance Equation
                 </p>
             </div>
-        </div>
-    </div>
-
-    <div id="empirical" class="mode">
-        <div class="row">
-            <div class="status col-1_8">
+            
+            <!--Empirical-->
+            <div class="status" id="empirical">
                 g
                 <p class="tooltip">
                     Determine Empirical Formula
                 </p>
             </div>
-        </div>
-    </div>
-
-    <div id="alkane" class="mode">
-        <div class="row">
-            <div class="status col-1_8">
+       
+            <!--Alkane-->
+            <div class="status" id="alkane">
                 CH
                 <p class="tooltip">
                     Alkane
                 </p>
+            </div>
+        </div>
+        
+        <!--Details-->
+        <div class="col-10" id="results">
+            <div class="panel" id="info-this">
+                <h1>
+                    <span id="yellow">CHE</span><span id="green">M</span><span id="blue">aths</span>
+                </h1>
+                <p id="authors">By <a href="https://github.com/JingjieYang">Jingjie</a> and <a href="https://github.com/TrakJohnson">Théo</a>.</p>
+                <h3>
+                    Chemistry with Mathematics<br/>
+                    High-School-Level Chemistry Calculator
+                </h3>
+                <a href="https://github.com/JingjieYang/CHEMaths">
+                    <img id="icon" src="/static/icon.png"/>
+                </a>
+            </div>
+            <div class="panel" id="info-molecule">
+                1
+            </div>
+            <div class="panel" id="info-equation">
+                2
+            </div>
+            <div class="panel" id="info-empirical">
+                3
+            </div>
+            <div class="panel" id="info-alkane">
+                4
             </div>
         </div>
     </div>
