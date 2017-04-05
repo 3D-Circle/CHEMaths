@@ -36,6 +36,7 @@ Don't forget about your tasks on heroku and float point :) */
 
 #input {
     height: 27px;
+	width: 100%;
 }
 
 #enter {
@@ -115,3 +116,5 @@ Don't forget about your tasks on heroku and float point :) */
     visibility: visible;
     opacity: 1;
 }
+
+
