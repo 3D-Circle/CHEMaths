@@ -20,11 +20,10 @@ def latex2chem(latex: str) -> dict:
         clean = clean1
         charge = 0
     else:
-        # handle 3 cases for charge (ex: -, 3-, -4)
         if charge in ['+', '-']:
             charge = int(f'{charge}1')
-        elif charge[0] in ['+', '-']:
-            charge = int(charge)
+        # elif charge[0] in ['+', '-']:  Probably not necessary
+        #     charge = int(charge)
         else:
             charge = int(charge[::-1])
 
