@@ -36,13 +36,13 @@ Don't forget about your tasks on heroku and float point :) */
 }
 
 #input {
-    height: 27px;
+    height: 32px;
     width: 100%;
 }
 
 #enter {
     border-radius: 25px;
-    height: 27px;
+    height: 32px;
     background-color: aquamarine;
     width: 100%;
 }
@@ -117,7 +117,7 @@ Don't forget about your tasks on heroku and float point :) */
     opacity: 1;
 }
 
-#mode, #results {
+#mode, #infos {
     position: relative;
     height: 512px;
 }

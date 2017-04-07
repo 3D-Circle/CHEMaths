@@ -127,7 +127,7 @@ def get_mole(rel_mass: float, mass: float) -> float:
     return round(mass / rel_mass, 6)
 
 
-def get_ratio(dict_in: dict) -> dict:
+def get_ratio(dict_in: dict, print_out=False) -> dict:
     """Calculate empirical formula of a compound given its atoms' mass or percentage of mass in the compound."""
     # TODO: resolve bug
     dict_processing = {}
@@ -146,7 +146,8 @@ def get_ratio(dict_in: dict) -> dict:
         dict_out[elem] = ele_ratio.numerator * multiple // ele_ratio.denominator
         if dict_out[elem] == 0 or dict_out[elem] >= 16:
             modelling = True
-        print(elem, round(ele_ratio.numerator / ele_ratio.denominator, 6))
+        if print_out:
+            print(elem, round(ele_ratio.numerator / ele_ratio.denominator, 6))
     if modelling:
         for elem, ele_ratio in dict_out.items():
             digits = len(str(ele_ratio))
@@ -173,6 +174,7 @@ def lcm_multiple(list_in: list) -> int:
 
 
 def get_inversion(iterable: iter) -> int:
+    """Calculate the inversion number for a given sequence"""
     number_list = iterable
     total = 0
     for index, number in enumerate(number_list):
@@ -271,6 +273,7 @@ def process_and_balance_equation(equation: str, parser=process_formula, split_to
         return error_messages[2]
 
     def format_string(index: int, molecule_string: str) -> str:
+        """Utility function to facilitate the formatting of the results"""
         return "{} {}".format(
             str(solution[index] if solution[index] != 1 else ""), molecule_string if solution[index] != 0 else ""
         )
@@ -283,6 +286,7 @@ def process_and_balance_equation(equation: str, parser=process_formula, split_to
 
 
 class Matrix:
+    """Implementation of matrices in mathematics"""
     def __init__(self, m: int, n: int):
         """Initiate a m*n zero matrix"""
         self.matrix = [[0] * n for _ in range(m)]
@@ -397,6 +401,7 @@ class Matrix:
         return self.size[0]
 
     def solve(self, homogeneous=True, integer_minimal=False):
+        """Solve for X taking this matrix as the coefficient matrix"""
         if homogeneous:
             # avoid side effects
             A = self.__copy__()
@@ -481,6 +486,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
                     dict_out[other_element] = fractions.Fraction(sign, dict_processing[other_element])
 
     def match_str_with_charge(to_match):
+        """Utility function to facilitate the formatting of the string representing the results"""
         if to_match > 0:
             sign_to_match = "+"
         elif to_match == 0:
@@ -502,6 +508,7 @@ def calculate_oxidation(dict_in: dict, return_string=False, return_type='*'):
 
 
 class Alkane:
+    """Generalization for hydrocarbon with the general formula CH"""
     def __init__(self, size):
         """Initialize an alkane according to the input size"""
         self.size = size
@@ -546,10 +553,113 @@ def partition(n, k) -> int:
         return partition(n - k, k) + partition(n - 1, k - 1)
 
 
-def launch_shell(state):
+def latex2chem(latex: str) -> dict:
+    """process a latex string for future uses  
+    ==Input: a latex string
+    =Output: a dictionary containing the elements that is contained and corresponding quantities,
+             as well as the charge"""
+    dict_return = {}
+    sanitized_latex = latex.replace("{", "").replace("}", "").replace("\\left", '').replace("\\right", '')
+
+    # Handle sign
+    if "^" in sanitized_latex:  # if molecule carries a charge
+        latex_formula, sign_string = sanitized_latex.split("^")
+        if sign_string in ('-', '+'):
+            sign = int(f'{sign_string}1')
+        else:
+            sign = int(f'{sign_string[-1]}{sign_string[:-1]}')
+    else:
+        latex_formula = sanitized_latex
+        sign = 0
+    dict_return["sign"] = sign
+
+    # process formula
+    formula = {latex_formula: 1}
+    while formula:
+        formula_copy = formula.copy()
+        for molecule_raw, coefficient in formula_copy.items():
+            # handling outer parentheses
+            if '(' in molecule_raw:
+                # TODO remove molecule inside parentheses and add to formula dict
+                parentheses_list = []  # list keeping record of pair(s) of outer parentheses
+                parentheses_count = 0  # integer determining if parentheses are nested or not
+                for index, char in enumerate(molecule_raw):
+                    if char == '(':
+                        if parentheses_count == 0:
+                            parentheses_list.append([index])
+                        parentheses_count += 1
+                    if char == ')':
+                        parentheses_count -= 1
+                        if parentheses_count == 0:
+                            parentheses_list[-1].append(index)
+                for index, (parenthesis_left, parenthesis_right) in enumerate(parentheses_list):
+                    nested_molecule = molecule_raw[parenthesis_left+1:parenthesis_right]
+                    coefficient_left = parenthesis_right + 1
+                    if coefficient_left >= len(molecule_raw) or molecule_raw[coefficient_left] != '_':
+                        nested_coefficient = 1
+                    else:
+                        try:
+                            coefficient_right = next(
+                                index for index, char in enumerate(molecule_raw[coefficient_left:])
+                                if char in ascii_uppercase or char == '('
+                            )  # actually one more index to the right of the right of the coefficient
+                        except StopIteration:
+                            coefficient_right = len(molecule_raw)
+                        parentheses_list[index][1] = coefficient_right
+                        nested_coefficient_string = molecule_raw[coefficient_left+1:coefficient_right]
+                        nested_coefficient = int(nested_coefficient_string)
+                    formula[nested_molecule] = nested_coefficient * coefficient
+                molecule_list = [molecule_raw[:parentheses_list[0][0]]]
+                for index in range(len(parentheses_list)):
+                    left = parentheses_list[index][1]
+                    right = parentheses_list[index+1][0] \
+                        if index + 1 != len(parentheses_list) else len(parentheses_list)
+                    molecule_list.append(molecule_raw[left:right])
+                molecule = ''.join(molecule_list)
+            else:
+                molecule = molecule_raw
+            elements_raw = re.sub(r"([A-Z])", r" \1", molecule).split()
+            for element_raw in elements_raw:
+                if '_' in element_raw:
+                    element, number_string = element_raw.split('_')
+                    number = int(number_string)
+                else:
+                    element = element_raw
+                    number = 1
+                dict_return[element] = number * coefficient
+            del formula[molecule_raw]
+    return dict_return
+
+
+def latex_valid(latex: str) -> bool:
+    """Determine if the input latex string is valid"""
+    return False
+
+
+def debug():
+    """Test the functionality of functions"""
+    valid = [
+        # ---Debugging 1 - balancing equation with charge
+        " MnO4^- + 5 Fe^2+ + 8 H^+  ->   Mn^2+ + 5 Fe^3+ + 4 H2O" == process_and_balance_equation(
+            "MnO4^- + Fe^2+ + H^+ -> Mn^2+ + Fe^3+ + H2O"
+        ),
+        # ---Debugging 2 - balancing equation
+        " CH4 + 2 O2  ->   CO2 + 2 H2O" == process_and_balance_equation("CH4 + O2 -> CO2 + H2O"),
+        # ---Debugging 3 - oxidation number
+        {'Li': +1, 'Al': -5, 'H': +1} == calculate_oxidation(process_formula("LiAlH4 ^ ")),
+        # ---Debugging 4 - alkane inspection: hexane
+        ("C6H14", 5) == (Alkane(6).molecular_formula, Alkane(6).isomers()),
+        # ---Debugging 5 - determine empirical formula
+        {'K': 1, 'I': 7, 'O': 20} == get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})
+    ]
+    invalid = [index + 1 for index, func in enumerate(valid) if not func]
+    if any(invalid):
+        print(f"Warning: Bug detected.\nContact developers (via github): reference code {invalid}\n")
+
+
+def launch_shell():
     """Interactive shell"""
-    active = state
-    while active:
+    while True:
         print("===START===")
         formula = input("Enter a formula or equation to balance (enter if you don't): ")
         start = time.process_time()
@@ -581,7 +691,7 @@ def launch_shell(state):
                 weight = input(ele + " (" + str(relative_atomic_mass[ele]) + "): ")
                 elements[ele] = eval(weight)
             start = time.process_time()
-            result = get_ratio(elements)
+            result = get_ratio(elements, print_out=True)
             result_to_print = [ele + str(ele_quantity) if ele_quantity != 1
                                else ele for ele, ele_quantity in result.items()]
             result_to_print = ''.join(result_to_print)
@@ -589,22 +699,7 @@ def launch_shell(state):
         time_end = time.process_time()
         time_taken = round(time_end - start, 6)
         print("===END:", time_taken, "seconds===\n")
-    else:
-        # ---Debugging 1 - balancing equation with charge
-        # expected: MnO4^- + 5 Fe^2+ + 8 H^+ -> Mn^2+ + 5 Fe^3+ + 4 H2O
-        print(process_and_balance_equation("MnO4^- + Fe^2+ + H^+ -> Mn^2+ + Fe^3+ + H2O"))
-        # ---Debugging 2 - balancing equation
-        # expected: CH4 + 2 O2 ->  CO2 + 2 H2O
-        print(process_and_balance_equation("CH4 + O2 -> CO2 + H2O"))
-        # ---Debugging 3 - oxidation number
-        # expected: Li +1; Al -5; H +1
-        print(calculate_oxidation(process_formula("LiAlH4 ^ "), return_string=True))
-        # ---Debugging 4 - alkane inspection: hexane
-        # expected: C6H14, 5, and lewis structures
-        print(Alkane(6))
-        # ---Debugging 5 - determine empirical formula
-        print(get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}))
-
 
 if __name__ == '__main__':
-    launch_shell(True)
+    debug()
+    launch_shell()

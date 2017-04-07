@@ -69,12 +69,19 @@ $(document).ready(function () {
     render("this");
                    
     // confirm input
-    $('#mainField').submit(function (event) {
+    $('#mainField').submit(function (e) {
         $('<input />').attr('type', 'hidden')
             .attr('name', 'input')
             .attr('value', currentMode + '||' + mainField.latex())
             .appendTo(this);
         return true;
+    });
+    $('#input').keypress(function (e) {
+        // submit form when enter is pressed
+        if (e.which == 13) {
+            $('#mainField').submit();
+            return false;
+        }
     });
 
     // set up buttons for symbols for input box

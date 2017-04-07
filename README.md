@@ -3,8 +3,7 @@
 is a chemistry calculator for educational uses
 suited for high school level chemistry.
 
-## Use Online
-**Website**: [Here!](https://chemaths.herokuapp.com/)
+## Use [Online](https://chemaths.herokuapp.com/)
 
 ## Use Locally
 0. If you haven't already, download _python 3.6_ from [Python.org](https://www.python.org/downloads/release/python-360/)
@@ -106,16 +105,18 @@ returns a 2D plain text illustration of the molecule
 ## To do:
 ### Visual
 - [x] grid
-- [ ] tooltip for modes
-- [ ] move out of sub / sup box when alphabet is entered 
+- [x] tooltip for modes
+- [x] move out of sub / sup box when alphabet is entered 
 - [ ] render results based on url
 - [ ] css enhancement for input fields
-- [ ] enable(expand) / disable(collapse) input fields based on mode
+- [x] enable(expand) / disable(collapse) input fields based on mode
 - [ ] Sync mode-specific input fields with main input field
+- [ ] label to indicate when input string is invalid (e.g. nested parentheses)
 
 ### Server
-- [ ] Latex parser
 - [x] Deploy to Heroku
 
 ### Core
 - [ ] fix issues caused by float point precision (while determining empirical formula)
+- [x] latex parser
+- [ ] preserve order of elements in original input string
