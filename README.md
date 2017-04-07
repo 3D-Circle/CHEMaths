@@ -112,11 +112,14 @@ returns a 2D plain text illustration of the molecule
 - [x] enable(expand) / disable(collapse) input fields based on mode
 - [ ] Sync mode-specific input fields with main input field
 - [ ] label to indicate when input string is invalid (e.g. nested parentheses)
+- [ ] customize `MathQuill` for smoother sub and sup box behaviour
 
 ### Server
 - [x] Deploy to Heroku
+- [ ] Live preview using `ajax`
 
 ### Core
 - [ ] fix issues caused by float point precision (while determining empirical formula)
 - [x] latex parser
 - [ ] preserve order of elements in original input string
+- [ ] Fix syntax for input

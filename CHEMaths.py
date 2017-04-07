@@ -13,6 +13,7 @@ import fractions
 import functools
 import time
 import json
+import re
 
 with open("static/data.json") as data:
     data_dict = json.loads(data.read())

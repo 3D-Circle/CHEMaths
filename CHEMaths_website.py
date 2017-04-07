@@ -2,7 +2,7 @@
 """Web version for CHEMaths"""
 from string import ascii_uppercase
 from flask import Flask, jsonify, render_template, request, redirect
-from CHEMaths import latex2chem
+from CHEMaths import latex2chem, latex_valid
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
 app = Flask(__name__)
 
