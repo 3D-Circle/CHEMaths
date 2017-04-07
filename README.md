@@ -114,7 +114,7 @@ returns a 2D plain text illustration of the molecule
 - [ ] Sync mode-specific input fields with main input field
 
 ### Server
-- [ ] Latex parser
+- [x] Latex parser
 - [x] Deploy to Heroku
 
 ### Core
