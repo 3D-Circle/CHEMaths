@@ -581,17 +581,16 @@ def latex2chem(latex: str) -> dict:
         for molecule_raw, coefficient in formula_copy.items():
             # handling outer parentheses
             if '(' in molecule_raw:
-                # TODO remove molecule inside parentheses and add to formula dict
+                level = 0  # integer determining if parentheses are nested or not
                 parentheses_list = []  # list keeping record of pair(s) of outer parentheses
-                parentheses_count = 0  # integer determining if parentheses are nested or not
                 for index, char in enumerate(molecule_raw):
                     if char == '(':
-                        if parentheses_count == 0:
+                        if level == 0:
                             parentheses_list.append([index])
-                        parentheses_count += 1
+                        level += 1
                     if char == ')':
-                        parentheses_count -= 1
-                        if parentheses_count == 0:
+                        level -= 1
+                        if level == 0:
                             parentheses_list[-1].append(index)
                 for index, (parenthesis_left, parenthesis_right) in enumerate(parentheses_list):
                     nested_molecule = molecule_raw[parenthesis_left+1:parenthesis_right]
@@ -602,7 +601,7 @@ def latex2chem(latex: str) -> dict:
                         try:
                             coefficient_right = next(
                                 index for index, char in enumerate(molecule_raw[coefficient_left:])
-                                if char in ascii_uppercase or char == '('
+                                if char in string.ascii_uppercase or char == '('
                             )  # actually one more index to the right of the right of the coefficient
                         except StopIteration:
                             coefficient_right = len(molecule_raw)
@@ -619,7 +618,7 @@ def latex2chem(latex: str) -> dict:
                 molecule = ''.join(molecule_list)
             else:
                 molecule = molecule_raw
-            elements_raw = re.sub(r"([A-Z])", r" \1", molecule).split()
+            elements_raw = re.findall(r"[A-Z][a-z_\d]*", molecule)
             for element_raw in elements_raw:
                 if '_' in element_raw:
                     element, number_string = element_raw.split('_')

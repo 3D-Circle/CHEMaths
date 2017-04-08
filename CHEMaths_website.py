@@ -13,25 +13,20 @@ def home():
     return render_template('index.html', name="homepage")
 
 
+@app.route("/live_preview", methods=['POST'])
+def live_process():
+    """processes input dynamically"""
+    mode = request.values.get('mode', None)
+    latex = request.values.get('latex', None)
+    print(mode, latex)
+    return jsonify(result="Hello, js")
+
+
 @app.route("/results", methods=['POST'])
 def process():
-    """processes input from home page"""
-    raw_input = request.form['input']
-    mode, latex_input = raw_input.split("||")
-    if mode == "molecule":
-        pass
-    elif mode == "equation":
-        return process_and_balance_equation(latex_input, parser=latex2chem, split_token=("+", "\\rightarrow"))
-    elif mode == "empirical":
-        pass
-    elif mode == "alkane":
-        input_arguments = latex_input.split("::")
-        size = int(input_arguments[1]) if len(input_arguments) == 2 else 1
-        return "<pre>"\
-               + Alkane(size).__str__().replace('\n', '<br/>')\
-               + "</pre>"
-    else:
-        return render_template('index.html', name="homepage")
+    """processes input from home page and redirect to result tab"""
+
+    return render_template('index.html', name="homepage")
     # return redirect('index.html', code=302, Response=None)  # TODO render results
 
 if __name__ == "__main__":

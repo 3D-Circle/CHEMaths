@@ -3,6 +3,23 @@ var modes = [
 ];
 var currentMode = "equation";
 
+// detect mode from latex string
+function detectMode(latex) {
+    if (latex.toLowerCase().includes("rightarrow")) {
+            mode = "equation";
+        } else if (latex.toLowerCase().includes("alkane")) {
+            mode = "alkane";
+        } else if (latex.includes(":")) {
+            mode = "empirical";
+        } else if (latex
+        ) {
+            mode = "molecule";
+        } else {
+            mode = "this"; // shows information on website
+        }
+    return mode;
+}
+
 // update render
 function render(mode) {
     for (var i = 0; i < modes.length; i++) {
@@ -45,22 +62,23 @@ $(document).ready(function () {
         charsThatBreakOutOfSupSub: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
         handlers: {
             edit: function () {
+                // update render
                 var latex = mainField.latex();
-                console.log(latex);
-                
-                if (latex.toLowerCase().includes("rightarrow")) {
-                    currentMode = "equation";
-                } else if (latex.toLowerCase().includes("alkane")) {
-                    currentMode = "alkane";
-                } else if (latex.includes(":")) {
-                    currentMode = "empirical";
-                } else if (latex
-                ) {
-                    currentMode = "molecule";
-                } else {
-                    currentMode = "this"; // shows information on website
-                }
+                var currentMode = detectMode(latex)
                 render(currentMode);
+                
+                // ajax request for live preview
+                $.ajax({
+                    url: "/live_preview",
+                    type: "post",
+                    data: {
+                        "mode": currentMode,
+                        "latex": latex
+                    },
+                    success: function(response){
+                        console.log(response);
+                    }
+                });
             }
         }
     });
