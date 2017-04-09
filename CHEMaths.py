@@ -14,7 +14,6 @@ import functools
 import time
 import json
 import re
-from latex_parser import latex2chem
 
 
 with open("static/data.json") as data:
@@ -302,7 +301,7 @@ def process_and_balance_equation(equation: str, parser=process_formula,
         )
 
     if not return_string:
-        return solution
+        return reactants, products, solution  # for server usage
     out_msg = ' -> '.join([
         split_token[0].join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
         split_token[0].join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
@@ -574,11 +573,6 @@ def partition(n, k) -> int:
         return 0
     else:
         return partition(n - k, k) + partition(n - 1, k - 1)
-
-
-def latex_valid(latex: str) -> bool:
-    """Determine if the input latex string is valid"""
-    return '' in latex  # TODO this
 
 
 def debug():

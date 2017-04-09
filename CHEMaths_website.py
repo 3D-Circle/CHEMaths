@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
 import json
-from string import ascii_uppercase
+from fractions import Fraction
 from flask import Flask, render_template, request, redirect
-from CHEMaths import latex2chem, latex_valid
+from latex_parser import latex2chem, latex_valid
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
+
 app = Flask(__name__)
 
 
@@ -19,7 +20,30 @@ def live_process():
     """processes input dynamically"""
     mode = request.values.get('mode', None)
     latex = request.values.get('latex', None)
-    print(mode, latex)
+    if mode == 'molecule':
+        pass
+    elif mode == 'equation':
+        result = process_and_balance_equation(
+            latex,
+            parser=latex2chem,
+            split_token=('+\\ ', '\\rightarrow '),
+            return_string=False
+        )
+        reactants, products, coefficients, error = None, None, None, None
+        try:
+            reactants, products, coefficients = result
+        except ValueError:  # too many values to unpack
+            error = result
+        else:
+            coefficients = [
+                f'{fraction.numerator}/{fraction.denominator}' for fraction in coefficients
+            ]  # encode fractions in json
+        return json.dumps({
+            'reactants': reactants,
+            'products': products,
+            'coefficients': coefficients,
+            'error': error
+        })
     return json.dumps({'result': latex2chem(latex)})
 
 

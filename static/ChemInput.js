@@ -20,6 +20,33 @@ function detectMode(latex) {
     return mode;
 }
 
+function renderResult(mode, json_result) {
+    if (mode == "molecule") {
+        // alors Mr Takla :)
+    } else if (mode == "equation") {
+        // ah c'est moi ici oké
+        result = JSON.parse(json_result);
+        console.log(result);
+        var reactants = result.reactants;
+        var products = result.products;
+        var coefficients = result.coefficients;
+        var error = result.error;
+
+        var table = "<table id=results-equation>";
+
+        table += "</table>";
+
+        if (error) {
+            table += '<td><span class=error>' + error + '</span></td>';
+        } else {
+            for (var i = 0; i < 2 * reactants.length - 1 + 1 + 2 * products.length - 1; i++) {
+                var row = "<tr>";
+            }
+        }
+        $('#info-equation').append(table);
+    }
+}
+
 // update render
 function render(mode) {
     for (var i = 0; i < modes.length; i++) {
@@ -75,8 +102,7 @@ $(document).ready(function () {
                         "latex": latex
                     },
                     success: function(response){
-                        console.log(response);
-                        //$('.active')
+                        renderResult(currentMode, response);
                     }
                 });
             }
@@ -124,7 +150,7 @@ $(document).ready(function () {
         mainField.focus();
     });
     $('#plus').click(function () {
-        mainField.cmd('+');
+        mainField.cmd('+\\');
         mainField.focus();
     });
     $('#colon').click(function () {
@@ -146,7 +172,7 @@ $(document).ready(function () {
                 text = "O_2";
                 break;
             case "equation":
-                text = "H_2 + O_2 \\rightarrow H_2O";
+                text = "H_2 \\+\\ O_2 \\rightarrow H_2O";
                 break;
             case "empirical":
                 text = "K: 1.82, I: 5.93, O: 2.24";

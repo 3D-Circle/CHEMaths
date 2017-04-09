@@ -187,3 +187,17 @@ Don't forget about your tasks on heroku and float point :) */
 #info-alkane {
     background-color: skyblue;
 }
+
+#results-equation {
+    width: 100%;
+}
+
+#results-equation .error {
+    color: red;
+    font-family: menlo;
+}
+
+#results-equation .number {
+    font-family: courier;
+    color: red;
+};

@@ -1,9 +1,22 @@
+# coding=utf-8
+"""Functions to parse latex for server"""
 import collections
 import re
 import string
 
 
+def latex_valid(latex: str) -> bool:
+    """Determine if the input latex string is valid"""
+    return '' in latex  # TODO this
+
+
+def eval_latex(latex: str) -> float:
+    """Evaluates the input latex string"""
+    pass
+
+
 def latex2chem(latex: str) -> dict:
+    """Takes a latex string as input and outputs a dictionary of elements and corresponding coefficients"""
     clean_latex = remove_string(latex, '{', '}', r'\left', r'\right')
     result_dict = collections.defaultdict(int)
 
@@ -16,7 +29,8 @@ def latex2chem(latex: str) -> dict:
     else:
         result_dict['sign'] = 0
 
-    def parse_single_expression(input_expression: str, top_level_coef=1) -> None:
+    def parse_single_expression(input_expression: str, top_level_coefficient=1) -> None:
+        """parses single expression and add element to result_dict"""
         exp = input_expression
         while exp:
             if '(' in exp:
@@ -32,16 +46,16 @@ def latex2chem(latex: str) -> dict:
                     elif char == '(':
                         level += 1
                 nested = exp[opening + 1:closing]
-                nested_coef = int(re.findall('\d*', exp[closing + 2:])[0])
-                exp = exp[:opening] + exp[closing + 2 + len(str(nested_coef)):]
-                parse_single_expression(nested, top_level_coef=nested_coef * top_level_coef)
+                nested_coefficient = int(re.findall('\d*', exp[closing + 2:])[0])
+                exp = exp[:opening] + exp[closing + 2 + len(str(nested_coefficient)):]
+                parse_single_expression(nested, top_level_coefficient=nested_coefficient * top_level_coefficient)
             else:
                 all_elements = re.findall('[A-Z][a-z_\d]*', exp)
                 for element in all_elements:
                     if '_' not in element:
-                        result_dict[element] += top_level_coef
+                        result_dict[element] += top_level_coefficient
                     else:
-                        result_dict[element.split('_')[0]] += int(element.split('_')[1]) * top_level_coef
+                        result_dict[element.split('_')[0]] += int(element.split('_')[1]) * top_level_coefficient
                 exp = ''
 
     parse_single_expression(clean_latex)  # launch recursion
@@ -128,10 +142,12 @@ def jingjie_latex2chem(latex: str) -> dict:
                 else:
                     element = element_raw
                     number = 1
-                dict_return['element'] += number * coefficient
+                dict_return[element] += number * coefficient
             del formula[molecule_raw]
-    return dict_return
+    return dict(dict_return)
 
 
 if __name__ == '__main__':
-    print(latex2chem('CH_3(CH_2)_3CH_3'))
+    expression = 'CH_3(CH_2)_3CH_3'
+    print(latex2chem(expression))
+    print(jingjie_latex2chem(expression))
