@@ -52,7 +52,7 @@ class SmartCalculatorTest(unittest.TestCase):
 
 if __name__ == '__main__':
     print(CHEMaths.smart_calculate(
-        {'C':1, 'O':2},
-        {}
+        {'C': 1, 'O': 2, 'sign': 0},
+        {'oxidation': '*'}
     ))
     # TODO: actual tests
