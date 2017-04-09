@@ -24,6 +24,14 @@ with open("static/data.json") as data:
     ]
 
 
+def get_elements(str_in: str) -> list:
+    """Return the collection of elements present in the input string"""
+    elements_with_duplicate = re.findall(r"[A-Z][a-z]*", str_in)
+    elements = []
+    [elements.append(i) for i in elements_with_duplicate if not elements.count(i)]
+    return elements  # TODO | use this to implement preserve_order
+
+
 def get_quantity(num_index: int, str_in: str) -> int:
     """Used in function process_formula to get quantity of atom from string input."""
     quantity = []
@@ -229,13 +237,13 @@ def smart_calculate(dict_in: dict, details: str) -> str:
     return '\n'.join(out_msg)
 
 
-def process_and_balance_equation(equation: str, parser=process_formula, split_token=(' + ', '->')) -> str:
+def process_and_balance_equation(equation: str, parser=process_formula,
+                                 split_token=(' + ', '->'), return_string=True):
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
-    error_messages = [f"Invalid syntax: no '{split_token}' found",
+    error_messages = [f"Invalid syntax: no '{split_token[1]}' found",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
-    # equation = equation.replace(' ', '')
     equation_split = equation.split(split_token[1])
     if len(equation_split) != 2:
         return error_messages[0]
@@ -279,6 +287,8 @@ def process_and_balance_equation(equation: str, parser=process_formula, split_to
             str(solution[index] if solution[index] != 1 else ""), molecule_string if solution[index] != 0 else ""
         )
 
+    if not return_string:
+        return solution
     out_msg = ' -> '.join([
         split_token[0].join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
         split_token[0].join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
@@ -422,6 +432,7 @@ class Matrix:
 
                     solution_lists.append(local_solution_list)
                 if integer_minimal:
+                    # TODO | better implementation -> IA
                     integer_solution_list = [
                         sum([solution_list[i] for solution_list in solution_lists]) for i in range(self.size[1])
                     ]
@@ -599,7 +610,7 @@ def latex2chem(latex: str) -> dict:
                         nested_coefficient = 1
                     else:
                         try:
-                            coefficient_right = next(
+                            coefficient_right = coefficient_left + next(
                                 index for index, char in enumerate(molecule_raw[coefficient_left:])
                                 if char in string.ascii_uppercase or char == '('
                             )  # actually one more index to the right of the right of the coefficient
@@ -613,7 +624,7 @@ def latex2chem(latex: str) -> dict:
                 for index in range(len(parentheses_list)):
                     left = parentheses_list[index][1]
                     right = parentheses_list[index+1][0] \
-                        if index + 1 != len(parentheses_list) else len(parentheses_list)
+                        if index + 1 != len(parentheses_list) else len(molecule_raw)
                     molecule_list.append(molecule_raw[left:right])
                 molecule = ''.join(molecule_list)
             else:
@@ -626,14 +637,14 @@ def latex2chem(latex: str) -> dict:
                 else:
                     element = element_raw
                     number = 1
-                dict_return[element] = number * coefficient
+                add_to_dict(element, number * coefficient, dict_return)
             del formula[molecule_raw]
     return dict_return
 
 
 def latex_valid(latex: str) -> bool:
     """Determine if the input latex string is valid"""
-    return False
+    return '' in latex  # TODO this
 
 
 def debug():

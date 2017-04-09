@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
+import json
 from string import ascii_uppercase
-from flask import Flask, jsonify, render_template, request, redirect
+from flask import Flask, render_template, request, redirect
 from CHEMaths import latex2chem, latex_valid
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
 app = Flask(__name__)
@@ -19,7 +20,7 @@ def live_process():
     mode = request.values.get('mode', None)
     latex = request.values.get('latex', None)
     print(mode, latex)
-    return jsonify(result="Hello, js")
+    return json.dumps({'result': latex2chem(latex)})
 
 
 @app.route("/results", methods=['POST'])
