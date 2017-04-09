@@ -193,48 +193,56 @@ def get_inversion(iterable: iter) -> int:
     return total
 
 
-def smart_calculate(dict_in: dict, details: str) -> str:
+def smart_calculate(dict_in: dict, details: dict) -> dict:
     """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
-    out_msg = ["Mr = {}".format(str(mr))]
-    element, element_percentages, mass, mol, oxidation = [None for _ in range(5)]
+    out_dict = {
+        'mr': mr,
+        'msg': [f'Mr = {mr}'],
+        'element': None,
+        'element_percentages': None,
+        'mass': None,
+        'mol': None,
+        'oxidation': None
+    }
 
-    if ':' not in details:
-        return '\n'.join(out_msg)
-    details = details.split(';')
-    for detail in details:
-        formula_property, value = detail.split(':')
+    if not details:
+        out_dict['msg'] = '\n'.join(out_dict['msg'])
+        return out_dict
+
+    for formula_property, value in details.items():
         if formula_property == "element":
-            element = value
+            out_dict['element'] = value
         elif formula_property == "mass":
-            mass = eval(value)
+            out_dict['mass'] = eval(value)
         elif formula_property == "mol":
-            mol = eval(value)
+            out_dict['mol'] = eval(value)
         elif formula_property == "oxidation":
-            oxidation = value
-    if element is not None and (element in relative_atomic_mass.keys() or element == '*'):
-        if element == '*':
-            elements = dict_in.keys()
-        else:
-            elements = [element]
-        element_percentages = {element: percentage_calc(element, dict_in) for element in elements}
-    if mass is not None and mol is None:
-        mol = get_mole(mr, mass)
-    if mol is not None and mass is None:
-        mass = get_mass(mr, mol)
-    if element_percentages is not None:
-        out_msg.append(", ".join(
+            out_dict['oxidation'] = value
+
+    if out_dict['element'] == '*':
+        elements = dict_in.keys()
+    else:
+        elements = [out_dict['element']]
+    out_dict['element_percentages'] = {element: percentage_calc(element, dict_in) for element in elements}
+
+    if out_dict['mass'] is not None and out_dict['mol'] is None:
+        out_dict['mol'] = get_mole(mr, out_dict['mass'])
+        out_dict['msg'].append("mass = {} g".format(str(out_dict['mass'])))
+    if out_dict['mol'] is not None and out_dict['mass'] is None:
+        out_dict['mass'] = get_mass(mr, out_dict['mol'])
+        out_dict['msg'].append("mol = {}".format(str(out_dict['mol'])))
+    if out_dict['element_percentages'] is not None:
+        out_dict['msg'].append(", ".join(
             ["% of {}: {}".format(
                 element, str(element_percentage)
-            ) for element, element_percentage in element_percentages.items()]
+            ) for element, element_percentage in out_dict['element_percentages'].items()]
         ))
-    if mass is not None:
-        out_msg.append("mass = {} g".format(str(mass)))
-    if mol is not None:
-        out_msg.append("mol = {}".format(str(mol)))
-    if oxidation is not None:
-        out_msg.append("oxidation = {}".format(calculate_oxidation(dict_in, return_string=True, return_type=oxidation)))
-    return '\n'.join(out_msg)
+    if out_dict['oxidation'] is not None:
+        out_dict['msg'].append("oxidation = {}".format(calculate_oxidation(dict_in, return_string=True, return_type=oxidation)))
+
+    out_dict['msg'] = '\n'.join(out_dict['msg'])
+    return out_dict
 
 
 def process_and_balance_equation(equation: str, parser=process_formula,
@@ -691,7 +699,14 @@ def launch_shell():
                            "Available arguments: element, mass, mol, oxidation\n"
                            "Add additional details:  ").replace(" ", '')
             start = time.process_time()
-            print('\n' + smart_calculate(formula_processed, option))
+            if ':' not in option:
+                if not option:
+                    option_dict = {}
+                else:
+                    option_dict = {'element': option}
+            else:
+                option_dict = {key: value for key, value in [i.split(':') for i in option.split(';')]}
+            print('\n' + smart_calculate(formula_processed, option_dict)['msg'])
         else:
             elements = {}
             print("Enter elements and their associated mass / percentage; enter to end")

@@ -53,7 +53,6 @@ function render(mode) {
 }
 
 $(document).ready(function () {
-    
     // set up input box
     var MQ = MathQuill.getInterface(2);
     var inputBox = $('#input')[0];
@@ -77,6 +76,7 @@ $(document).ready(function () {
                     },
                     success: function(response){
                         console.log(response);
+                        //$('.active')
                     }
                 });
             }

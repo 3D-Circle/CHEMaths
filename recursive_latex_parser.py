@@ -2,7 +2,7 @@ import collections
 import re
 
 
-def latex2chem(latex):
+def latex2chem(latex: str) -> dict:
     clean_latex = remove_string(latex, '{', '}', r'\left', r'\right')
     result_dict = collections.defaultdict(int)
 
@@ -15,8 +15,7 @@ def latex2chem(latex):
     else:
         result_dict['sign'] = 0
 
-    def parse_single_expression(input_expression, top_level_coef=1):
-        result = []
+    def parse_single_expression(input_expression: str, top_level_coef=1) -> None:
         exp = input_expression
         while exp:
             if '(' in exp:
@@ -43,7 +42,6 @@ def latex2chem(latex):
                     else:
                         result_dict[element.split('_')[0]] += int(element.split('_')[1]) * top_level_coef
                 exp = ''
-        return result
     parse_single_expression(clean_latex)
     return dict(result_dict)
 
@@ -53,3 +51,6 @@ def remove_string(s, *args):
     for arg in args:
         s = s.replace(arg, '')
     return s
+
+if __name__ == '__main__':
+    print(latex2chem('CH_3(CH_2)_3CH_3'))
