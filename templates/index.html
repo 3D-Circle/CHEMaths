@@ -17,7 +17,6 @@
 </head>
 
 <body>
-    <!--Main input field-->
     <form action="/results" method="POST" id="mainField">
         <div class="row">
             <div class="col-1_24"></div>
@@ -100,7 +99,30 @@
             </div>
 
             <div class="panel" id="info-molecule">
-                1
+                <table class="results_display_table">
+                    <tbody>
+                        <tr>
+                            <td>Molecular formula</td>
+                            <td id="molecular_formula"></td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td id="name"></td>
+                        </tr>
+                        <tr>
+                            <td>Molar mass</td>
+                            <td id="molar_mass"></td>
+                        </tr>
+                        <tr>
+                            <td>Components</td>
+                            <td id="components"></td>
+                        </tr>
+                        <tr>
+                            <td>Oxidation</td>
+                            <td id="oxidation"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="panel" id="info-equation">

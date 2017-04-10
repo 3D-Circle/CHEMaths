@@ -26,11 +26,11 @@ with open("static/data.json") as data:
 
 
 def get_elements(str_in: str) -> list:
-    """Return the collection of elements present in the input string"""
+    """Return the ordered collection of elements present in the input string"""
     elements_with_duplicate = re.findall(r"[A-Z][a-z]*", str_in)
     elements = []
     [elements.append(i) for i in elements_with_duplicate if not elements.count(i)]
-    return elements  # TODO | use this to implement preserve_order
+    return elements
 
 
 def get_quantity(num_index: int, str_in: str) -> int:
@@ -194,7 +194,7 @@ def get_inversion(iterable: iter) -> int:
     return total
 
 
-def smart_calculate(dict_in: dict, details: dict) -> dict:
+def smart_calculate(dict_in: dict, details: dict, precision=2) -> dict:
     """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
     out_dict = {
@@ -205,6 +205,15 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
         'mass': None,
         'mol': None,
         'oxidation': None
+    }
+    if out_dict['element'] and out_dict['element'] != '*':
+        elements = [out_dict['element']]
+    else:
+        elements = dict_in.keys()
+    out_dict['element_percentages'] = {
+        element: round(percentage_calc(
+            element, {key: value for key, value in dict_in.items() if key != 'sign'}
+        ), precision) for element in elements if element != 'sign'  # sign messes up stuff
     }
 
     if not details:
@@ -220,16 +229,6 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
             out_dict['mol'] = eval(value)
         elif formula_property == "oxidation":
             out_dict['oxidation'] = value
-
-    if out_dict['element'] and out_dict['element'] != '*':
-        elements = [out_dict['element']]
-    else:
-        elements = dict_in.keys()
-    out_dict['element_percentages'] = {
-        element: percentage_calc(
-            element, {key: value for key, value in dict_in.items() if key != 'sign'}
-        ) for element in elements if element != 'sign'  # sign messes up stuff
-    }
 
     if out_dict['mass'] is not None and out_dict['mol'] is None:
         out_dict['mol'] = get_mole(mr, out_dict['mass'])

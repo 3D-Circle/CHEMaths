@@ -23,9 +23,34 @@ function detectMode(latex) {
 
 function renderResult(mode, result) {
     if (mode == "molecule") {
-        // alors Mr Takla :)
+        // Molecular formula
+        var molecular_formula = '';
+        for (key in result.molecule) {
+            if (key != 'sign') {
+                molecular_formula += key + '_{' + result.molecule[key] + '}';
+            }
+        }
+        $('#molecular_formula').html(molecular_formula);
+        // Name
+        $('#name').html('To be implemented...');
+        // Molar mass TODO: add option to change units and ajust precision
+        $('#molar_mass').html(result.info['mr'] + ' g / mol')
+        // Components & percentages
+        var composition = result.info.element_percentages;
+        // this sorts dict keys (http://stackoverflow.com/a/16794116/4489998)
+        var sorted_elements = Object.keys(composition).sort(function(a,b){return composition[a]-composition[b]})
+        var new_html = '';
+        var element;
+        var percentage;
+        for (var i = 0; i < sorted_elements.length; i++) {
+            element = sorted_elements[i];
+            percentage = composition[element];
+            new_html += '<div class="component"> ' + element + '<br>' + percentage +'%</div>';
+        }
+        $('#components').html(new_html);
+
     } else if (mode == "equation") {
-        // ah c'est moi ici oké
+        // mr jingjie
         console.log(result);
         var reactants = result.reactants;
         var products = result.products;
@@ -105,6 +130,21 @@ function render(mode) {
         }
     } 
 }
+
+
+function python_round(callback, n, precision) {
+    var result;
+    $.ajax({
+        url: "/round",
+        type: "post",
+        data: {
+            "n": n,
+            "precision": precision
+        },
+        success: callback
+    });
+}
+
 
 $(document).ready(function () {
     // set up input box

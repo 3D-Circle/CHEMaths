@@ -1,6 +1,4 @@
-* {
-    box-sizing: border-box;
-}
+
 
 /*For you the reader of my code (bonjour Mr Trak),
 Why not make a js for this? 
@@ -129,6 +127,7 @@ Don't forget about your tasks on heroku and float point :) */
     height: 100%;
     width: 100%;
     display: none;
+    padding: 30px;  /* for the table inside */
 }
 
 #info-this {
@@ -219,3 +218,34 @@ Don't forget about your tasks on heroku and float point :) */
 #info-equation > table .number {
     color: red;
 };
+
+
+/* Tables */
+
+table {
+    /* very required ! we have no idea why */
+}
+
+.results_display_table {
+    border-collapse: collapse;
+}
+
+.results_display_table td {
+    padding: 10px;
+    border: 1px solid gray;
+}
+
+.results_display_table td:first-child {
+    text-align: right;
+    vertical-align: center;
+}
+
+.component {
+    display: inline-block;
+    text-align: center;
+    margin: 4px;
+    padding: 4px;
+    background: whitesmoke;
+    box-shadow: 2px 2px 1px gray;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2)
+}

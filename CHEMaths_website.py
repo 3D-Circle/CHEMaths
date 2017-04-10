@@ -5,6 +5,7 @@ from latex_parser import latex2chem, latex_valid
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
 @app.route("/")
@@ -16,10 +17,13 @@ def home():
 @app.route("/live_preview", methods=['POST'])
 def live_process():
     """processes input dynamically"""
-    mode = request.values.get('mode', None)
-    latex = request.values.get('latex', None)
+    mode = request.values.get('mode')
+    latex = request.values.get('latex')
     if mode == 'molecule':
-        pass
+        return jsonify({
+            'molecule': latex2chem(latex),
+            'info': smart_calculate(latex2chem(latex), {})  # TODO: make the empty dict editable
+        })
     elif mode == 'equation':
         result = process_and_balance_equation(
             latex,
@@ -43,7 +47,14 @@ def live_process():
             'coefficients': coefficients,
             'error': error
         })
-    return jsonify({'result': latex2chem(latex)})
+
+
+@app.route('/round', methods=['GET', 'POST'])
+def python_round():
+    # TODO JINGJIE ! your job.
+    n = float(request.values.get('n'))
+    precision = int(request.values.get('precision', 2))
+    return jsonify({'result': round(n, precision)})
 
 
 @app.route("/results", methods=['POST'])
