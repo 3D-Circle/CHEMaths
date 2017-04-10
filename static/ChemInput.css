@@ -120,6 +120,8 @@ Don't forget about your tasks on heroku and float point :) */
 #mode, #infos {
     position: relative;
     height: 512px;
+    overflow: hidden;
+    float: left;
 }
 
 .panel {
@@ -188,16 +190,32 @@ Don't forget about your tasks on heroku and float point :) */
     background-color: skyblue;
 }
 
-#results-equation {
+#info-equation > table {
     width: 100%;
+    height: 100%;
+    margin: 2.5px;
 }
 
-#results-equation .error {
+#info-equation > table, #info-equation > table th, #info-equation > table td {
+    border: 1px;
+    text-align: justify;
+}
+
+#info-equation > table th {
+    width: 15%;
+    float: left;
+}
+
+#info-equation > table .data {
+    font-family: courier;
+    text-align: center;
+}
+
+#info-equation > table .error {
     color: red;
     font-family: menlo;
 }
 
-#results-equation .number {
-    font-family: courier;
+#info-equation > table .number {
     color: red;
 };

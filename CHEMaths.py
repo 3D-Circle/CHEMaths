@@ -201,7 +201,7 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
         'mr': mr,
         'msg': [f'Mr = {mr}'],
         'element': None,
-        'element_percentages': None,
+        'element_percentages': {},
         'mass': None,
         'mol': None,
         'oxidation': None
@@ -233,25 +233,23 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
 
     if out_dict['mass'] is not None and out_dict['mol'] is None:
         out_dict['mol'] = get_mole(mr, out_dict['mass'])
-        out_dict['msg'].append("mass = {} g".format(str(out_dict['mass'])))
+        out_dict['msg'] += [f"mass = {out_dict['mass']} g"]
     if out_dict['mol'] is not None and out_dict['mass'] is None:
         out_dict['mass'] = get_mass(mr, out_dict['mol'])
-        out_dict['msg'].append("mol = {}".format(str(out_dict['mol'])))
-    if out_dict['element_percentages'] is not None:
-        out_dict['msg'].append(", ".join(
-            ["% of {}: {}".format(
-                element, str(element_percentage)
-            ) for element, element_percentage in out_dict['element_percentages'].items()]
-        ))
+        out_dict['msg'] += [f"mol = {out_dict['mol']}"]
+    if out_dict['element_percentages']:
+        out_dict['msg'] += [", ".join(
+            [f"% of {element}: {percentage}" for element, percentage in out_dict['element_percentages'].items()]
+        )]
     if out_dict['oxidation'] is not None:
-        out_dict['msg'].append("oxidation = {}".format(calculate_oxidation(dict_in, return_string=True)))
+        out_dict['msg'] += [f"oxidation = {calculate_oxidation(dict_in, return_string=True)}"]
 
     out_dict['msg'] = '\n'.join(out_dict['msg'])
     return out_dict
 
 
 def process_and_balance_equation(equation: str, parser=process_formula,
-                                 split_token=(' + ', '->'), return_string=True):
+                                 split_token=(' + ', '->'), return_string=True, regex=False):
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
     error_messages = [f"Invalid syntax: no '{split_token[1]}' found",
@@ -260,7 +258,10 @@ def process_and_balance_equation(equation: str, parser=process_formula,
     equation_split = equation.split(split_token[1])
     if len(equation_split) != 2:
         return error_messages[0]
-    reactants, products = [sum_atoms.split(split_token[0]) for sum_atoms in equation_split]
+    if regex:
+        reactants, products = [re.findall(split_token[0], sum_atoms) for sum_atoms in equation_split]
+    else:
+        reactants, products = [sum_atoms.split(split_token[0]) for sum_atoms in equation_split]
     if len(reactants) == 0 or len(products) == 0:
         return error_messages[1]
     reactants_list = [parser(reactant) for reactant in reactants]

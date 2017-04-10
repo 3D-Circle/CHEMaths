@@ -34,7 +34,7 @@
     <!--Buttons for input field-->
     <div id="buttons" class="row">
         <div class="col-1_24"></div>
-        <button id='rightarrow' class="col-11_96">-></button>
+        <button id='rightarrow' class="col-11_96">&rarr;</button>
         <button id='sup' class="col-11_96">^</button>
         <button id='sub' class="col-11_96">_</button>
         <button id='left-parenthesis' class="col-11_96">(</button>
@@ -104,7 +104,24 @@
             </div>
 
             <div class="panel" id="info-equation">
-                <!--Dynamically generated table will be inserted here-->
+                <!--The content of the table will be updated live-->
+                <table>
+                    <tr id="reaction_type">
+                        <th>Reaction Type:</th>
+                    </tr>
+                    <tr id="formula">
+                        <th>Reaction Equation</th>
+                    </tr>
+                    <tr id="coefficient">
+                        <th>Mole Ratio</th>
+                    </tr>
+                    <tr id="mole">
+                        <th>Mole</th>
+                    </tr>
+                    <tr id="mass">
+                        <th>Mass</th>
+                    </tr>
+                </table>
             </div>
 
             <div class="panel" id="info-empirical">

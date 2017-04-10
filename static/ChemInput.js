@@ -2,6 +2,7 @@ var modes = [
     "this", "molecule", "equation", "empirical", "alkane"
 ];
 var currentMode = "equation";
+var MQ = MathQuill.getInterface(2);
 
 // detect mode from latex string
 function detectMode(latex) {
@@ -20,30 +21,56 @@ function detectMode(latex) {
     return mode;
 }
 
-function renderResult(mode, json_result) {
+function renderResult(mode, result) {
     if (mode == "molecule") {
         // alors Mr Takla :)
     } else if (mode == "equation") {
         // ah c'est moi ici oké
-        result = JSON.parse(json_result);
         console.log(result);
         var reactants = result.reactants;
         var products = result.products;
         var coefficients = result.coefficients;
         var error = result.error;
-
-        var table = "<table id=results-equation>";
-
-        table += "</table>";
-
+        $("#info-equation > table").find(".error, .data").remove();
         if (error) {
-            table += '<td><span class=error>' + error + '</span></td>';
+            $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
             for (var i = 0; i < 2 * reactants.length - 1 + 1 + 2 * products.length - 1; i++) {
-                var row = "<tr>";
+                var molecule = "";
+                var coefficient = "";
+                if (i < 2 * reactants.length - 1) {
+                    if (i % 2 == 0) {
+                        var index = i / 2;
+                        molecule = reactants[index];
+                        coefficient = coefficients[index];
+                    } else {
+                        molecule = "+";
+                    }
+                } else if (i == 2 * reactants.length - 1) {
+                        molecule = "\\rightarrow ";
+                } else {
+                    if (i % 2 == 0) {
+                        var index = (i - 2 * reactants.length) / 2;
+                        molecule = products[index];
+                        coefficient = coefficients[reactants.length + index];
+                    } else {
+                        molecule = "+";
+                    }
+                }
+                var molecule_id = "equation-formula" + index;
+                var coefficient_id = "equation-coefficient" + index;
+                $("<td><span class='data' id='" + molecule_id+ "'>" + molecule + "</span></td>").appendTo("#info-equation > table #formula");
+                $("<td><span class='data number' id='" + coefficient_id + "'>" + coefficient + "</span></td>").appendTo("#info-equation > table #coefficient");
+
+//                var molecule_col = MQ.StaticMath($('#' + molecule_id)[0]);
+//                var coefficient_col = MQ.StaticMath($('#' + coefficient_id)[0]);
+//                console.log(molecule);
+//                console.log(coefficient);
+//
+//                molecule_col.latex(molecule);
+//                coefficient_col.latex(coefficient);
             }
         }
-        $('#info-equation').append(table);
     }
 }
 
@@ -62,12 +89,12 @@ function render(mode) {
                 $other.each(function(index, self) {
                     var $this = $(self);
                     $this.removeClass('active').animate({
-                        left: $(window).width()
+                        left: $this.width()
                     }, 500);
                 });
 
                 $target.addClass('active').show().css({
-                    right: -($target.width())
+                    left: -($target.width())
                 }).animate({
                     left: 0
                 }, 500);
@@ -81,7 +108,6 @@ function render(mode) {
 
 $(document).ready(function () {
     // set up input box
-    var MQ = MathQuill.getInterface(2);
     var inputBox = $('#input')[0];
     var mainField = MQ.MathField(inputBox, {
         supSubsRequireOperand: true,
@@ -150,7 +176,7 @@ $(document).ready(function () {
         mainField.focus();
     });
     $('#plus').click(function () {
-        mainField.cmd('+\\');
+        mainField.cmd('+');
         mainField.focus();
     });
     $('#colon').click(function () {
@@ -172,7 +198,7 @@ $(document).ready(function () {
                 text = "O_2";
                 break;
             case "equation":
-                text = "H_2 \\+\\ O_2 \\rightarrow H_2O";
+                text = "H_2O \\rightarrow O_2 + H^+ + e^-";
                 break;
             case "empirical":
                 text = "K: 1.82, I: 5.93, O: 2.24";
