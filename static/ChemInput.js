@@ -33,7 +33,7 @@ function renderResult(mode, result) {
         $('#molecular_formula').html(molecular_formula);
         // Name
         $('#name').html('To be implemented...');
-        // Molar mass TODO: add option to change units and ajust precision
+        // Molar mass TODO: add option to change units and adjust precision
         $('#molar_mass').html(result.info['mr'] + ' g / mol')
         // Components & percentages
         var composition = result.info.element_percentages;
@@ -56,7 +56,7 @@ function renderResult(mode, result) {
         var products = result.products;
         var coefficients = result.coefficients;
         var error = result.error;
-        $("#info-equation > table").find(".error, .data").remove();
+        $("#info-equation > table").find("td").remove();
         if (error) {
             $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
@@ -82,18 +82,19 @@ function renderResult(mode, result) {
                         molecule = "+";
                     }
                 }
-                var molecule_id = "equation-formula" + index;
-                var coefficient_id = "equation-coefficient" + index;
-                $("<td><span class='data' id='" + molecule_id+ "'>" + molecule + "</span></td>").appendTo("#info-equation > table #formula");
-                $("<td><span class='data number' id='" + coefficient_id + "'>" + coefficient + "</span></td>").appendTo("#info-equation > table #coefficient");
 
-//                var molecule_col = MQ.StaticMath($('#' + molecule_id)[0]);
-//                var coefficient_col = MQ.StaticMath($('#' + coefficient_id)[0]);
-//                console.log(molecule);
-//                console.log(coefficient);
-//
-//                molecule_col.latex(molecule);
-//                coefficient_col.latex(coefficient);
+                var molecule_id = "equation-formula" + i;
+                var coefficient_id = "equation-coefficient" + i;
+
+                var molecule_span_html = "<span class='data' id='" + molecule_id+ "'>" + molecule + "</span>";
+                var coefficient_span_html = "<span class='data number' id='" + coefficient_id + "'>" + coefficient + "</span>";
+
+                $("<td>" + coefficient_span_html + molecule_span_html + "</td>").appendTo("#info-equation > table #formula");
+                $("<td>" + coefficient_span_html + "</td>").appendTo("#info-equation > table #coefficient");
+
+                var molecule_span = $("#" + molecule_id)[0]
+                molecule_display = MQ.StaticMath(molecule_span);
+                molecule_display.latex(molecule);
             }
         }
     }
@@ -128,7 +129,7 @@ function render(mode) {
             // update status label
             $('#' + option).removeClass("selected");
         }
-    } 
+    }
 }
 
 
@@ -158,7 +159,7 @@ $(document).ready(function () {
                 var latex = mainField.latex();
                 var currentMode = detectMode(latex)
                 render(currentMode);
-                
+
                 // ajax request for live preview
                 $.ajax({
                     url: "/live_preview",
@@ -174,10 +175,10 @@ $(document).ready(function () {
             }
         }
     });
-    
+
     mainField.focus();
     render("this");
-                   
+
     // confirm input
     $('#mainField').submit(function (e) {
         $('<input />').attr('type', 'hidden')
@@ -227,8 +228,8 @@ $(document).ready(function () {
         mainField.cmd(';');
         mainField.focus();
     });
-    
-    
+
+
     // show template when status label is clicked
     $('.status').click(function () {
         var mode = $(this).attr('id');

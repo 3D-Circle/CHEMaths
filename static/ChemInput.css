@@ -1,5 +1,9 @@
 
 
+body {
+    background-color: lavender;
+}
+
 /*For you the reader of my code (bonjour Mr Trak),
 Why not make a js for this? 
 Don't forget about your tasks on heroku and float point :) */
@@ -36,6 +40,7 @@ Don't forget about your tasks on heroku and float point :) */
 #input {
     height: 32px;
     width: 100%;
+    background-color: white;
 }
 
 #enter {
@@ -131,7 +136,7 @@ Don't forget about your tasks on heroku and float point :) */
 }
 
 #info-this {
-    background-color: ivory;
+    background-color: whitesmoke;
 }
 
 #info-this h1 {
@@ -174,19 +179,19 @@ Don't forget about your tasks on heroku and float point :) */
 }
 
 #info-molecule {
-    background-color: darksalmon;
+    background-color: #FADBD8;
 }
 
 #info-equation {
-    background-color: lightgreen;
+    background-color: #D6EAF8;
 }
 
 #info-empirical {
-	background-color: khaki;
+	background-color: #D4EFDF;
 }
 
 #info-alkane {
-    background-color: skyblue;
+    background-color: #FCF3CF;
 }
 
 #info-equation > table {
@@ -197,17 +202,19 @@ Don't forget about your tasks on heroku and float point :) */
 
 #info-equation > table, #info-equation > table th, #info-equation > table td {
     border: 1px;
-    text-align: justify;
 }
 
 #info-equation > table th {
     width: 15%;
-    float: left;
+    text-align: justify;
+}
+
+#info-equation > table td {
+    text-align: center;
 }
 
 #info-equation > table .data {
     font-family: courier;
-    text-align: center;
 }
 
 #info-equation > table .error {

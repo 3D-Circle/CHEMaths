@@ -39,7 +39,7 @@ def live_process():
             error = result
         else:
             coefficients = [
-                fr'\frac{{{fraction.numerator}}}{{{fraction.denominator}}}' for fraction in coefficients
+                f'{fraction.numerator}' for fraction in coefficients
             ]  # encode fractions in json
         return jsonify({
             'reactants': reactants,
