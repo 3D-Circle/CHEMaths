@@ -7,7 +7,6 @@ var MQ = MathQuill.getInterface(2);
 
 function renderResult(result) {
     var mode = result.mode;
-    console.log(mode);
     render(mode);
     if (mode == "molecule") {
         // Molecular formula
@@ -22,9 +21,14 @@ function renderResult(result) {
         // Name
         $('#name').html('To be implemented...');
 
-        // Molar mass TODO: add option to change units and adjust precision
-        $('#molar_mass').html('<div>' + result.info['mr'] + '</div> g / mol')
-        $('input#molar_mass_precision').val(2);
+        // Molar mass TODO: add option to change units ?
+        $('#molar_mass').html('<div></div> g / mol')
+        $('#molar_mass>div').data('fullfloat', result.info['mr']);
+        python_round([result.info['mr']], $('input#molar_mass_precision').val(), function (response) {
+            $('#molar_mass>div').html(response.result);
+        })
+        console.log($('#molar_mass>div').data('fullfloat'));
+
 
         // Components & percentages
         var composition = result.info.element_percentages;
@@ -32,25 +36,45 @@ function renderResult(result) {
         var sorted_elements = Object.keys(composition).sort(function(a,b){
             return composition[a]-composition[b]
         }).reverse();
-         var array_to_round = sorted_elements.map(function(x) {
+        var array_to_round = sorted_elements.map(function(x) {
             return composition[x];
-         });
-
+        });
+        $("#components").html('');  //clean up components
         var precision = 2;  // TODO: Replace with slider
         python_round(array_to_round, precision, function(rounded_array) {
-            var new_html = '';
             var element;
             var percentage;
             for (var i = 0; i < sorted_elements.length; i++) {
                 element = sorted_elements[i];
                 percentage = rounded_array.result[i];
-                new_html += '<div class="component">' + element + '<br><i>' + percentage +'%</i></div>';
+                $('#components').append('<div class="component" id="'+ element + '">' + element +
+                '<br><i><div>' + percentage +'</div>%</i></div>');
             }
-            $('#components').html(new_html);
-        })
+            // check for multiple ids and remove duplicates
+            var dup_id;
+            $('[id]').each(function(){
+                var ids = $('[id="'+this.id+'"]');
+                if(ids.length>1 && ids[0]==this) {
+                    dup_id = this.id;
+                }
+            });
+            $('#' + dup_id).remove();
+
+            for (var i = 0; i < sorted_elements.length; i++) {
+                element = sorted_elements[i];
+                true_percentage = array_to_round[i];
+                $('#' + element).find('div').data('fullfloat', true_percentage);
+            }
+        });
 
         // Oxidation
         $('#oxidation').html(result.info.oxidation);
+
+        // Set all precision range inputs to 2
+        var dummy = $('.precision').map(function (e) {
+
+            }
+        );
 
 
     } else if (mode == "equation") {
@@ -261,7 +285,7 @@ $(document).ready(function () {
 
 
     // show template when status label is clicked
-    $('.status').click(function () {
+    $('.status').click(function (e) {
         var mode = $(this).attr('id');
         var text;
         switch(mode) {
@@ -285,20 +309,43 @@ $(document).ready(function () {
         mainField.moveToLeftEnd();
         mainField.select();
 
-        // precision sliders change detection
-        $('input.precision').each(function() {
-            var elem = $(this);
-            // Look for changes in the value
-            elem.bind("input", precision_change);
-        });
+        e.stopImmediatePropagation();
+
     });
+
+    // precision sliders change detection
+    $('input.precision').each(function() {
+        var elem = $(this);
+        // Look for changes in the value
+        elem.bind("input", precision_change);
+    });
+
 });
 
 function precision_change(event) {
+    // change digits upon precision range input change
     var elem = event.target;
     var precision = elem.value;
     // get which value we have to change
-    var num_to_change = event.target.id.split('_');
-    num_to_change.pop()
-    num_to_change = num_to_change.join('_');
+    var target_wrapper_id = elem.id.split('_');
+    target_wrapper_id.pop();
+    target_wrapper_id = target_wrapper_id.join('_');
+    var target_wrapper = $('#' + target_wrapper_id);
+    var components = target_wrapper.find(".component");  //will be empty if there are none
+    var current_full_float_array;
+    if (components.length) {
+        for (var i = 0; i < components.length; i++) {
+            var current_component_id = $(components[i]).attr('id');
+            current_full_float_array = [$('#' + current_component_id).find('i').find('div').data('fullfloat')];
+            python_round(current_full_float_array, precision, function (response) {
+                $('#' + current_component_id).find('i').find('div').html(response.result);
+            })
+
+        }
+    } else {
+        current_full_float_array = [target_wrapper.find('div').data('fullfloat')];
+        python_round(current_full_float_array, precision, function (response) {
+            target_wrapper.find('div').html(response.result);
+        })
+    }
 }

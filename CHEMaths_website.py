@@ -63,7 +63,9 @@ def python_round():
     simply because rounding in javascript is AWFUL."""
     num_array = request.form.getlist("num_array[]", type=float)
     precision = int(request.values.get('precision', 2))
-    return jsonify({'result': [round(i, precision) for i in num_array]})
+    return jsonify({
+        'result': [format(round(i, precision), f'.{precision}f') for i in num_array]
+    })
 
 
 @app.route("/results", methods=['POST'])

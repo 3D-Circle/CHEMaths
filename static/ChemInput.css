@@ -241,7 +241,7 @@ Don't forget about your tasks on heroku and float point :) */
 };
 
 
-/* Tables */
+/* Table for results display */
 
 table {
     /* very required ! we have no idea why */
@@ -270,6 +270,10 @@ table {
     background: whitesmoke;
     box-shadow: 2px 2px 1px gray;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2)
+}
+
+#molar_mass div, .component div {
+    display: inline;
 }
 
 /* precision slider */
