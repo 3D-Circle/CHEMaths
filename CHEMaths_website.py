@@ -29,11 +29,11 @@ def live_process():
         })
     elif mode == 'equation':
         result = process_and_balance_equation(
-            latex.replace("\\", "").replace(' ', ''),
+            latex.replace("\\ ", '').replace("\\left(", '(').replace(r"\right)", ')'),
             parser=latex2chem,
             regex=True,
             split_token=(
-                r"(?:[\(eA-Z][a-z\)]*(?:_\{?\d*\}?(?:\)(?:_\d)?)*)?)+(?:\^\{?\d*[\+-]?\}?)?", 'rightarrow'
+                r"(?:[\(\)eA-Z][a-z]*(?:_\{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", '\\rightarrow'
             ),
             return_string=False
         )
@@ -44,7 +44,7 @@ def live_process():
             error = result
         else:
             coefficients = [f'{fraction.numerator}' for fraction in coefficients]
-            reaction_type = determine_reaction_type(reactants, products)
+            reaction_type = determine_reaction_type(reactants, products, coefficients)
         return jsonify({
             'mode': mode,
             'reaction_type': reaction_type,

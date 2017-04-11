@@ -172,12 +172,9 @@ def determine_mode(latex: str) -> str:
     elif latex:
         latex_sanitized = latex.replace("\\left(", '(').replace(r"\right)", ')')
         molecules_list = re.findall(
-            r"(?:[\(eA-Z][a-z\)]*(?:_\{? ?\d*\}?(?:\)(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", latex_sanitized
+            r"(?:[\(\)eA-Z][a-z]*(?:_\{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", latex_sanitized
         )
         molecule_count = len(molecules_list)
-        print(latex_sanitized)
-        print(molecules_list)
-
         if r"\rightarrow" in latex or molecule_count >= 2:
             return "equation"
         elif molecule_count == 1:

@@ -219,6 +219,10 @@ Don't forget about your tasks on heroku and float point :) */
     text-align: center;
 }
 
+#info-equation > table td.left_is_reactants_right_is_products {
+    background-color: lightgray;
+}
+
 #info-equation > table .data {
     font-family: courier;
 }
@@ -226,6 +230,10 @@ Don't forget about your tasks on heroku and float point :) */
 #info-equation > table .error {
     color: red;
     font-family: menlo;
+}
+
+#info-equation > table .nil {
+    color: grey;
 }
 
 #info-equation > table .number {

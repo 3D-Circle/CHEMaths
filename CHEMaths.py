@@ -247,11 +247,19 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
     return out_dict
 
 
-def determine_reaction_type(reactants: list, products: list) -> str:
+def determine_reaction_type(reactants: list, products: list, coefficients: list) -> str:
     """Determine the reaction type based on the given lists of reactants and products
     Outputs one of the following string:
     combustion, neutralisation, single displacement, double displacement, decomposition, synthesis, redox"""
     reaction_type = "$DEFAULT"  # TODO remove this
+    # Remove reactants / products with coefficient equal to 0
+    reactants, products = reactants.copy(), products.copy()
+    for i, coefficient in enumerate(coefficients):
+        if coefficient == '0':
+            if i < len(reactants):
+                reactants.pop(i)
+            else:
+                products.pop(i - len(reactants))
     if len(reactants) == len(products) == 1:
         reaction_type = "NOT A REACTION"
     elif len(reactants) == len(products) == 2:

@@ -69,7 +69,7 @@ function renderResult(result) {
             $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
             var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
-            $("<td colspan=" + total_length + ">" + reaction_type + "</td>").appendTo("#info-equation > table #reaction_type");
+            $("<td colspan=" + total_length + "><b>" + reaction_type + "</b></td>").appendTo("#info-equation > table #reaction_type");
             for (var i = 0; i < total_length; i++) {
                 var molecule = "";
                 var coefficient = "";
@@ -82,7 +82,7 @@ function renderResult(result) {
                         molecule = "+";
                     }
                 } else if (i == 2 * reactants.length - 1) {
-                        molecule = "\\rightarrow ";
+                        molecule = "\\rightarrow";
                 } else {
                     if (i % 2 == 0) {
                         var index = (i - 2 * reactants.length) / 2;
@@ -94,6 +94,7 @@ function renderResult(result) {
                 }
 
                 var molecule_id = "equation-formula" + i;
+                var coefficient_id = "equation-coefficient" + i;
 
                 var molecule_span_html = "<span class='data' id='" + molecule_id+ "'>" + molecule + "</span>";
                 var coefficient_span_html = "<span class='data number'>" + coefficient + "</span>";
@@ -103,7 +104,19 @@ function renderResult(result) {
                 }
 
                 $("<td>" + molecule_span_html + "</td>").appendTo("#info-equation > table #formula");
-                $("<td>" + coefficient_span_html + "</td>").appendTo("#info-equation > table #coefficient");
+                $("<td id='" + coefficient_id + "'>" + coefficient_span_html + "</td>").appendTo("#info-equation > table #coefficient");
+
+                if (coefficient == "0") {
+                    $("#" + molecule_id).addClass("nil");
+                    if (i != 0 || i != 2 * reactants.length) {
+                        $("#" + "equation-formula" + (i - 1)).addClass("nil");
+                    }
+                }
+
+                if (molecule == "\\rightarrow") {
+                    $("#" + molecule_id).parent().addClass("left_is_reactants_right_is_products");
+                    $("#" + coefficient_id).addClass("left_is_reactants_right_is_products");
+                }
 
                 var molecule_span = $("#" + molecule_id)[0]
                 molecule_display = MQ.StaticMath(molecule_span);
@@ -164,6 +177,8 @@ $(document).ready(function () {
     // set up input box
     var inputBox = $('#input')[0];
     var mainField = MQ.MathField(inputBox, {
+        supSubsRequireOperand: true,
+//        spaceBehavesLikeTab: true,
         supSubsRequireOperand: true,
         charsThatBreakOutOfSupSub: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
         handlers: {
