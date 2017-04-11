@@ -104,22 +104,33 @@
                         <tr>
                             <td>Molecular formula</td>
                             <td id="molecular_formula"></td>
+                            <td></td>  <!--Last element is necessary for using :last-child-->
                         </tr>
                         <tr>
                             <td>Name</td>
                             <td id="name"></td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td>Molar mass</td>
                             <td id="molar_mass"></td>
+                            <td>
+                                <input type="range"
+                                       name="molar_mass_precision"
+                                       id="molar_mass_precision"
+                                       class="precision"
+                                       min="0" max="5">
+                            </td>
                         </tr>
                         <tr>
                             <td>Components</td>
                             <td id="components"></td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td>Oxidation</td>
                             <td id="oxidation"></td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>

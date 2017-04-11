@@ -31,23 +31,40 @@ function renderResult(mode, result) {
             }
         }
         $('#molecular_formula').html(molecular_formula);
+
         // Name
         $('#name').html('To be implemented...');
+
         // Molar mass TODO: add option to change units and adjust precision
-        $('#molar_mass').html(result.info['mr'] + ' g / mol')
+        $('#molar_mass').html('<div>' + result.info['mr'] + '</div> g / mol')
+        $('input#molar_mass_precision').val(2);
+
         // Components & percentages
         var composition = result.info.element_percentages;
-        // this sorts dict keys (http://stackoverflow.com/a/16794116/4489998)
-        var sorted_elements = Object.keys(composition).sort(function(a,b){return composition[a]-composition[b]})
-        var new_html = '';
-        var element;
-        var percentage;
-        for (var i = 0; i < sorted_elements.length; i++) {
-            element = sorted_elements[i];
-            percentage = composition[element];
-            new_html += '<div class="component"> ' + element + '<br>' + percentage +'%</div>';
-        }
-        $('#components').html(new_html);
+        // this sorts dict keys according to concentration (http://stackoverflow.com/a/16794116/4489998)
+        var sorted_elements = Object.keys(composition).sort(function(a,b){
+            return composition[a]-composition[b]
+        }).reverse();
+         var array_to_round = sorted_elements.map(function(x) {
+            return composition[x];
+         });
+
+        var precision = 2;  // TODO: Replace with slider
+        python_round(array_to_round, precision, function(rounded_array) {
+            var new_html = '';
+            var element;
+            var percentage;
+            for (var i = 0; i < sorted_elements.length; i++) {
+                element = sorted_elements[i];
+                percentage = rounded_array.result[i];
+                new_html += '<div class="component">' + element + '<br><i>' + percentage +'%</i></div>';
+            }
+            $('#components').html(new_html);
+        })
+
+        // Oxidation
+        $('#oxidation').html(result.info.oxidation);
+
 
     } else if (mode == "equation") {
         // mr jingjie
@@ -132,14 +149,14 @@ function render(mode) {
     }
 }
 
-
-function python_round(callback, n, precision) {
-    var result;
+// python round function takes precision as an argument
+function python_round(num_array, precision, callback) {
+    // if you want only one value, use an array with one element
     $.ajax({
         url: "/round",
         type: "post",
         data: {
-            "n": n,
+            "num_array": num_array,
             "precision": precision
         },
         success: callback
@@ -254,5 +271,20 @@ $(document).ready(function () {
         mainField.focus();
         mainField.moveToLeftEnd();
         mainField.select();
+
+        // precision sliders change detection
+        $('input.precision').each(function() {
+            // Look for changes in the value
+            elem.bind("input", precision_change);
+        });
     });
 });
+
+function precision_change(event) {
+    var elem = event.target;
+    var precision = elem.value;
+    // get which value we have to change
+    var num_to_change = event.target.id.split('_');
+    num_to_change.pop()
+    num_to_change = num_to_change.join('_');
+}

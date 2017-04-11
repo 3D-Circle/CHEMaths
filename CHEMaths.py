@@ -194,7 +194,7 @@ def get_inversion(iterable: iter) -> int:
     return total
 
 
-def smart_calculate(dict_in: dict, details: dict, precision=2) -> dict:
+def smart_calculate(dict_in: dict, details: dict) -> dict:
     """Smart handling input details (i.e. mole, mass, etc.) and printing out available information"""
     mr = mr_calc(dict_in)
     out_dict = {
@@ -211,9 +211,9 @@ def smart_calculate(dict_in: dict, details: dict, precision=2) -> dict:
     else:
         elements = dict_in.keys()
     out_dict['element_percentages'] = {
-        element: round(percentage_calc(
+        element: percentage_calc(
             element, {key: value for key, value in dict_in.items() if key != 'sign'}
-        ), precision) for element in elements if element != 'sign'  # sign messes up stuff
+        ) for element in elements if element != 'sign'  # sign messes up stuff
     }
 
     if not details:

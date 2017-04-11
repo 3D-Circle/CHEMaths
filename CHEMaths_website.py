@@ -51,10 +51,9 @@ def live_process():
 
 @app.route('/round', methods=['GET', 'POST'])
 def python_round():
-    # TODO JINGJIE ! your job.
-    n = float(request.values.get('n'))
+    num_array = request.form.getlist("num_array[]", type=float)
     precision = int(request.values.get('precision', 2))
-    return jsonify({'result': round(n, precision)})
+    return jsonify({'result': [round(i, precision) for i in num_array]})
 
 
 @app.route("/results", methods=['POST'])
