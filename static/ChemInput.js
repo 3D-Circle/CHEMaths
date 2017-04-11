@@ -172,7 +172,8 @@ $(document).ready(function () {
                 var latex = mainField.latex();
                 if (latex.includes("->")) {
                     var new_latex = latex.replace("->", "\\rightarrow ");
-                    mainField.latex(new_latex);  // this function will be called again
+                    mainField.latex(new_latex);
+                    latex = mainField.latex();
                 }
 
                 // ajax request for live preview
