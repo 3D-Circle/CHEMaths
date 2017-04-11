@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
 from flask import Flask, jsonify, render_template, request, redirect
-from latex_parser import latex2chem, latex_valid
+from latex_parser import latex2chem, latex_valid, determine_mode
 from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
+from CHEMaths import determine_reaction_type
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -17,40 +18,49 @@ def home():
 @app.route("/live_preview", methods=['POST'])
 def live_process():
     """processes input dynamically"""
-    mode = request.values.get('mode')
     latex = request.values.get('latex')
+    mode = determine_mode(latex)
     if mode == 'molecule':
+        parsed_molecule = latex2chem(latex)
         return jsonify({
-            'molecule': latex2chem(latex),
-            'info': smart_calculate(latex2chem(latex), {})  # TODO: make the empty dict editable
+            'mode': mode,
+            'molecule': parsed_molecule,
+            'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
         })
     elif mode == 'equation':
         result = process_and_balance_equation(
-            latex,
+            latex.replace("\\", "").replace(' ', ''),
             parser=latex2chem,
             regex=True,
-            split_token=(r"[eA-Z][_A-Za-z\d]*(?:\^\{?\d*[\+-]\}?)?", '\\rightarrow '),
+            split_token=(
+                r"(?:[\(eA-Z][a-z\)]*(?:_\{?\d*\}?(?:\)(?:_\d)?)*)?)+(?:\^\{?\d*[\+-]?\}?)?", 'rightarrow'
+            ),
             return_string=False
         )
-        reactants, products, coefficients, error = None, None, None, None
+        reaction_type, reactants, products, coefficients, error = None, None, None, None, None
         try:
             reactants, products, coefficients = result
         except ValueError:  # too many values to unpack
             error = result
         else:
-            coefficients = [
-                f'{fraction.numerator}' for fraction in coefficients
-            ]  # encode fractions in json
+            coefficients = [f'{fraction.numerator}' for fraction in coefficients]
+            reaction_type = determine_reaction_type(reactants, products)
         return jsonify({
+            'mode': mode,
+            'reaction_type': reaction_type,
             'reactants': reactants,
             'products': products,
             'coefficients': coefficients,
             'error': error
         })
+    else:
+        return jsonify({'mode': mode})
 
 
 @app.route('/round', methods=['GET', 'POST'])
 def python_round():
+    """Round the input number to the input precision from the request,
+    simply because rounding in javascript is AWFUL."""
     num_array = request.form.getlist("num_array[]", type=float)
     precision = int(request.values.get('precision', 2))
     return jsonify({'result': [round(i, precision) for i in num_array]})

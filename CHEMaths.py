@@ -247,11 +247,29 @@ def smart_calculate(dict_in: dict, details: dict) -> dict:
     return out_dict
 
 
+def determine_reaction_type(reactants: list, products: list) -> str:
+    """Determine the reaction type based on the given lists of reactants and products
+    Outputs one of the following string:
+    combustion, neutralisation, single displacement, double displacement, decomposition, synthesis, redox"""
+    reaction_type = "$DEFAULT"  # TODO remove this
+    if len(reactants) == len(products) == 1:
+        reaction_type = "NOT A REACTION"
+    elif len(reactants) == len(products) == 2:
+        pass
+    elif len(reactants) == 1 and len(products) >= 2:
+        reaction_type = "Decomposition"
+    elif len(reactants) >= 2 and len(products) == 1:
+        reaction_type = "Synthesis"
+    else:
+        pass
+    return reaction_type
+
+
 def process_and_balance_equation(equation: str, parser=process_formula,
                                  split_token=(' + ', '->'), return_string=True, regex=False):
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
-    error_messages = [f"Invalid syntax: no '{split_token[1]}' found",
+    error_messages = [f"Invalid syntax: '{split_token[1]}' is misplaced",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
     equation_split = equation.split(split_token[1])

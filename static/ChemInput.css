@@ -132,11 +132,10 @@ Don't forget about your tasks on heroku and float point :) */
     height: 100%;
     width: 100%;
     display: none;
-    padding: 30px;  /* for the table inside */
 }
 
 #info-this {
-    background-color: whitesmoke;
+    background-color: ghostwhite;
 }
 
 #info-this h1 {
@@ -204,9 +203,16 @@ Don't forget about your tasks on heroku and float point :) */
     border: 1px;
 }
 
+#info-equation > table tr {
+    background: mintcream;
+}
+
 #info-equation > table th {
     width: 15%;
     text-align: justify;
+    background-color: azure;
+    padding-left: 10px;
+    border-radius: 2.5px;
 }
 
 #info-equation > table td {

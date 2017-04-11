@@ -4,24 +4,11 @@ var modes = [
 var currentMode = "equation";
 var MQ = MathQuill.getInterface(2);
 
-// detect mode from latex string
-function detectMode(latex) {
-    if (latex.toLowerCase().includes("rightarrow")) {
-            mode = "equation";
-        } else if (latex.toLowerCase().includes("alkane")) {
-            mode = "alkane";
-        } else if (latex.includes(":")) {
-            mode = "empirical";
-        } else if (latex
-        ) {
-            mode = "molecule";
-        } else {
-            mode = "this"; // shows information on website
-        }
-    return mode;
-}
 
-function renderResult(mode, result) {
+function renderResult(result) {
+    var mode = result.mode;
+    console.log(mode);
+    render(mode);
     if (mode == "molecule") {
         // Molecular formula
         var molecular_formula = '';
@@ -69,15 +56,21 @@ function renderResult(mode, result) {
     } else if (mode == "equation") {
         // mr jingjie
         console.log(result);
+        var reaction_type = result.reaction_type;
         var reactants = result.reactants;
         var products = result.products;
         var coefficients = result.coefficients;
         var error = result.error;
+
+        // remove old data
         $("#info-equation > table").find("td").remove();
+        // add new data
         if (error) {
             $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
-            for (var i = 0; i < 2 * reactants.length - 1 + 1 + 2 * products.length - 1; i++) {
+            var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
+            $("<td colspan=" + total_length + ">" + reaction_type + "</td>").appendTo("#info-equation > table #reaction_type");
+            for (var i = 0; i < total_length; i++) {
                 var molecule = "";
                 var coefficient = "";
                 if (i < 2 * reactants.length - 1) {
@@ -101,12 +94,15 @@ function renderResult(mode, result) {
                 }
 
                 var molecule_id = "equation-formula" + i;
-                var coefficient_id = "equation-coefficient" + i;
 
                 var molecule_span_html = "<span class='data' id='" + molecule_id+ "'>" + molecule + "</span>";
-                var coefficient_span_html = "<span class='data number' id='" + coefficient_id + "'>" + coefficient + "</span>";
+                var coefficient_span_html = "<span class='data number'>" + coefficient + "</span>";
 
-                $("<td>" + coefficient_span_html + molecule_span_html + "</td>").appendTo("#info-equation > table #formula");
+                if (coefficient != 1) {
+                    molecule_span_html = coefficient_span_html + molecule_span_html;
+                }
+
+                $("<td>" + molecule_span_html + "</td>").appendTo("#info-equation > table #formula");
                 $("<td>" + coefficient_span_html + "</td>").appendTo("#info-equation > table #coefficient");
 
                 var molecule_span = $("#" + molecule_id)[0]
@@ -174,19 +170,20 @@ $(document).ready(function () {
             edit: function () {
                 // update render
                 var latex = mainField.latex();
-                var currentMode = detectMode(latex)
-                render(currentMode);
+                if (latex.includes("->")) {
+                    var new_latex = latex.replace("->", "\\rightarrow ");
+                    mainField.latex(new_latex);  // this function will be called again
+                }
 
                 // ajax request for live preview
                 $.ajax({
                     url: "/live_preview",
                     type: "post",
                     data: {
-                        "mode": currentMode,
                         "latex": latex
                     },
                     success: function(response){
-                        renderResult(currentMode, response);
+                        renderResult(response);
                     }
                 });
             }

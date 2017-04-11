@@ -161,6 +161,32 @@ def jingjie_latex2chem(latex: str) -> dict:
     return dict(dict_return)
 
 
+def determine_mode(latex: str) -> str:
+    """Determine the mode (i.e. functionality) the server should use to process the given latex string
+    Return one of the following strings:
+    this (default case), molecule, equation, empirical, alkane"""
+    if "alkane" in latex.lower():
+        return "alkane"
+    if ":" in latex:
+        return "empirical"
+
+    latex_sanitized = latex.replace("\\left(", '(').replace(r"\right)", ')')
+    molecules_list = re.findall(
+        r"(?:[\(eA-Z][a-z\)]*(?:_\{? ?\d*\}?(?:\)(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", latex_sanitized
+    )
+    molecule_count = len(molecules_list)
+    print(latex_sanitized)
+    print(molecules_list)
+
+    if r"\rightarrow" in latex or molecule_count >= 2:
+        return "equation"
+    elif molecule_count == 1:
+        if latex_sanitized == molecules_list[0]:
+            return "molecule"
+        else:
+            return "equation"
+
+
 if __name__ == '__main__':
     expression = '(CH_2)'
     print(latex2chem(expression))
