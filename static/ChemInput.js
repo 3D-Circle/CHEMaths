@@ -274,6 +274,7 @@ $(document).ready(function () {
 
         // precision sliders change detection
         $('input.precision').each(function() {
+            var elem = $(this);
             // Look for changes in the value
             elem.bind("input", precision_change);
         });

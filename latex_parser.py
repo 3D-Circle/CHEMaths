@@ -54,7 +54,9 @@ def latex2chem(latex: str) -> dict:
                 # get paren contents
                 nested = exp[opening + 1:closing]
                 # find coefficient for paren content
-                nested_coefficient = int(re.findall('\d*', exp[closing + 2:])[0])
+                nested_coefficient = int(
+                    re.findall('\d*', exp[closing + 2:])[0]
+                ) if len(exp) != closing + 1 and exp[closing + 1] == '_' else 1
                 # delete paren contents + coef from initial expression
                 exp = exp[:opening] + exp[closing + 2 + len(str(nested_coefficient)):]
                 # rerun the contents of the parentheses in the same function with the coef as top_level_coefficient
@@ -160,6 +162,6 @@ def jingjie_latex2chem(latex: str) -> dict:
 
 
 if __name__ == '__main__':
-    expression = 'CH_3(CH_2)_3CH_3'
+    expression = '(CH_2)'
     print(latex2chem(expression))
     print(jingjie_latex2chem(expression))
