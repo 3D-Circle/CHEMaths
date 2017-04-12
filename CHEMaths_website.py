@@ -22,20 +22,29 @@ def live_process():
     mode = determine_mode(latex)
     syntax = latex_valid(latex, mode)
     if mode == 'molecule':
-        parsed_molecule = latex2chem(latex)
-        return jsonify({
-            'mode': mode,
-            'syntax': syntax,
-            'molecule': parsed_molecule,
-            'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
-        })
+        error = syntax[1] if not syntax[0] else None
+        if error:
+            return jsonify({
+                'error': error,
+                'mode': mode,
+                'syntax': syntax
+            })
+        else:
+            parsed_molecule = latex2chem(latex)
+            return jsonify({
+                'error': error,
+                'mode': mode,
+                'syntax': syntax,
+                'molecule': parsed_molecule,
+                'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
+            })
     elif mode == 'equation':
         result = process_and_balance_equation(
             latex.replace("\\ ", '').replace("\\left(", '(').replace(r"\right)", ')'),
             parser=latex2chem,
             regex=True,
             split_token=(
-                r"(?:[\(\)eA-Z][a-z]*(?:_\{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", '\\rightarrow'
+                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", '\\rightarrow'
             ),
             return_string=False
         )

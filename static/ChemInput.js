@@ -18,81 +18,84 @@ function renderResult(result) {
     if (syntax[1]) {
         $("#syntax_check_error_text").text(syntax[1]);
     }
-    // TODO show message
     if (mode == "molecule") {
-        // Molecular formula
-        var molecular_formula = '';
-        for (key in result.molecule) {
-            if (key != 'sign') {
-                if (result.molecule[key] == 1) {
-                    molecular_formula += key;
-                } else {
-                    molecular_formula += key + '_{' + result.molecule[key] + '}';
+        var error = result.error;
+        if (error) {
+            $('#molecular_formula').html('<span class=error>' + error + '</span>');
+        } else  {
+            // Molecular formula
+            var molecular_formula = '';
+            for (key in result.molecule) {
+                if (key != 'sign') {
+                    if (result.molecule[key] == 1) {
+                        molecular_formula += key;
+                    } else {
+                        molecular_formula += key + '_{' + result.molecule[key] + '}';
+                    }
                 }
             }
-        }
 
-        $('#molecular_formula').html('<span></span>');  // TODO: order the elements correctly
-        var molecular_formula_span = $('#molecular_formula>span')[0];
-        molecular_formula_display = MQ.StaticMath(molecular_formula_span);
-        molecular_formula_display.latex(molecular_formula);
+            $('#molecular_formula').html('<span></span>');  // TODO: order the elements correctly
+            var molecular_formula_span = $('#molecular_formula>span')[0];
+            molecular_formula_display = MQ.StaticMath(molecular_formula_span);
+            molecular_formula_display.latex(molecular_formula);
 
-        // Name
-        $('#name').html('To be implemented...');
+            // Name
+            $('#name').html('To be implemented...');
 
-        // Molar mass TODO: add option to change units ?
-        $('#molar_mass').html('<div></div> g / mol')
-        $('#molar_mass>div').data('fullfloat', result.info['mr']);
-        python_round([result.info['mr']], $('input#molar_mass_precision').val(), function (response) {
-            $('#molar_mass>div').html(response.result);
-        })
+            // Molar mass TODO: add option to change units ?
+            $('#molar_mass').html('<div></div> g / mol')
+            $('#molar_mass>div').data('fullfloat', result.info['mr']);
+            python_round([result.info['mr']], $('input#molar_mass_precision').val(), function (response) {
+                $('#molar_mass>div').html(response.result);
+            })
 
-        // Components & percentages
-        var composition = result.info.element_percentages;
-        // this sorts dict keys according to concentration (http://stackoverflow.com/a/16794116/4489998)
-        var sorted_elements = Object.keys(composition).sort(function(a,b){
-            return composition[a]-composition[b]
-        }).reverse();
-        var array_to_round = sorted_elements.map(function(x) {
-            return composition[x];
-        });
-        $("#components").html('');  //clean up components
-        var precision = $('#components_precision').val();
-        python_round(array_to_round, precision, function(rounded_array) {
-            var element;
-            var percentage;
-            for (var i = 0; i < sorted_elements.length; i++) {
-                element = sorted_elements[i];
-                percentage = rounded_array.result[i];
-                $('#components').append('<div class="component" id="'+ element + '">' + element +
-                '<br><i><div>' + percentage +'</div>%</i></div>');
-            }
-            // check for multiple ids and remove duplicates
-            var dup_id;
-            $('[id]').each(function(){
-                var ids = $('[id="'+this.id+'"]');
-                if(ids.length>1 && ids[0]==this) {
-                    dup_id = this.id;
+            // Components & percentages
+            var composition = result.info.element_percentages;
+            // this sorts dict keys according to concentration (http://stackoverflow.com/a/16794116/4489998)
+            var sorted_elements = Object.keys(composition).sort(function(a,b){
+                return composition[a]-composition[b]
+            }).reverse();
+            var array_to_round = sorted_elements.map(function(x) {
+                return composition[x];
+            });
+            $("#components").html('');  //clean up components
+            var precision = $('#components_precision').val();
+            python_round(array_to_round, precision, function(rounded_array) {
+                var element;
+                var percentage;
+                for (var i = 0; i < sorted_elements.length; i++) {
+                    element = sorted_elements[i];
+                    percentage = rounded_array.result[i];
+                    $('#components').append('<div class="component" id="'+ element + '">' + element +
+                    '<br><i><div>' + percentage +'</div>%</i></div>');
+                }
+                // check for multiple ids and remove duplicates
+                var dup_id;
+                $('[id]').each(function(){
+                    var ids = $('[id="'+this.id+'"]');
+                    if(ids.length>1 && ids[0]==this) {
+                        dup_id = this.id;
+                    }
+                });
+                $('#' + dup_id).remove();
+
+                for (var i = 0; i < sorted_elements.length; i++) {
+                    element = sorted_elements[i];
+                    true_percentage = array_to_round[i];
+                    $('#' + element).find('div').data('fullfloat', true_percentage);
                 }
             });
-            $('#' + dup_id).remove();
 
-            for (var i = 0; i < sorted_elements.length; i++) {
-                element = sorted_elements[i];
-                true_percentage = array_to_round[i];
-                $('#' + element).find('div').data('fullfloat', true_percentage);
-            }
-        });
+            // Oxidation
+            $('#oxidation').html(result.info.oxidation);
 
-        // Oxidation
-        $('#oxidation').html(result.info.oxidation);
-
-        // Set all precision range inputs to 2
-        $.makeArray($('.precision')).map(function (slider) {
-                return $(slider).val(2);
-            }
-        );
-
+            // Set all precision range inputs to 2
+            $.makeArray($('.precision')).map(function (slider) {
+                    return $(slider).val(2);
+                }
+            );
+        }
 
     } else if (mode == "equation") {
         // mr jingjie

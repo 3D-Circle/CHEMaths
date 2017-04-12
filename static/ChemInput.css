@@ -91,6 +91,7 @@ Don't forget about your tasks on heroku and float point :) */
             );
         width: 32px;
         height: 32px;
+        margin: auto;
 }
 
 #syntax_check_status.syntax_error {
@@ -111,10 +112,17 @@ Don't forget about your tasks on heroku and float point :) */
 
 #syntax_check_text {
     transition: visibility 0.5s;
+    width: 16px;
+    height: 16px;
     border-radius: 16px;
     text-align: center;
+    margin: auto;
     color: white;
     background-color: black;
+}
+
+#syntax_check_text:hover {
+    opacity: 0.8;
 }
 
 #syntax_check_text:hover > #syntax_check_error_text {
@@ -286,13 +294,13 @@ Don't forget about your tasks on heroku and float point :) */
     border-bottom: 1px lightgray solid;
 }
 
-#info-equation > table .error {
+.error {
     color: red;
     font-family: menlo;
 }
 
 #info-equation > table .nil {
-    color: grey;
+    color: gray;
 }
 
 

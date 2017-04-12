@@ -3,6 +3,7 @@
 import collections
 import re
 import string
+from CHEMaths import relative_atomic_mass
 
 
 def latex_valid(latex: str, mode: str) -> (bool, str):
@@ -10,7 +11,29 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
     Return True and an empty string if nothing is wrong, else return False with error message"""
     if mode == "this":
         return True, "Welcome! Feed me some chemistry :)"
-    if mode == "molecule":
+    elif mode == "molecule":
+        illegal_characters = [char for char in latex
+                              if char not in string.ascii_lowercase and char not in string.ascii_uppercase
+                              and char not in '123456789+-()_^{ }\\']
+        if illegal_characters:
+            return False, f"Illegal characters: '{''.join(illegal_characters)}'"
+        if "{ }" in latex:
+            return False, "Superscript / subscript is left empty"
+        if re.findall(r"_(?!{?\d}?)", latex):
+            return False, "Subscript should only contain integer coefficient"
+        if re.findall(r"\^(?!({\d*)?[\+-]}?)", latex):
+            return False, "Superscript should only contain integer charges" \
+                          "(0 and 1 can and should be omitted)" \
+                          "with '+' or '-' placed at the end"
+        matched = re.findall(
+            r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", latex
+        )[0]
+        if matched != latex:
+            return False, "Syntax error"
+        parsed = latex2chem(latex)
+        for element in parsed.keys():
+            if element not in relative_atomic_mass and element != "sign":
+                return False, f"Unknown element: '{element}'"
         return True, ""
     elif mode == "equation":
         return True, ""
