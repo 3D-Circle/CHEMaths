@@ -88,7 +88,7 @@ function renderResult(result) {
 
         // remove old data
         $("#info-equation > table").find("td").remove();
-        // add new data
+        // get and add new data
         if (error) {
             $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
@@ -97,11 +97,15 @@ function renderResult(result) {
             for (var i = 0; i < total_length; i++) {
                 var molecule = "";
                 var coefficient = "";
+                var mole_index = null;
+                var mass_index = null;
                 if (i < 2 * reactants.length - 1) {
                     if (i % 2 == 0) {
                         var index = i / 2;
                         molecule = reactants[index];
                         coefficient = coefficients[index];
+                        mole_index = index;
+                        mass_index = index;
                     } else {
                         molecule = "+";
                     }
@@ -112,39 +116,73 @@ function renderResult(result) {
                         var index = (i - 2 * reactants.length) / 2;
                         molecule = products[index];
                         coefficient = coefficients[reactants.length + index];
+                        mole_index = reactants.length + index;
+                        mass_index = reactants.length + index;
                     } else {
                         molecule = "+";
                     }
                 }
-
+                // create <td>'s
                 var molecule_id = "equation-formula" + i;
                 var coefficient_id = "equation-coefficient" + i;
+                var mole_id = "equation-mole" + i;
+                var mass_id = "equation-mass" + i;
 
-                var molecule_span_html = "<span class='data' id='" + molecule_id+ "'>" + molecule + "</span>";
-                var coefficient_span_html = "<span class='data number'>" + coefficient + "</span>";
+                var molecule_span_html = "<span id='" + molecule_id + "'>" + molecule + "</span>"; // just in case
+                var coefficient_span_html = "<span class='number'>" + coefficient + "</span>";
+                var mole_span_html = "<span id='" + mole_id + "'></span>";
+                var mass_span_html = "<span id='" + mass_id + "'></span>";
 
                 if (coefficient != 1) {
                     molecule_span_html = coefficient_span_html + molecule_span_html;
                 }
 
-                $("<td>" + molecule_span_html + "</td>").appendTo("#info-equation > table #formula");
-                $("<td id='" + coefficient_id + "'>" + coefficient_span_html + "</td>").appendTo("#info-equation > table #coefficient");
+                // add to DOM
+                var data_table = "#info-equation > table ";
+                $("<td>" + molecule_span_html + "</td>").appendTo(data_table + "#formula");
+                $("<td id='" + coefficient_id + "'>" + coefficient_span_html + "</td>").appendTo(data_table + "#coefficient");
+                $("<td>" + mole_span_html + "</td>").appendTo(data_table + "#mole");
+                $("<td>" + mass_span_html + "</td>").appendTo(data_table + "#mass");
 
+                // add color themes
                 if (coefficient == "0") {
                     $("#" + molecule_id).addClass("nil");
                     if (i != 0 || i != 2 * reactants.length) {
                         $("#" + "equation-formula" + (i - 1)).addClass("nil");
                     }
+                    $("#" + molecule_id).parent().addClass("trivial");
+                    $("#" + coefficient_id).addClass("trivial");
+                    $("#" + mole_id).addClass("trivial");
+                    $("#" + mass_id).addClass("trivial");
                 }
 
-                if (molecule == "\\rightarrow") {
-                    $("#" + molecule_id).parent().addClass("left_is_reactants_right_is_products");
-                    $("#" + coefficient_id).addClass("left_is_reactants_right_is_products");
+                var color_theme_class = "";
+                switch (molecule) {
+                    case "\\rightarrow":
+                        color_theme_class = "left_is_reactants_right_is_products";
+                        break;
+                    case "+":
+                        color_theme_class = "trivial";
                 }
 
-                var molecule_span = $("#" + molecule_id)[0]
+                $("#" + molecule_id).parent().addClass(color_theme_class);
+                $("#" + coefficient_id).addClass(color_theme_class);
+                $("#" + mole_id).parent().addClass(color_theme_class);
+                $("#" + mass_id).parent().addClass(color_theme_class);
+
+                // render latex
+                var molecule_span = $("#" + molecule_id)[0];
                 molecule_display = MQ.StaticMath(molecule_span);
                 molecule_display.latex(molecule);
+
+                if (mole_index !== null && mass_index !== null) {
+                    var mole_span = $("#" + mole_id)[0];
+                    var mass_span = $("#" + mass_id)[0];
+                    $(mole_span).addClass("sub_field");
+                    $(mass_span).addClass("sub_field");
+                    mole_input = MQ.MathField(mole_span);
+                    mass_input = MQ.MathField(mass_span);  // TODO add config and ajax
+                }
             }
         }
     }
@@ -312,6 +350,12 @@ $(document).ready(function () {
         e.stopImmediatePropagation();
 
     });
+
+  // gitter chat for feedback
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'CHEMaths/Lobby'
+  };
+
 
     // precision sliders change detection
     $('input.precision').each(function() {

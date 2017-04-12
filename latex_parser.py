@@ -178,10 +178,7 @@ def determine_mode(latex: str) -> str:
         if r"\rightarrow" in latex or molecule_count >= 2:
             return "equation"
         elif molecule_count == 1:
-            if latex_sanitized == molecules_list[0]:
-                return "molecule"
-            else:
-                return "equation"
+            return "molecule"
     else:
         return "this"
 

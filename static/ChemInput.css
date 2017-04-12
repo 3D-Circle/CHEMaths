@@ -220,11 +220,11 @@ Don't forget about your tasks on heroku and float point :) */
 }
 
 #info-equation > table td.left_is_reactants_right_is_products {
-    background-color: lightgray;
+    background-color: darkgray;
 }
 
-#info-equation > table .data {
-    font-family: courier;
+#info-equation > table td.trivial {
+    background-color: lightgray;
 }
 
 #info-equation > table .error {
@@ -236,9 +236,17 @@ Don't forget about your tasks on heroku and float point :) */
     color: grey;
 }
 
+
 #info-equation > table .number {
     color: red;
+    font-family: courier;
 };
+
+#info-equation > table td > span.sub_field {
+    width: 32px;
+    background-color: black;
+    color: yellow;
+}
 
 
 /* Table for results display */
