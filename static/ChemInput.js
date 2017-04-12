@@ -13,10 +13,18 @@ function renderResult(result) {
         var molecular_formula = '';
         for (key in result.molecule) {
             if (key != 'sign') {
-                molecular_formula += key + '_{' + result.molecule[key] + '}';
+                if (result.molecule[key] == 1) {
+                    molecular_formula += key;
+                } else {
+                    molecular_formula += key + '_{' + result.molecule[key] + '}';
+                }
             }
         }
-        $('#molecular_formula').html(molecular_formula);
+
+        $('#molecular_formula').html('<span></span>');  // TODO: order the elements correctly
+        var molecular_formula_span = $('#molecular_formula>span')[0];
+        molecular_formula_display = MQ.StaticMath(molecular_formula_span);
+        molecular_formula_display.latex(molecular_formula);
 
         // Name
         $('#name').html('To be implemented...');
@@ -27,8 +35,6 @@ function renderResult(result) {
         python_round([result.info['mr']], $('input#molar_mass_precision').val(), function (response) {
             $('#molar_mass>div').html(response.result);
         })
-        console.log($('#molar_mass>div').data('fullfloat'));
-
 
         // Components & percentages
         var composition = result.info.element_percentages;
@@ -40,7 +46,7 @@ function renderResult(result) {
             return composition[x];
         });
         $("#components").html('');  //clean up components
-        var precision = 2;  // TODO: Replace with slider
+        var precision = $('#components_precision').val();
         python_round(array_to_round, precision, function(rounded_array) {
             var element;
             var percentage;
@@ -182,7 +188,7 @@ function render(mode) {
     }
 }
 
-// python round function takes precision as an argument
+// python round function takes precision as an argument (unlike js!)
 function python_round(num_array, precision, callback) {
     // if you want only one value, use an array with one element
     $.ajax({
@@ -331,17 +337,19 @@ function precision_change(event) {
     target_wrapper_id.pop();
     target_wrapper_id = target_wrapper_id.join('_');
     var target_wrapper = $('#' + target_wrapper_id);
-    var components = target_wrapper.find(".component");  //will be empty if there are none
+    var components = target_wrapper.find(".component").toArray();  //will be empty if there are none
     var current_full_float_array;
     if (components.length) {
-        for (var i = 0; i < components.length; i++) {
-            var current_component_id = $(components[i]).attr('id');
+        var current_component_id;
+        components.forEach(function(current_component) {
+            current_component_id = $(current_component).attr('id');
             current_full_float_array = [$('#' + current_component_id).find('i').find('div').data('fullfloat')];
-            python_round(current_full_float_array, precision, function (response) {
-                $('#' + current_component_id).find('i').find('div').html(response.result);
-            })
-
-        }
+            (function(c_id) {
+                python_round(current_full_float_array, precision, function (response) {
+                    $('#' + c_id).find('i').find('div').html(response.result);
+                })
+            })(current_component_id)
+        });
     } else {
         current_full_float_array = [target_wrapper.find('div').data('fullfloat')];
         python_round(current_full_float_array, precision, function (response) {
