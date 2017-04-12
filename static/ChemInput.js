@@ -71,8 +71,8 @@ function renderResult(result) {
         $('#oxidation').html(result.info.oxidation);
 
         // Set all precision range inputs to 2
-        var dummy = $('.precision').map(function (e) {
-
+        $.makeArray($('.precision')).map(function (slider) {
+                return $(slider).val(2);
             }
         );
 
