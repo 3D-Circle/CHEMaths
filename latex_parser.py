@@ -14,7 +14,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
     elif mode == "molecule":
         illegal_characters = [char for char in latex
                               if char not in string.ascii_lowercase and char not in string.ascii_uppercase
-                              and char not in '123456789+-()_^{ }\\']
+                              and char not in '0123456789+-()_^{ }\\']
         if illegal_characters:
             return False, f"Illegal characters: '{''.join(illegal_characters)}'"
         if "{ }" in latex:
