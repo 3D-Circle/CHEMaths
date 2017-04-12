@@ -5,9 +5,21 @@ import re
 import string
 
 
-def latex_valid(latex: str) -> bool:
-    """Determine if the input latex string is valid"""
-    return '' in latex  # TODO this
+def latex_valid(latex: str, mode: str) -> (bool, str):
+    """Check if there is any syntax error in the given latex string depending on given mode
+    Return True and an empty string if nothing is wrong, else return False with error message"""
+    if mode == "this":
+        return True, "Welcome! Feed me some chemistry :)"
+    if mode == "molecule":
+        return True, ""
+    elif mode == "equation":
+        return True, ""
+    else:
+        if mode == "empirical":
+            pass
+        if mode == "alkane":
+            pass
+        return True, ""
 
 
 def eval_latex(latex: str) -> float:

@@ -20,10 +20,12 @@ def live_process():
     """processes input dynamically"""
     latex = request.values.get('latex')
     mode = determine_mode(latex)
+    syntax = latex_valid(latex, mode)
     if mode == 'molecule':
         parsed_molecule = latex2chem(latex)
         return jsonify({
             'mode': mode,
+            'syntax': syntax,
             'molecule': parsed_molecule,
             'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
         })
@@ -47,6 +49,7 @@ def live_process():
             reaction_type = determine_reaction_type(reactants, products, coefficients)
         return jsonify({
             'mode': mode,
+            'syntax': syntax,
             'reaction_type': reaction_type,
             'reactants': reactants,
             'products': products,
@@ -54,7 +57,10 @@ def live_process():
             'error': error
         })
     else:
-        return jsonify({'mode': mode})
+        return jsonify({
+            'mode': mode,
+            'syntax': syntax
+        })
 
 
 @app.route('/round', methods=['GET', 'POST'])

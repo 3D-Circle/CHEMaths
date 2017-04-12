@@ -8,6 +8,17 @@ var MQ = MathQuill.getInterface(2);
 function renderResult(result) {
     var mode = result.mode;
     render(mode);
+    var syntax = result.syntax;
+    if (syntax[0] === true) {
+        $("#syntax_check_status").removeClass("syntax_error");
+        $("#syntax_check_error_text").text("No problems found :)")
+    } else {
+        $("#syntax_check_status").addClass("syntax_error");
+    }
+    if (syntax[1]) {
+        $("#syntax_check_error_text").text(syntax[1]);
+    }
+    // TODO show message
     if (mode == "molecule") {
         // Molecular formula
         var molecular_formula = '';
@@ -269,7 +280,7 @@ $(document).ready(function () {
     });
 
     mainField.focus();
-    render("this");
+    renderResult({'mode': "this", "syntax": [true, "Welcome! Feed me chemistry :)"]});
 
     // confirm input
     $('#mainField').submit(function (e) {

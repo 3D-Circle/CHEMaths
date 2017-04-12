@@ -78,6 +78,63 @@ Don't forget about your tasks on heroku and float point :) */
     }
 }
 
+#syntax_check_status {
+        background:
+            linear-gradient(
+                to left top,
+                rgba(50, 205, 50, 0.9) 0%/*bottom-right color*/,
+                rgba(0, 255, 127, 0.85) 50% /*middle color*/,
+                rgba(0, 255, 127, 0.8) 100% /*top-left color*/
+            ),
+            /*"faked" black background make sure to add last or it will appear before the transparent/colored layer*/
+            linear-gradient(
+                rgba(255, 255, 255, 1),
+                rgba(255, 255, 255, 1)
+            );
+        width: 32px;
+        height: 32px;
+}
+
+#syntax_check_status.syntax_error {
+    background:
+            linear-gradient(
+                to left top,
+                rgba(255, 0, 0, 0.9) 0%/*bottom-right color*/,
+                rgba(220, 20, 60, 0.85) 50% /*middle color*/,
+                rgba(250, 128, 114, 0.8) 100% /*top-left color*/
+            ),
+            /*"faked" black background make sure to add last or it will appear before the transparent/colored layer*/
+            linear-gradient(
+                rgba(255, 255, 255, 1),
+                rgba(255, 255, 255, 1)
+            );
+    transition: background 0.25s;
+}
+
+#syntax_check_text {
+    transition: visibility 0.5s;
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+    background-color: black;
+}
+
+#syntax_check_text:hover > #syntax_check_error_text {
+    visibility: visible;
+}
+
+#syntax_check_error_text {
+    visibility: hidden;
+    margin-top: -40px;
+    position: absolute;
+    z-index: 1;
+
+    background-color: whitesmoke;
+    color: gray;
+    padding: 2.5px;
+    border-radius: 5px;
+}
+
 #buttons button {
     border-radius: 5px;
     background-color: burlywood;
@@ -196,11 +253,11 @@ Don't forget about your tasks on heroku and float point :) */
 #info-equation > table {
     width: 100%;
     height: 100%;
-    margin: 2.5px;
 }
 
 #info-equation > table, #info-equation > table th, #info-equation > table td {
-    border: 1px;
+    border: 1px gray solid;
+    border-collapse: collapse;
 }
 
 #info-equation > table tr {
@@ -221,10 +278,12 @@ Don't forget about your tasks on heroku and float point :) */
 
 #info-equation > table td.left_is_reactants_right_is_products {
     background-color: darkgray;
+    border-bottom: 1px darkgray solid;
 }
 
 #info-equation > table td.trivial {
     background-color: lightgray;
+    border-bottom: 1px lightgray solid;
 }
 
 #info-equation > table .error {
