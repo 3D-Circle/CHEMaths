@@ -273,24 +273,24 @@ def determine_reaction_type(reactants: list, products: list, coefficients: list)
     return reaction_type
 
 
-def process_and_balance_equation(equation: str, parser=process_formula,
-                                 split_token=(' + ', '->'), return_string=True, regex=False):
+def process_and_balance_equation(equation: str, pre_processed=None, return_string=True):
     """processes input string chemical equation into a matrix and return the least 
     significant integer solution to that matrix which is the balanced equation"""
-    error_messages = [f"Invalid syntax: '{split_token[1]}' is misplaced",
+    error_messages = ["Invalid syntax: '->' is misplaced",
                       "Value Error: no reactant / product found",
                       "Value Error: equation not feasible"]
-    equation_split = equation.split(split_token[1])
-    if len(equation_split) != 2:
-        return error_messages[0]
-    if regex:
-        reactants, products = [re.findall(split_token[0], sum_atoms) for sum_atoms in equation_split]
+    if pre_processed:
+        reactants_list, products_list = pre_processed
+        reactants, products = None, None  # for pycharm inspection
     else:
-        reactants, products = [sum_atoms.split(split_token[0]) for sum_atoms in equation_split]
-    if len(reactants) == 0 or len(products) == 0:
-        return error_messages[1]
-    reactants_list = [parser(reactant) for reactant in reactants]
-    products_list = [parser(product) for product in products]
+        equation_split = equation.split('->')
+        if len(equation_split) != 2:
+            return error_messages[0]
+        reactants, products = [sum_atoms.split(' + ') for sum_atoms in equation_split]
+        if len(reactants) == 0 or len(products) == 0:
+            return error_messages[1]
+        reactants_list = [process_formula(reactant) for reactant in reactants]
+        products_list = [process_formula(product) for product in products]
     atoms_list_raw = reactants_list + products_list
     atoms_list = []
     for atom_dict in atoms_list_raw:
@@ -327,11 +327,12 @@ def process_and_balance_equation(equation: str, parser=process_formula,
         )
 
     if not return_string:
-        return reactants, products, solution  # for server usage
-    out_msg = ' -> '.join([
-        split_token[0].join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
-        split_token[0].join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
-    ])
+        return solution  # for server usage
+    else:
+        out_msg = ' -> '.join([
+            ' + '.join([format_string(index, reactant) for index, reactant in enumerate(reactants)]),
+            ' + '.join([format_string(len(reactants) + index, product) for index, product in enumerate(products)])
+        ])
     return out_msg
 
 

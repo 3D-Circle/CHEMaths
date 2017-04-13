@@ -9,19 +9,20 @@ function renderResult(result) {
     var mode = result.mode;
     render(mode);
     var syntax = result.syntax;
-    if (syntax[0] === true) {
+    var error = result.error;
+    if (syntax == true) {
         $("#syntax_check_status").removeClass("syntax_error");
         $("#syntax_check_error_text").text("No problems found :)")
     } else {
         $("#syntax_check_status").addClass("syntax_error");
     }
-    if (syntax[1]) {
-        $("#syntax_check_error_text").text(syntax[1]);
+    if (error) {
+        $("#syntax_check_error_text").text(error);
     }
     if (mode == "molecule") {
-        var error = result.error;
         if (error) {
-            $('#molecular_formula').html('<span class=error>' + error + '</span>');
+            // There are problems, so nothing will be rendered
+            $('#molecular_formula').html('<p class=error>' + error + '</p>');
         } else  {
             // Molecular formula
             var molecular_formula = '';
@@ -99,12 +100,10 @@ function renderResult(result) {
 
     } else if (mode == "equation") {
         // mr jingjie
-        console.log(result);
         var reaction_type = result.reaction_type;
         var reactants = result.reactants;
         var products = result.products;
         var coefficients = result.coefficients;
-        var error = result.error;
 
         // remove old data
         $("#info-equation > table").find("td").remove();
@@ -172,8 +171,8 @@ function renderResult(result) {
                     }
                     $("#" + molecule_id).parent().addClass("trivial");
                     $("#" + coefficient_id).addClass("trivial");
-                    $("#" + mole_id).addClass("trivial");
-                    $("#" + mass_id).addClass("trivial");
+                    $("#" + mole_id).parent().addClass("trivial");
+                    $("#" + mass_id).parent().addClass("trivial");
                 }
 
                 var color_theme_class = "";
@@ -289,7 +288,7 @@ $(document).ready(function () {
     });
 
     mainField.focus();
-    renderResult({'mode': "this", "syntax": [true, "Welcome! Feed me chemistry :)"]});
+    renderResult({'mode': "this", "syntax": true, "error": "Welcome! Feed me chemistry :)"});
 
     // confirm input
     $('#mainField').submit(function (e) {

@@ -20,45 +20,39 @@ def live_process():
     """processes input dynamically"""
     latex = request.values.get('latex')
     mode = determine_mode(latex)
-    syntax = latex_valid(latex, mode)
-    if mode == 'molecule':
-        error = syntax[1] if not syntax[0] else None
+    syntax_check = latex_valid(latex, mode)
+    error = syntax_check[1] if not syntax_check[0] else None
+    if mode == 'this':
+        return jsonify({
+            'mode': mode,
+            'syntax': syntax_check[0],
+            'error': syntax_check[1]  # more like a welcoming note than an error :)
+        })
+    elif mode == 'molecule':
         if error:
             return jsonify({
                 'error': error,
                 'mode': mode,
-                'syntax': syntax
+                'syntax': syntax_check[0]
             })
         else:
-            parsed_molecule = latex2chem(latex)
+            parsed_molecule = syntax_check[1]
             return jsonify({
                 'error': error,
                 'mode': mode,
-                'syntax': syntax,
+                'syntax': syntax_check[0],
                 'molecule': parsed_molecule,
                 'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
             })
     elif mode == 'equation':
-        result = process_and_balance_equation(
-            latex.replace("\\ ", '').replace("\\left(", '(').replace(r"\right)", ')'),
-            parser=latex2chem,
-            regex=True,
-            split_token=(
-                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", '\\rightarrow'
-            ),
-            return_string=False
-        )
-        reaction_type, reactants, products, coefficients, error = None, None, None, None, None
-        try:
-            reactants, products, coefficients = result
-        except ValueError:  # too many values to unpack
-            error = result
-        else:
-            coefficients = [f'{fraction.numerator}' for fraction in coefficients]
+        reaction_type, reactants, products, coefficients = None, None, None, None
+        if not error:
+            reactants, products, coefficients = syntax_check[1]
             reaction_type = determine_reaction_type(reactants, products, coefficients)
+            coefficients = [f'{fraction.numerator}' for fraction in coefficients]
         return jsonify({
             'mode': mode,
-            'syntax': syntax,
+            'syntax': syntax_check[0],
             'reaction_type': reaction_type,
             'reactants': reactants,
             'products': products,
@@ -68,7 +62,7 @@ def live_process():
     else:
         return jsonify({
             'mode': mode,
-            'syntax': syntax
+            'syntax': syntax_check[0]
         })
 
 

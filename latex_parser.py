@@ -3,7 +3,7 @@
 import collections
 import re
 import string
-from CHEMaths import relative_atomic_mass
+import CHEMaths
 
 
 def latex_valid(latex: str, mode: str) -> (bool, str):
@@ -22,9 +22,9 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
         if re.findall(r"_(?!{?\d}?)", latex):
             return False, "Subscript should only contain integer coefficient"
         if re.findall(r"\^(?!({\d*)?[\+-]}?)", latex):
-            return False, "Superscript should only contain integer charges" \
-                          "(0 and 1 can and should be omitted)" \
-                          "with '+' or '-' placed at the end"
+            return False, "Superscript should only contain integer charges <br>" \
+                          "(0 and 1 can and should be omitted) <br>" \
+                          "with '+' or '-' placed at the end <br>"
         matched = re.findall(
             r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", latex
         )[0]
@@ -32,11 +32,44 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
             return False, "Syntax error"
         parsed = latex2chem(latex)
         for element in parsed.keys():
-            if element not in relative_atomic_mass and element != "sign":
+            if element not in CHEMaths.relative_atomic_mass and element != "sign":
                 return False, f"Unknown element: '{element}'"
-        return True, ""
+        return True, parsed
     elif mode == "equation":
-        return True, ""
+        sanitized = latex.replace("\\ ", '').replace("\\left(", '(').replace(r"\right)", ')')
+        try:
+            reactants_string, products_string = sanitized.split('\\rightarrow')
+        except ValueError:  # not enough values to unpack
+            return False, "Invalid syntax: '->' (\\rightarrow) is misplaced or missing"
+        else:
+            if not reactants_string:
+                return False, "No reactant found"
+            if not products_string:
+                return False, "No product found"
+            reactants = re.findall(
+                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", reactants_string
+            )
+            products = re.findall(
+                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", products_string
+            )
+            reactants_parsed, products_parsed = [], []
+            for index, molecule in enumerate(reactants + products):
+                molecule_check = latex_valid(molecule, "molecule")
+                if not molecule_check[0]:
+                    return False, molecule_check[1]
+                else:
+                    if index < len(reactants):
+                        reactants_parsed.append(molecule_check[1])  # parsed molecule
+                    else:
+                        products_parsed.append(molecule_check[1])
+            result = CHEMaths.process_and_balance_equation(
+                "",
+                pre_processed=(reactants_parsed, products_parsed),
+                return_string=False
+            )
+            if type(result) == str:  # reaction infeasible
+                return False, result
+        return True, (reactants, products, result)
     else:
         if mode == "empirical":
             pass
