@@ -164,6 +164,7 @@ function renderResult(result) {
                 $("<td>" + mass_span_html + "</td>").appendTo(data_table + "#mass");
 
                 // add color themes
+                var trivial = false;
                 if (coefficient == "0") {
                     $("#" + molecule_id).addClass("nil");
                     if (i != 0 || i != 2 * reactants.length) {
@@ -173,6 +174,7 @@ function renderResult(result) {
                     $("#" + coefficient_id).addClass("trivial");
                     $("#" + mole_id).parent().addClass("trivial");
                     $("#" + mass_id).parent().addClass("trivial");
+                    trivial = true;
                 }
 
                 var color_theme_class = "";
@@ -194,7 +196,7 @@ function renderResult(result) {
                 molecule_display = MQ.StaticMath(molecule_span);
                 molecule_display.latex(molecule);
 
-                if (mole_index !== null && mass_index !== null) {
+                if ((mole_index !== null && mass_index !== null) && !trivial) {
                     var mole_span = $("#" + mole_id)[0];
                     var mass_span = $("#" + mass_id)[0];
                     $(mole_span).addClass("sub_field");

@@ -260,7 +260,7 @@ def determine_reaction_type(reactants: list, products: list, coefficients: list)
                 reactants.pop(i)
             else:
                 products.pop(i - len(reactants))
-    if len(reactants) == len(products) == 1:
+    if len(reactants) == len(products) == 1 or not len(reactants) or not len(products):
         reaction_type = "NOT A REACTION"
     elif len(reactants) == len(products) == 2:
         pass
