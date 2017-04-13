@@ -255,7 +255,7 @@ def determine_reaction_type(reactants: list, products: list, coefficients: list)
     # Remove reactants / products with coefficient equal to 0
     reactants, products = reactants.copy(), products.copy()
     for i, coefficient in enumerate(coefficients):
-        if coefficient == '0':
+        if coefficient == 0:
             if i < len(reactants):
                 reactants.pop(i)
             else:

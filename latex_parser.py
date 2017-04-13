@@ -94,7 +94,7 @@ def latex2chem(latex: str) -> dict:
         if charge in ['+', '-']:
             result_dict['sign'] = int(f'{charge}1')
         else:
-            result_dict['sign'] = int(charge[::-1])
+            result_dict['sign'] = int(f'{charge[-1]}{charge[:-1]}')
     else:
         result_dict['sign'] = 0
 

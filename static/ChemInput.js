@@ -206,6 +206,10 @@ function renderResult(result) {
                 }
             }
         }
+    } else if (mode == "empirical") {
+        // TODO this and fix float point issues
+    } else if (mode == "alkane") {
+
     }
 }
 
