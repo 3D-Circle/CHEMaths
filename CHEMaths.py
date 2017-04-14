@@ -337,20 +337,39 @@ def process_and_balance_equation(equation: str, pre_processed=None, return_strin
 
 
 class Matrix:
-    """Implementation of matrices in mathematics"""
-    def __init__(self, m: int, n: int):
+    """Implementation of matrices in mathematics
+    constructs a zero matrix of size m * n by default"""
+    def __init__(self, m: int, n: int, identity=False):
         """Initiate a m*n zero matrix"""
         self.matrix = [[0] * n for _ in range(m)]
         self.size = [m, n]
+
+        if identity and m == n:
+            for i in range(m):
+                self.assign_new_value(i, i, 1)
 
     def __str__(self) -> str:
         """String representation of a matrix"""
         return "[\n" + '\n'.join(['  ' + ' '.join([str(num) for num in row]) for row in self.matrix]) + "\n]"
 
+    def __repr__(self) -> str:
+        """String representation of the matrix"""
+        return self.__str__()
+
     def __copy__(self):
         """Return a copy of the matrix to avoid side effects"""
         A = Matrix(self.size[0], self.size[1])
         A.matrix = [row.copy() for row in self.matrix]
+        return A
+
+    def transpose(self, override=False):
+        """Return the transpose of this matrix"""
+        A = Matrix(self.size[1], self.size[0])
+        for i in range(self.size[0]):
+            for j in range(self.size[1]):
+                A.matrix[j][i] = self.matrix[i][j]
+        if override:
+            self.matrix = A.matrix
         return A
 
     def assign_new_value(self, i: int, j: int, value):
@@ -376,7 +395,7 @@ class Matrix:
         for col_index in range(self.size[1]):
             self.matrix[row_index][col_index] += coefficient * self.matrix[row_to_add_index][col_index]
 
-    def rref(self, override=False, return_pivots=False):
+    def rref(self, override=False, return_pivots=False, juxtaposed=None):
         """return the reduced row echelon form of the matrix"""
         # Make a copy of matrix to avoid side effects
         m, n = self.size
@@ -393,15 +412,21 @@ class Matrix:
                 for new_row in range(row + 1, m):
                     if A.matrix[new_row][col] != 0:
                         pivot = A.matrix[new_row][col]
+                        if isinstance(juxtaposed, Matrix):
+                            juxtaposed.swap_rows(row, new_row)
                         A.swap_rows(row, new_row)
                         break
                 else:
                     col += 1
                     continue
             pivot_list.append((row, col))
+            if isinstance(juxtaposed, Matrix):
+                juxtaposed.multiply_row(row, fractions.Fraction(1, pivot))
             A.multiply_row(row, fractions.Fraction(1, pivot))
             for row_to_subtract in range(row + 1, m):
                 if A.matrix[row_to_subtract][col] != 0:
+                    if isinstance(juxtaposed, Matrix):
+                        juxtaposed.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
                     A.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
             row += 1
             col += 1
@@ -412,12 +437,14 @@ class Matrix:
             while pivot_list:
                 r_pivot, r_col = pivot_list.pop()
                 for r in range(r_pivot):
+                    if isinstance(juxtaposed, Matrix):
+                        juxtaposed.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
                     A.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
 
         if override:
             self.matrix = A.matrix
         if return_pivots:
-            return A.matrix, pivot_list_copy
+            return pivot_list_copy
         return A.matrix
 
     def det(self):
@@ -456,7 +483,7 @@ class Matrix:
         if homogeneous:
             # avoid side effects
             A = self.__copy__()
-            pivots = A.rref(override=True, return_pivots=True)[1]  # pivots list
+            pivots = A.rref(override=True, return_pivots=True)  # pivots list
             independent_variables = A.size[1] - A.rank(pre_processed=True)
             if independent_variables == 0:  # no independent variable -> zero solution
                 return [0] * self.size[1]
@@ -472,13 +499,30 @@ class Matrix:
 
                     solution_lists.append(local_solution_list)
                 if integer_minimal:
-                    # TODO | better implementation -> IA
                     integer_solution_list = [
                         sum([solution_list[i] for solution_list in solution_lists]) for i in range(self.size[1])
                     ]
                     common_multiplier = lcm_multiple([entry.denominator for entry in integer_solution_list])
                     return [integer_solution_list[i] * common_multiplier for i in range(self.size[1])]
                 return solution_lists
+
+    def null_space(self):
+        """Determine the basis of kernel / null space of this matrix
+        i.e. the set v such that Av = 0
+        This can be found by transforming (A^T|I^T)^T to (B^T|C^T)^T
+        where B^T is in row echelon form and B thus in column echelon form
+        the basis of the null space correspond to the non-zero rows of C^T such that
+        corresponding rows of B^T are zero rows"""
+        A_T = self.__copy__().transpose()  # avoid side effects
+        I_T = Matrix(self.size[1], self.size[1], identity=True)
+        B_T = A_T.rref(juxtaposed=I_T)  # note: B_T is a list of lists, not a Matrix
+        C_T = I_T
+
+        kernel = []
+        for r_index in range(A_T.size[0]):
+            if all([B_T[r_index][c_index] == 0 for c_index in range(A_T.size[1])]):
+                kernel.append(C_T.matrix[r_index])
+        return kernel
 
 
 def calculate_oxidation(dict_in: dict, return_string=False):
