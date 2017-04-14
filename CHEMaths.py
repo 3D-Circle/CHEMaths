@@ -370,6 +370,7 @@ class Matrix:
                 A.matrix[j][i] = self.matrix[i][j]
         if override:
             self.matrix = A.matrix
+            self.size = self.size[::-1]
         return A
 
     def assign_new_value(self, i: int, j: int, value):
@@ -414,6 +415,7 @@ class Matrix:
                         pivot = A.matrix[new_row][col]
                         if isinstance(juxtaposed, Matrix):
                             juxtaposed.swap_rows(row, new_row)
+                            print(juxtaposed)
                         A.swap_rows(row, new_row)
                         break
                 else:
@@ -422,11 +424,13 @@ class Matrix:
             pivot_list.append((row, col))
             if isinstance(juxtaposed, Matrix):
                 juxtaposed.multiply_row(row, fractions.Fraction(1, pivot))
+                print(juxtaposed)
             A.multiply_row(row, fractions.Fraction(1, pivot))
             for row_to_subtract in range(row + 1, m):
                 if A.matrix[row_to_subtract][col] != 0:
                     if isinstance(juxtaposed, Matrix):
                         juxtaposed.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
+                        print(juxtaposed)
                     A.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
             row += 1
             col += 1
@@ -439,6 +443,7 @@ class Matrix:
                 for r in range(r_pivot):
                     if isinstance(juxtaposed, Matrix):
                         juxtaposed.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
+                        print(juxtaposed)
                     A.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
 
         if override:
