@@ -21,12 +21,12 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
             return False, "Superscript / subscript is left empty"
         if re.findall(r"_(?!{?\d}?)", latex):
             return False, "Subscript should only contain integer coefficient"
-        if re.findall(r"\^(?!({\d*)?[\+-]}?)", latex):
+        if re.findall(r"\^(?!({\d*)?[+-]}?)", latex):
             return False, "Superscript should only contain integer charges <br>" \
                           "(0 and 1 can and should be omitted) <br>" \
                           "with '+' or '-' placed at the end <br>"
         matched = re.findall(
-            r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", latex
+            r"(?:[()eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[+-]?}?)?", latex
         )[0]
         if matched != latex:
             return False, "Syntax error"
@@ -36,7 +36,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                 return False, f"Unknown element: '{element}'"
         return True, parsed
     elif mode == "equation":
-        sanitized = latex.replace("\\ ", '').replace("\\left(", '(').replace(r"\right)", ')')
+        sanitized = latex.replace("\\ ", '').replace(" ", '').replace("\\left(", '(').replace(r"\right)", ')')
         try:
             reactants_string, products_string = sanitized.split('\\rightarrow')
         except ValueError:  # not enough values to unpack
@@ -46,17 +46,13 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                 return False, "No reactant found"
             if not products_string:
                 return False, "No product found"
-            reactants = re.findall(
-                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", reactants_string
-            )
-            products = re.findall(
-                r"(?:[\(\)eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[\+-]?}?)?", products_string
-            )
+            reactants = re.split(r"(?<!{\d)(?<!\^)\+", reactants_string)
+            products = re.split(r"(?<!{\d)(?<!\^)\+", products_string)
             reactants_parsed, products_parsed = [], []
             for index, molecule in enumerate(reactants + products):
                 molecule_check = latex_valid(molecule, "molecule")
                 if not molecule_check[0]:
-                    return False, molecule_check[1]
+                    return False, f"'{molecule}': {molecule_check[1]}"
                 else:
                     if index < len(reactants):
                         reactants_parsed.append(molecule_check[1])  # parsed molecule
@@ -80,7 +76,8 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
 
 def eval_latex(latex: str) -> float:
     """Evaluates the input latex string"""
-    pass
+    print(latex)
+    return 0.1
 
 
 def latex2chem(latex: str) -> dict:
@@ -240,7 +237,7 @@ def determine_mode(latex: str) -> str:
     elif latex:
         latex_sanitized = latex.replace("\\left(", '(').replace(r"\right)", ')')
         molecules_list = re.findall(
-            r"(?:[\(\)eA-Z][a-z]*(?:_\{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^\{? ?\d*[\+-]?\}?)?", latex_sanitized
+            r"(?:[()eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[+-]?\}?)?", latex_sanitized
         )
         molecule_count = len(molecules_list)
         if r"\rightarrow" in latex or molecule_count >= 2:
