@@ -17,7 +17,7 @@ function renderResult(result) {
         $("#syntax_check_status").addClass("syntax_error");
     }
     if (error) {
-        $("#syntax_check_error_text").text(error);
+        $("#syntax_check_error_text").html(error);
     }
     if (mode == "molecule") {
         if (error) {

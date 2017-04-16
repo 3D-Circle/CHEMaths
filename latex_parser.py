@@ -9,20 +9,24 @@ import CHEMaths
 def latex_valid(latex: str, mode: str) -> (bool, str):
     """Check if there is any syntax error in the given latex string depending on given mode
     Return True and an empty string if nothing is wrong, else return False with error message"""
+    latex = latex
     if mode == "this":
-        return True, "Welcome! Feed me some chemistry :)"
+        return True, "Welcome! Type some chemistry or click on the red buttons :)"
     elif mode == "molecule":
         illegal_characters = [char for char in latex
                               if char not in string.ascii_lowercase and char not in string.ascii_uppercase
                               and char not in '0123456789+-()_^{ }\\']
         if illegal_characters:
-            return False, f"Illegal characters: '{''.join(illegal_characters)}'"
+            return False, f"Illegal character(s): '{''.join(illegal_characters)}'"
         if "{ }" in latex:
             return False, "Superscript / subscript is left empty"
-        if re.findall(r"_(?!{?\d}?)", latex):
+        if len(re.findall(r"(?<![A-Za-z])e(?!\^(-|{1-}))", latex)):
+            return False, "Electrons should only be used with -1 charge alone"
+        if len(re.findall(r"_(?!{?\d}?)", latex)):
             return False, "Subscript should only contain integer coefficient"
-        if re.findall(r"\^(?!({\d*)?[+-]}?)", latex):
-            return False, "Superscript should only contain integer charges <br>" \
+        if len(re.findall(r"\^(?!({\d)?[+-]}?)", latex)):
+            return False, "<br>" \
+                          "Superscript should only contain 1-digit integer charges <br>" \
                           "(0 and 1 can and should be omitted) <br>" \
                           "with '+' or '-' placed at the end <br>"
         matched = re.findall(
@@ -36,9 +40,8 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                 return False, f"Unknown element: '{element}'"
         return True, parsed
     elif mode == "equation":
-        sanitized = latex.replace("\\ ", '').replace(" ", '').replace("\\left(", '(').replace(r"\right)", ')')
         try:
-            reactants_string, products_string = sanitized.split('\\rightarrow')
+            reactants_string, products_string = latex.split('\\rightarrow')
         except ValueError:  # not enough values to unpack
             return False, "Invalid syntax: '->' (\\rightarrow) is misplaced or missing"
         else:
@@ -48,6 +51,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                 return False, "No product found"
             reactants = re.split(r"(?<!{\d)(?<!\^)\+", reactants_string)
             products = re.split(r"(?<!{\d)(?<!\^)\+", products_string)
+            # TODO aha apparently doesn't support multiple digit positive charge!
             reactants_parsed, products_parsed = [], []
             for index, molecule in enumerate(reactants + products):
                 molecule_check = latex_valid(molecule, "molecule")
@@ -235,9 +239,8 @@ def determine_mode(latex: str) -> str:
     elif ":" in latex:
         return "empirical"
     elif latex:
-        latex_sanitized = latex.replace("\\left(", '(').replace(r"\right)", ')')
         molecules_list = re.findall(
-            r"(?:[()eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[+-]?\}?)?", latex_sanitized
+            r"(?:[()eA-Z][a-z]*(?:_{? ?\d*\}?(?:(?:_\d)?)*)?)+(?:\^{? ?\d*[+-]?\}?)?", latex
         )
         molecule_count = len(molecules_list)
         if r"\rightarrow" in latex or molecule_count >= 2:

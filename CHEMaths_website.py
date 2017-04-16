@@ -18,7 +18,9 @@ def home():
 @app.route("/live_preview", methods=['POST'])
 def live_process():
     """processes input dynamically"""
-    latex = request.values.get('latex')
+    latex = request.values.get(
+        'latex'
+    ).replace("\\ ", '').replace(" ", '').replace("\\left(", '(').replace(r"\right)", ')')
     mode = determine_mode(latex)
     syntax_check = latex_valid(latex, mode)
     error = syntax_check[1] if not syntax_check[0] else None

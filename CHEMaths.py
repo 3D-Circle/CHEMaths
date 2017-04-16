@@ -314,7 +314,10 @@ def process_and_balance_equation(equation: str, pre_processed=None, return_strin
             else:
                 products_list_copy.remove(molecule)
             matrix.assign_new_value(i, j, sign * atom_count)
+    print(matrix)
     solution = matrix.solve(homogeneous=True, integer_minimal=True)
+    print(matrix.null_space())
+    print(solution)
 
     # trivial solution: infeasible reaction
     if all(entry == 0 for entry in solution) or any(entry < 0 for entry in solution):
@@ -415,7 +418,6 @@ class Matrix:
                         pivot = A.matrix[new_row][col]
                         if isinstance(juxtaposed, Matrix):
                             juxtaposed.swap_rows(row, new_row)
-                            print(juxtaposed)
                         A.swap_rows(row, new_row)
                         break
                 else:
@@ -424,13 +426,11 @@ class Matrix:
             pivot_list.append((row, col))
             if isinstance(juxtaposed, Matrix):
                 juxtaposed.multiply_row(row, fractions.Fraction(1, pivot))
-                print(juxtaposed)
             A.multiply_row(row, fractions.Fraction(1, pivot))
             for row_to_subtract in range(row + 1, m):
                 if A.matrix[row_to_subtract][col] != 0:
                     if isinstance(juxtaposed, Matrix):
                         juxtaposed.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
-                        print(juxtaposed)
                     A.add_row(row_to_subtract, row, coefficient=-A.matrix[row_to_subtract][col])
             row += 1
             col += 1
@@ -443,7 +443,6 @@ class Matrix:
                 for r in range(r_pivot):
                     if isinstance(juxtaposed, Matrix):
                         juxtaposed.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
-                        print(juxtaposed)
                     A.add_row(r, r_pivot, coefficient=-A.matrix[r][r_col])
 
         if override:
