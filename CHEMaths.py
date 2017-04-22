@@ -6,12 +6,13 @@ Functionality:
     - balancing equation, determining oxidation state(/number)
 Author: Jingjie YANG (j.yang19 at ejm.org)"""
 
+import decimal
 import string
 import fractions
 import time
 import json
 import re
-from matrices import Matrix, lcm_multiple, gcd_multiple
+from linear_algebra import Matrix, lcm_multiple
 
 
 with open("static/data.json") as data:
@@ -135,34 +136,29 @@ def get_mole(rel_mass: float, mass: float) -> float:
     return round(mass / rel_mass, 6)
 
 
-def get_ratio(dict_in: dict, print_out=False) -> dict:
+def get_ratio(dict_in: dict, parser=process_formula) -> dict:
     """Calculate empirical formula of a compound given its atoms' mass or percentage of mass in the compound."""
-    # TODO: resolve bug
+    # Init
     dict_processing = {}
     dict_out = {}
-    for elem, ele_weight in dict_in.items():
-        dict_processing[elem] = ele_weight / relative_atomic_mass[elem]
-        dict_processing[elem] = fractions.Fraction(dict_processing[elem]).limit_denominator(16)
-        if dict_processing[elem] == 0:
-            dict_processing[elem] = fractions.Fraction(
-                ele_weight / relative_atomic_mass[elem] * 10
-            ).limit_denominator(16)
-    denominators = [_.denominator for _ in dict_processing.values()]
-    multiple = lcm_multiple(denominators)
-    modelling = False
-    for elem, ele_ratio in dict_processing.items():
-        dict_out[elem] = ele_ratio.numerator * multiple // ele_ratio.denominator
-        if dict_out[elem] == 0 or dict_out[elem] >= 16:
-            modelling = True
-        if print_out:
-            print(elem, round(ele_ratio.numerator / ele_ratio.denominator, 6))
-    if modelling:
-        for elem, ele_ratio in dict_out.items():
-            digits = len(str(ele_ratio))
-            dict_out[elem] = round(ele_ratio, -1 * digits + 1)
-    simplifier = gcd_multiple(list(dict_out.values()))
-    for elem, ele_ratio in dict_out.items():
-        dict_out[elem] = ele_ratio // simplifier
+
+    # Calculate the relative ratio for each element
+    # through dividing its weight / percentage by its relative atomic mass
+    for chemical, chemical_weight in dict_in.items():
+        chemical_parsed = parser(chemical)
+        relative_formula_mass = mr_calc(chemical_parsed)
+
+        ratio = decimal.Decimal(chemical_weight) / decimal.Decimal(relative_formula_mass)
+        # dict_processing[chemical] = ratio
+        print(ratio)
+        dict_processing[chemical] = fractions.Fraction(ratio)
+
+    print(dict_processing)
+    common_multiple = lcm_multiple([fraction.denominator for fraction in dict_processing.values()])
+
+    for chemical, ratio in dict_processing.items():
+        dict_out[chemical] = ratio * common_multiple
+
     return dict_out
 
 
@@ -443,7 +439,7 @@ def debug():
         # ---Debugging 4 - alkane inspection: hexane
         ("C6H14", 5) == (Alkane(6).molecular_formula, Alkane(6).isomers()),
         # ---Debugging 5 - determine empirical formula
-        {'K': 1, 'I': 7, 'O': 20} == get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})
+        {'K': 1, 'I': 1, 'O': 3} == get_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24})
     ]
     invalid = [index + 1 for index, func in enumerate(valid) if not func]
     if any(invalid):
