@@ -4,6 +4,7 @@ import fractions
 import functools
 import itertools
 import math
+import ast
 
 
 def lcm(a: int, b: int) -> int:
@@ -341,25 +342,41 @@ class Vector:
 
 class Line2D:
     """Implementation of a line"""
-    def __init__(self, a, b, c):
+    def __init__(self, a: float, b: float, c: float):
         """Initialize a line with equation
         ax + by + c = 0"""
         self.equation = (a, b, c)
+
+        self.slope = -a / b
+        self.y_intercept = -c / b
+
         self.general_form = \
             f"{a}x {('+ ' if b >=0 else '- ') + str(abs(b))}y {('+ ' if c >= 0 else '- ') + str(abs(c))} = 0"
         self.slope_intercept_form = \
-            f"y = {str(fractions.Fraction(a, -b))}x {('+ ' if c <=0 else '- ') + str(abs(fractions.Fraction(c, -b)))}"
+            f"y = {self.slope}x {('+ ' if self.y_intercept >= 0 else '- ') + str(abs(self.y_intercept))}"
 
     @classmethod
-    def from2points(cls, point1: tuple, point2: tuple):
-        """Construct a line given 2 points
-        Return a tuple (a, b, c) as in ax + by + c = 0"""
-        a = fractions.Fraction(point2[1] - point1[1], point2[0] - point1[0])
+    def from_slope_intercept(cls, slope: float, y_intercept: float) -> 'Line2D':
+        """Construct a line given the slope and the y-intercept
+        Return a Line2D object"""
+        a = slope
         b = -1
-        c = fractions.Fraction(point1[1] - a * point1[0])
-        multiplier = lcm(a.denominator, c.denominator)
-        equation = tuple(x * multiplier for x in (a, b, c))
-        return cls(*equation)
+        c = y_intercept
+        return Line2D(a, b, c)
+
+    @classmethod
+    def from2points(cls, point1: (float, float), point2: (float, float)) -> 'Line2D':
+        """Construct a line given 2 points
+        Return a Line2D object"""
+        slope = (point2[1] - point1[1]) / (point2[0] - point1[0])
+        return cls.from_point_and_slope(point1, slope)
+
+    @classmethod
+    def from_point_and_slope(cls, point: (float, float), slope: float) -> 'Line2D':
+        """Construct a line given 1 point and its slope
+        Return a Line2D object"""
+        y_intercept = point[1] - slope * point[0]
+        return cls.from_slope_intercept(slope, y_intercept)
 
     def __repr__(self) -> str:
         return '\n'.join((self.general_form, self.slope_intercept_form))
@@ -367,19 +384,44 @@ class Line2D:
     def __str__(self) -> str:
         return self.__repr__()
 
+    def x_calculate(self, y: float) -> float:
+        """Calculate x for the given x"""
+        return (y - self.y_intercept) / self.slope
+
+    def y_calculate(self, x: float) -> float:
+        """Calculate y for the given x"""
+        return self.slope * x + self.y_intercept
+
+    def calculate_x_intercept(self) -> (float, float):
+        """Return the coordinates of x-intercept"""
+        return -self.y_intercept / self.slope, 0
+
+    def calculate_y_intercept(self) -> (float, float):
+        """Return the coordinates of y-intercept"""
+        return 0, self.y_intercept
+
     def is_perpendicular(self, line: 'Line2D') -> bool:
         """Determine if the given line is perpendicular to this line"""
-        a, b, _ = self.equation
-        c, d, _ = line.equation
-        return fractions.Fraction(a, -b) == fractions.Fraction(-1, fractions.Fraction(c, -d))
+        return self.slope == -1 / line.slope
 
     def is_parallel(self, line: 'Line2D') -> bool:
         """Determine if the given line is parallel to this line"""
         a, b, _ = self.equation
         c, d, _ = line.equation
-        return fractions.Fraction(a, -b) == fractions.Fraction(c, -d)
+        return self.slope == line.slope
 
-    def perpendicular_at_point(self, point: tuple) -> 'Line2D':
+    def intersect(self, line: 'Line2D') -> (float, float):
+        """Determine the intersection of 2 lines (Line2D objects)
+        If 2 lines intersect, return the coordinates of the intersection;
+        if they do not intersect, return (inf, inf)"""
+        if self.is_parallel(line):
+            return float('inf'), float('inf')
+        else:
+            x_coordinate = (line.y_intercept - self.y_intercept) / (self.slope - line.slope)
+            y_coordinate = self.slope * x_coordinate + self.y_intercept
+            return x_coordinate, y_coordinate
+
+    def perpendicular_at_point(self, point: (float, float)) -> 'Line2D':
         """Determine the line perpendicular to this line at the given point
         Return a Line2D object"""
         a, b, c = self.equation
@@ -388,7 +430,7 @@ class Line2D:
         c2 = point[1] - a2 * point[0]
         return Line2D(a2, b2, c2)
 
-    def distance_to_point(self, point: tuple) -> float:
+    def distance_to_point(self, point: (float, float)) -> float:
         """Calculate the distance between a given point to this line
         Return a float"""
         a, b, c = self.equation
@@ -398,11 +440,11 @@ class Line2D:
 
 class Segment2D:
     """A finite line"""
-    def __init__(self, point1: tuple, point2: tuple):
+    def __init__(self, point1: (float, float), point2: (float, float)):
         """Construct a segment from its two extremities"""
         self.extremities = (point1, point2)
 
-    def midpoint(self) -> tuple:
+    def midpoint(self) -> (float, float):
         """Determine the mid point of this segment
         Return a tuple of coordinates of the midpoint"""
         point1, point2 = self.extremities
@@ -410,8 +452,22 @@ class Segment2D:
 
 
 if __name__ == "__main__":
+    # > Humbert
+    print("Zis you ask Humbert")
     v = Vector.from_list([47, 140])
     w = Vector.from_list([1, 3])
     distance = w - w.dot_product(v.unit()) * v.unit()
+    # TODO find *w* to minimize distance.norm()
     print(distance.norm())
     print(1 / v.norm())
+    # < Humbert
+    print("And zis I do for you for Humbert :)")
+    Line1 = Line2D.from_slope_intercept(
+        ast.literal_eval(input("Coefficient directeur: ")),
+        ast.literal_eval(input("Ordonnée à l'origine: "))
+    )
+    Line2 = Line2D.from_slope_intercept(
+        ast.literal_eval(input("Coefficient directeur: ")),
+        ast.literal_eval(input("Ordonnée à l'origine: "))
+    )
+    print(Line1.intersect(Line2))
