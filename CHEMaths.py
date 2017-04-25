@@ -389,11 +389,9 @@ class Alkane:
 
     def __str__(self) -> str:
         """Return information on the alkane"""
-        return """name: {}
-molecular_formula: {}
-number of isomers: {}
-lewis structure:
-{}""".format(self.name, self.molecular_formula, self.isomers(), self.lewis())
+        return "name: {}\nmolecular_formula: {}\nnumber of isomers: {}\nlewis structure: {}".format(
+            self.name, self.molecular_formula, self.isomers(), self.lewis()
+        )
 
     def isomers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
@@ -401,9 +399,9 @@ lewis structure:
             count = 1
         else:
             count = sum([partition(self.size - 2, k + 1) for k in range(self.size - 2)])
-        '''the number of partitions of n into k non-negative (including zero) parts is
-        equivalent to number of partitions of n + k into k non-zero parts
-        where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)'''
+        # the number of partitions of n into k non-negative (including zero) parts is
+        # equivalent to number of partitions of n + k into k non-zero parts
+        # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
         return count
 
     def lewis(self) -> str:
