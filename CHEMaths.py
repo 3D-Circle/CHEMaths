@@ -30,7 +30,7 @@ class Molecule:
 
     def __init__(self, molecular_formula: dict, raw_string='', mass=None, mole=None):
         self.formula_string = raw_string
-        self.elements = self.get_elements()
+        self.elements = self.get_elements() if self.formula_string else molecular_formula.keys() - {'sign'}
         self.molecular_formula = molecular_formula
         self.empirical_formula = {
             element: self.molecular_formula[element] // gcd_multiple(*list(self.molecular_formula.values()))
@@ -161,6 +161,7 @@ class Molecule:
     def from_ratio(cls, quantity: dict, latex=False) -> 'Molecule':
         """Calculate empirical formula of a compound given its atoms' mass or percentage of mass in the compound."""
         # Init
+        decimal.getcontext().prec = 2
         dict_processing = {}
         molecular_formula = {'sign': 0}
         # TODO: complete this
@@ -174,13 +175,14 @@ class Molecule:
             relative_formula_mass = parsed.mr
 
             ratio = decimal.Decimal(chemical_weight) / decimal.Decimal(relative_formula_mass)
+            print(ratio)
             # dict_processing[chemical] = ratio
             dict_processing[chemical] = fractions.Fraction(ratio)
 
         common_multiple = lcm_multiple(*[fraction.denominator for fraction in dict_processing.values()])
 
         for chemical, ratio in dict_processing.items():
-            molecular_formula[chemical] = ratio * common_multiple
+            molecular_formula[chemical] = int(ratio * common_multiple)
         return Molecule(molecular_formula)
 
     def calculate_mr(self) -> float:
@@ -302,9 +304,13 @@ class Equation:
     def __init__(self, parsed_reactants: list, parsed_products: list, raw_reactants=None, raw_products=None):
         self.reactants = parsed_reactants
         self.products = parsed_products
+        self.size = len(self.reactants + self.products)
 
         self.raw_reactants = raw_reactants
         self.raw_products = raw_products
+
+        self.coefficients = self.balance()
+        assert isinstance(self.coefficients, list), "Reaction not feasible"
 
     @classmethod
     def from_string(cls, equation: string) -> 'Equation':
@@ -349,14 +355,65 @@ class Equation:
         solution = matrix.solve(homogeneous=True, integer_minimal=True)
 
         # trivial solution: infeasible reaction
-        if all(entry == 0 for entry in solution) or any(entry < 0 for entry in solution):
+        if any(entry <= 0 for entry in solution):
             raise ValueError("equation not feasible")
 
         return solution
 
+    def calculate_extent_from_moles(self, moles: list) -> float:
+        """Calculate the extent of reaction (in moles) based on the input list of  moles
+        The moles taken as input should be in the order of the reactants and products"""
+        assert len(moles) == self.size, "Size of input does not agree with equation"
+
+        extent = min([
+            moles[i] / self.coefficients[i] if moles[i] else float("Inf") for i in range(self.size)
+        ])
+
+        return extent
+
+    def calculate_extent_from_masses(self, masses: list) -> float:
+        """Calculate the extent of reaction (in moles) based on the input list of masses
+        The masses taken as input should be in the order of the reactants and products"""
+        assert len(masses) == self.size, "Size of input does not agree with equation"
+        moles = self.convert_mass_to_mole(masses)
+        extent = min([
+            moles[i] / self.coefficients[i] if moles[i] else float("Inf") for i in range(self.size)
+        ])
+        return extent
+
+    def calculate_moles_from_extent(self, extent: float) -> list:
+        """Calculate the moles of all reactants and products from input extent of reaction"""
+        return [extent * self.coefficients[i] for i in range(self.size)]
+
+    def calculate_masses_from_extent(self, extent: float) -> list:
+        """Calculate the masses of all reactants and products from input extent of reaction"""
+        return self.convert_mole_to_mass(
+            self.calculate_moles_from_extent(extent)
+        )
+
+    def convert_mass_to_mole(self, masses: list) -> list:
+        """Convert the input masses to moles"""
+        assert len(masses) == self.size, "Size of input does not agree with equation"
+        return [
+            Molecule(
+                self.reactants[i] if i < len(self.reactants) else self.products[i - len(self.reactants)],
+                mass=masses[i]
+            ).mole for i in range(self.size)
+        ]
+
+    def convert_mole_to_mass(self, moles: list) -> list:
+        """Convert the input moles to masses"""
+        assert len(moles) == self.size, "Size of input does not agree with equation"
+        return [
+            Molecule(
+                self.reactants[i] if i < len(self.reactants) else self.products[i - len(self.reactants)],
+                mole=moles[i]
+            ).mass for i in range(self.size)
+        ]
+
     def get_balanced_string(self):
         """Return a string representation of the balanced equation"""
-        solution = self.balance()
+        solution = self.coefficients
 
         def format_string(index: int, molecule_string: str) -> str:
             """Utility function to facilitate the formatting of the results"""
@@ -379,8 +436,7 @@ class Equation:
         reaction_type = "$DEFAULT"  # TODO remove this
         # Remove reactants / products with coefficient equal to 0
         reactants, products = self.reactants.copy(), self.products.copy()
-        coefficients = self.balance()
-        for i, coefficient in enumerate(coefficients):
+        for i, coefficient in enumerate(self.coefficients):
             if coefficient == 0:
                 if i < len(reactants):
                     reactants.pop(i)
