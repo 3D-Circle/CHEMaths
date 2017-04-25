@@ -325,6 +325,9 @@ class Equation:
         products_parsed = [Molecule.from_string(product).molecular_formula for product in products]
         return cls(reactants_parsed, products_parsed, raw_reactants=reactants, raw_products=products)
 
+    def __getitem__(self, index: int) -> dict:
+        return self.reactants[index] if index < len(self.reactants) else self.products[index - len(self.reactants)]
+
     def balance(self):
         """construct a coefficient matrix based on reactants and reactants
         Return the smallest integer solution that makes the equation balanced"""
@@ -396,7 +399,7 @@ class Equation:
         assert len(masses) == self.size, "Size of input does not agree with equation"
         return [
             Molecule(
-                self.reactants[i] if i < len(self.reactants) else self.products[i - len(self.reactants)],
+                self[i],
                 mass=masses[i]
             ).mole for i in range(self.size)
         ]
@@ -406,7 +409,7 @@ class Equation:
         assert len(moles) == self.size, "Size of input does not agree with equation"
         return [
             Molecule(
-                self.reactants[i] if i < len(self.reactants) else self.products[i - len(self.reactants)],
+                self[i],
                 mole=moles[i]
             ).mass for i in range(self.size)
         ]
@@ -466,9 +469,10 @@ class Alkane:
 
     def __str__(self) -> str:
         """Return information on the alkane"""
-        return "name: {}\nmolecular_formula: {}\nnumber of isomers: {}\nlewis structure: {}".format(
-            self.name, self.molecular_formula, self.isomers(), self.lewis()
-        )
+        return f"name: {self.name}\n" \
+               f"molecular_formula: {self.molecular_formula}\n" \
+               f"number of isomers: {self.isomers()}\n" \
+               f"lewis structure: {self.lewis()}"
 
     def isomers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
@@ -520,6 +524,29 @@ def launch_shell():
         if '->' in formula:
             equation = Equation.from_string(formula)
             print(equation.get_balanced_string())
+            more_calculations = input("Proceed to calculate mass / mole? [Y / n] ") is 'Y'
+            if more_calculations:
+                moles = []
+                for index, chemical in enumerate(equation.raw_reactants + equation.raw_products):
+                    mass_input = input(f"Mass (g) of {chemical}: ")
+                    if not mass_input:
+                        mole_input = input(f"Mole (mol) of {chemical}: ")
+                        mole = literal_eval(mole_input) if mole_input else None
+                    else:
+                        mass = literal_eval(mass_input)
+                        mole = Molecule(
+                            equation[index],
+                            mass=mass
+                        ).mole
+                    moles.append(mole)
+                start = time.process_time()
+                reaction_extent = equation.calculate_extent_from_moles(moles)
+                reaction_moles = equation.calculate_moles_from_extent(reaction_extent)
+                reaction_masses = equation.calculate_masses_from_extent(reaction_extent)
+                print('\n'.join([
+                    f"{chemical}: {reaction_masses[index]} g <=> {reaction_moles[index]} mol"
+                    for index, chemical in enumerate(equation.raw_reactants + equation.raw_products)
+                ]))
         elif "alkane" in formula.lower():
             formula = formula.replace(" ", "")
             if ":" not in formula:
