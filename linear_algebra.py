@@ -12,14 +12,24 @@ def lcm(a: int, b: int) -> int:
     return a * b // math.gcd(a, b)
 
 
-def gcd_multiple(list_in: list) -> int:
-    """Return greatest common divisor of integers in list_in."""
-    return functools.reduce(math.gcd, list_in)
+def gcd_multiple(*args) -> int:
+    """Return greatest common divisor of integers in args"""
+    return functools.reduce(math.gcd, args)
 
 
-def lcm_multiple(list_in: list) -> int:
-    """Return lowest common multiple of integers in list_in."""
-    return functools.reduce(lcm, list_in)
+def lcm_multiple(*args) -> int:
+    """Return lowest common multiple of integers in args"""
+    return functools.reduce(lcm, args)
+
+
+def partition(n, k) -> int:
+    """return number of partitions of integer n into k strictly positive parts"""
+    if n == k:
+        return 1
+    elif n <= 0 or k <= 0:
+        return 0
+    else:
+        return partition(n - k, k) + partition(n - 1, k - 1)
 
 
 class Matrix:
@@ -201,7 +211,7 @@ class Matrix:
                     integer_solution_list = [
                         sum([solution_list[i] for solution_list in solution_lists]) for i in range(self.size[1])
                     ]
-                    common_multiplier = lcm_multiple([entry.denominator for entry in integer_solution_list])
+                    common_multiplier = lcm_multiple(*[entry.denominator for entry in integer_solution_list])
                     return [integer_solution_list[i] * common_multiplier for i in range(self.size[1])]
                 return solution_lists
 
@@ -362,7 +372,7 @@ class Line2D:
         a = slope
         b = -1
         c = y_intercept
-        return Line2D(a, b, c)
+        return cls(a, b, c)
 
     @classmethod
     def from2points(cls, point1: (float, float), point2: (float, float)) -> 'Line2D':
@@ -406,8 +416,6 @@ class Line2D:
 
     def is_parallel(self, line: 'Line2D') -> bool:
         """Determine if the given line is parallel to this line"""
-        a, b, _ = self.equation
-        c, d, _ = line.equation
         return self.slope == line.slope
 
     def intersect(self, line: 'Line2D') -> (float, float):
@@ -424,11 +432,8 @@ class Line2D:
     def perpendicular_at_point(self, point: (float, float)) -> 'Line2D':
         """Determine the line perpendicular to this line at the given point
         Return a Line2D object"""
-        a, b, c = self.equation
-        a2 = fractions.Fraction(-1, (a, -b))
-        b2 = -1
-        c2 = point[1] - a2 * point[0]
-        return Line2D(a2, b2, c2)
+        slope = -1 / self.slope
+        return Line2D.from_point_and_slope(point, slope)
 
     def distance_to_point(self, point: (float, float)) -> float:
         """Calculate the distance between a given point to this line

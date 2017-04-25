@@ -51,7 +51,6 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                 return False, "No product found"
             reactants = re.split(r"(?<!{\d)(?<!\^)\+", reactants_string)
             products = re.split(r"(?<!{\d)(?<!\^)\+", products_string)
-            # TODO aha apparently doesn't support multiple digit positive charge!
             reactants_parsed, products_parsed = [], []
             for index, molecule in enumerate(reactants + products):
                 molecule_check = latex_valid(molecule, "molecule")
@@ -62,14 +61,14 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                         reactants_parsed.append(molecule_check[1])  # parsed molecule
                     else:
                         products_parsed.append(molecule_check[1])
-            result = CHEMaths.process_and_balance_equation(
-                "",
-                pre_processed=(reactants_parsed, products_parsed),
-                return_string=False
-            )
-            if type(result) == str:  # reaction infeasible
-                return False, result
-        return True, (reactants, products, result)
+            try:
+                equation = CHEMaths.Equation(reactants_parsed, products_parsed)
+            except ValueError:
+                return False, "Value Error: equation not feasible"
+            else:
+                result = equation.balance()
+                reaction_type = equation.get_reaction_type()
+                return True, (reactants, products, result, reaction_type)
     else:
         if mode == "empirical":
             pass

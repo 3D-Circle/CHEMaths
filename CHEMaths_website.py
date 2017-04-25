@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
-from flask import Flask, jsonify, render_template, request, redirect
-from latex_parser import latex2chem, latex_valid, determine_mode
-from CHEMaths import smart_calculate, process_and_balance_equation, get_ratio, Alkane
-from CHEMaths import determine_reaction_type
+from flask import Flask, jsonify, render_template, request
+from latex_parser import latex_valid, determine_mode
+from CHEMaths import Molecule
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -39,18 +38,19 @@ def live_process():
             })
         else:
             parsed_molecule = syntax_check[1]
+            molecule = Molecule(parsed_molecule, raw_string=latex)
+            print(molecule.calculate_percentages())
             return jsonify({
                 'error': error,
                 'mode': mode,
                 'syntax': syntax_check[0],
                 'molecule': parsed_molecule,
-                'info': smart_calculate(parsed_molecule, {})  # TODO: make the empty dict editable
+                'info': {'mr': molecule.mr, 'element_percentages': molecule.calculate_percentages()}
             })
     elif mode == 'equation':
         reaction_type, reactants, products, coefficients = None, None, None, None
         if not error:
-            reactants, products, coefficients = syntax_check[1]
-            reaction_type = determine_reaction_type(reactants, products, coefficients)
+            reactants, products, coefficients, reaction_type = syntax_check[1]
             coefficients = [f'{fraction.numerator}' for fraction in coefficients]
         return jsonify({
             'mode': mode,
