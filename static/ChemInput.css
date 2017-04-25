@@ -2,9 +2,7 @@ body {
     background-color: lavender;
 }
 
-/*For you the reader of my code (bonjour Mr Trak),
-Why not make a js for this? 
-Don't forget about your tasks on heroku and float point :) */
+/* TODO: Remove this mess */
 .col-1_24 {width: 4.17%;}
 .col-11_96 {width: 11.46%;}
 .col-1_8 {width: 12.5%;}
@@ -35,19 +33,21 @@ Don't forget about your tasks on heroku and float point :) */
     padding-left: 2.5px;
 }
 
-#input {
-    height: 32px;
-    width: 100%;
-    background-color: white;
+#mainField { /* form */
+    padding: 10px;
+    display: flex;
 }
 
+#input {
+    flex-grow: 10;
+    background-color: white;
+    margin: 0 10px 0 10px;
+}
 #enter {
     border-radius: 25px;
-    height: 32px;
     background-color: aquamarine;
-    width: 100%;
+    flex-grow: 1;
 }
-
 #enter:hover {
     animation: rainbow 3s linear 0s infinite;
 }
@@ -77,21 +77,22 @@ Don't forget about your tasks on heroku and float point :) */
 }
 
 #syntax_check_status {
-        background:
-            linear-gradient(
-                to left top,
-                rgba(50, 205, 50, 0.9) 0%/*bottom-right color*/,
-                rgba(0, 255, 127, 0.85) 50% /*middle color*/,
-                rgba(0, 255, 127, 0.8) 100% /*top-left color*/
-            ),
-            /*"faked" black background make sure to add last or it will appear before the transparent/colored layer*/
-            linear-gradient(
-                rgba(255, 255, 255, 1),
-                rgba(255, 255, 255, 1)
-            );
-        width: 32px;
-        height: 32px;
-        margin: auto;
+    background:
+        linear-gradient(
+            to left top,
+            rgba(50, 205, 50, 0.9) 0%/*bottom-right color*/,
+            rgba(0, 255, 127, 0.85) 50% /*middle color*/,
+            rgba(0, 255, 127, 0.8) 100% /*top-left color*/
+        ),
+        /*"faked" black background make sure to add last or it will appear before the transparent/colored layer*/
+        linear-gradient(
+            rgba(255, 255, 255, 1),
+            rgba(255, 255, 255, 1)
+        );
+    width: 32px;
+    height: 32px;
+    margin: auto;
+    border-radius: 3px;
 }
 
 #syntax_check_status.syntax_error {
@@ -121,34 +122,29 @@ Don't forget about your tasks on heroku and float point :) */
     background-color: black;
 }
 
-#syntax_check_text:hover {
-    opacity: 0.8;
-}
-
-#syntax_check_text:hover > #syntax_check_error_text {
-    visibility: visible;
-}
-
-#syntax_check_error_text {
-    visibility: hidden;
-    margin-top: -40px;
-    position: absolute;
-    z-index: 1;
-
-    background-color: whitesmoke;
-    color: gray;
-    padding: 2.5px;
-    border-radius: 5px;
+#buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Evenly spread */
 }
 
 #buttons button {
     border-radius: 5px;
+    width: 12%;
+    height: 25px;
     background-color: burlywood;
-    margin: 0.5em 0.25em 1em 0.5em;
+    border: 0;
+    box-shadow: 1px 1px 1px gray;
+    margin: 4px;
 }
 
 #buttons button:hover {
     opacity: 0.8;
+}
+
+#buttons button:focus {
+    outline: 0;
+    box-shadow: inset 0 0 3px #000000;
 }
 
 .status {
@@ -328,10 +324,15 @@ table {
 }
 
 #info-molecule table {
+    border-collapse: collapse;
     width: 100%;
     height: 100%;
     padding-right: 2px;  /* fix table issues (n'est-ce pas mr absolute) */
     padding-bottom: 11px;
+}
+
+#info-molecule table, #info-molecule table th, #info-molecule table td {
+    border: 1px gray solid;
 }
 
 #info-molecule table td {
@@ -346,9 +347,6 @@ table {
     background-color: azure;
 }
 
-#info-molecule table, #info-molecule table th, #info-molecule table td {
-    border: 1px;
-}
 
 #components {
     width: 80%;

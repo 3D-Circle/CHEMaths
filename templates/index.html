@@ -8,9 +8,11 @@
     <meta name="author" content="Jingjie YANG (j.yang19@ejm.org), Théo Takla (t.takla19@ejm.org)"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHEMaths</title>
+    <!--  Styles & images -->
     <link rel="stylesheet" href="/static/MathQuill/mathquill.css"/>
     <link rel="stylesheet" href="/static/ChemInput.css"/>
     <link rel="shortcut icon" type="image/png" href="/static/icon.png"/>
+    <!--  Scripts  -->
     <script src="/static/jQuery/jquery-3.2.0.js"></script>
     <script src="/static/MathQuill/mathquill.js"></script>
     <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
@@ -18,42 +20,30 @@
 </head>
 
 <body>
-    <form action="/results" method="POST" id="mainField">
-        <div class="row">
-            <div class="col-1_24">
+    <div id="top-bar">
+        <div id="input-wrapper">
+            <form action="/results" method="POST" id="mainField">
                 <div id="syntax_check_status"></div>
-            </div>
-            <div class="col-9">
                 <span id='input'></span>
-            </div>
-            <div class="col-2">
                 <input type="submit" value="Maths!" id="enter"/>
-            </div>
-            <div class="col-1_24"></div>
+            </form>
         </div>
-    </form>
 
-    <!--Buttons for input field-->
-    <div id="buttons" class="row">
-        <div class="col-1_24">
-            <div id="syntax_check_text">
-                ?
-                <div id="syntax_check_error_text"></div>
-            </div>
-        </div>
-        <button id='rightarrow' class="col-11_96">&rarr;</button>
-        <button id='sup' class="col-11_96">^</button>
-        <button id='sub' class="col-11_96">_</button>
-        <button id='left-parenthesis' class="col-11_96">(</button>
-        <button id='right-parenthesis' class="col-11_96">)</button>
-        <button id='plus' class="col-11_96">+</button>
-        <button id='colon' class="col-11_96">:</button>
-        <button id='semi-colon' class="col-11_96">;</button>
-        <div class="col-1_24"></div>
+        <!--Buttons for input field-->
+        <div id="buttons" class="row">
+        <button id='rightarrow'>&rarr;</button>
+        <button id='sup'>^</button>
+        <button id='sub'>_</button>
+        <button id='left-parenthesis'>(</button>
+        <button id='right-parenthesis'>)</button>
+        <button id='plus'>+</button>
+        <button id='colon'>:</button>
+        <button id='semi-colon'>;</button>
     </div>
 
+
     <!--Additional information and results-->
-    <div class="row">
+    <div id="content" class="row">
 
         <!--Status labels-->
         <div id="mode" class="col-1_8">
