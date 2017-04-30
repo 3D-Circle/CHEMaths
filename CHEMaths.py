@@ -13,16 +13,30 @@ import time
 import json
 import re
 import latex_parser
-from linear_algebra import Matrix, gcd_multiple, lcm_multiple, partition
+from linear_algebra import Matrix, ext_euclid, gcd_multiple, lcm_multiple, partition
 from ast import literal_eval
 
 with open("static/data.json") as data:
     data_dict = json.loads(data.read())
-    relative_atomic_mass, alkali_metals, alkali_earth_metals, halogens, non_metals = [
+    relative_atomic_mass, alkali_metals, alkali_earth_metals, halogens, non_metals, enthalpies = [
         data_dict[key] for key in [
-            "relative atomic mass", "alkali metals", "alkali earth metals", "halogens", "non-metals"
+            "relative atomic mass", "alkali metals", "alkali earth metals", "halogens", "non-metals", "enthalpy"
         ]
     ]
+
+
+def get_bond_enthalpy(element1: str, element2: str, bond='single bond') -> float:
+    """Utility function that retrieves the bond enthalpy between element1 and element2 (regardless or order)
+    An optional argument, bond, describing the bond (single, double, triple) could be specified
+    If not specified, bond defaults to 'single'
+    The optional argument exception is used to distinguish the double bond between carbon atoms in benzene"""
+    enthalpies_dict = enthalpies[bond]
+    if element1 in enthalpies_dict and element2 in enthalpies_dict[element1]:
+        return enthalpies_dict[element1][element2]
+    elif element2 in enthalpies_dict and element1 in enthalpies_dict[element2]:
+        return enthalpies_dict[element2][element1]
+    else:
+        return 0
 
 
 class Molecule:
@@ -30,12 +44,15 @@ class Molecule:
 
     def __init__(self, molecular_formula: dict, raw_string='', mass=None, mole=None):
         self.formula_string = raw_string
-        self.elements = self.get_elements() if self.formula_string else molecular_formula.keys() - {'sign'}
         self.molecular_formula = molecular_formula
+
+        self.elements = self.get_elements()
+
         self.empirical_formula = {
             element: self.molecular_formula[element] // gcd_multiple(*list(self.molecular_formula.values()))
             for element in self.elements
         }
+
         self.mr = self.calculate_mr()
 
         self.molecular_formula_string = ''.join([
@@ -59,7 +76,7 @@ class Molecule:
         return f"==================================================\n" \
                f"Molecular formula: {self.molecular_formula_string}\n" \
                f"Empirical formula: {self.empirical_formula_string}\n" \
-               f"Relative formula mass: {self.mr} g / mol" \
+               f"Relative formula mass: {self.mr} g / mol\n" \
                f"Mass: {self.mass} g\n" \
                f"Mole: {self.mole} mol\n" \
                f"Element ratio: {self.get_percentages_string()}\n" \
@@ -163,7 +180,7 @@ class Molecule:
         # Init
         decimal.getcontext().prec = 2
         dict_processing = {}
-        molecular_formula = {'sign': 0}
+        molecular_formula = {}
         # TODO: complete this
         # Calculate the relative ratio for each element
         # through dividing its weight / percentage by its relative atomic mass
@@ -175,15 +192,23 @@ class Molecule:
             relative_formula_mass = parsed.mr
 
             ratio = decimal.Decimal(chemical_weight) / decimal.Decimal(relative_formula_mass)
-            print(ratio)
-            # dict_processing[chemical] = ratio
             dict_processing[chemical] = fractions.Fraction(ratio)
 
         common_multiple = lcm_multiple(*[fraction.denominator for fraction in dict_processing.values()])
+        common_divisor = gcd_multiple(*[fraction.numerator for fraction in dict_processing.values()])
 
         for chemical, ratio in dict_processing.items():
-            molecular_formula[chemical] = int(ratio * common_multiple)
-        return Molecule(molecular_formula)
+            molecular_formula[chemical] = int(ratio * common_multiple / common_divisor)
+        if len(molecular_formula) != 1 and any([value > 16 for value in molecular_formula.values()]):
+            if len(molecular_formula) == 2:
+                # solve for |ax + by| = 1
+                element1, element2 = molecular_formula.keys()
+                ratio1, ratio2 = molecular_formula.values()
+                coefficient1, coefficient2, _ = ext_euclid(ratio2, -ratio1)
+                molecular_formula[element1] = coefficient1
+                molecular_formula[element2] = coefficient2
+        molecular_formula['sign'] = 0
+        return Molecule(molecular_formula)  # place holder
 
     def calculate_mr(self) -> float:
         """Calculate relative formula mass for dictionary input processed by function process_formula."""
@@ -197,7 +222,7 @@ class Molecule:
         """Calculate the percentage by mass of an element in the compound. """
         return {
             element: (self.molecular_formula[element] * relative_atomic_mass[element]) / self.mr * 100
-            for element in self.get_elements()
+            for element in self.elements
         }
 
     def calculate_mass(self, mole: float) -> float:
@@ -267,13 +292,18 @@ class Molecule:
 
     def get_elements(self) -> list:
         """Return the ordered collection of elements present in the input string"""
-        elements_with_duplicate = re.findall(r"[A-Z][a-z]*", self.formula_string)
-        elements = []
-        [elements.append(i) for i in elements_with_duplicate if not elements.count(i)]
+        if self.formula_string:
+            elements_with_duplicate = re.findall(r"[A-Z][a-z]*", self.formula_string)
+            elements = []
+            [elements.append(i) for i in elements_with_duplicate if not elements.count(i)]
+        else:
+            # using Hill notation
+            elements = sorted([key for key in self.molecular_formula.keys() if key != "sign"])
         return elements
 
     def get_oxidation_string(self) -> str:
         """Return a string representation of the oxidation numbers"""
+
         def match_str_with_charge(to_match):
             """Utility function to facilitate the formatting of the string representing the results"""
             if to_match > 0:
@@ -423,6 +453,7 @@ class Equation:
             return "{} {}".format(
                 str(solution[index] if solution[index] != 1 else ""), molecule_string if solution[index] != 0 else ""
             )
+
         reactants, products = self.raw_reactants, self.raw_products
         if reactants and products:
             return ' -> '.join([
@@ -458,23 +489,64 @@ class Equation:
         return reaction_type
 
 
-class Alkane:
-    """Generalization for hydrocarbon with the general formula CH"""
+class Enthalpy:
+    """Utility class to facilitate enthalpy data retrieval"""
 
-    def __init__(self, size):
-        """Initialize an alkane according to the input size"""
+    def __init__(self):
+        pass
+
+
+class OrganicCompound:
+    """Base formula for hydrocarbon"""
+    names = ["meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"]
+
+    def __init__(self, size: int):
+        """Init takes one argument, size, equal to the number of carbons"""
         self.size = size
-        self.name = (["meth", "eth", "prop", "but", "pent", "hex"][size - 1] if size <= 6 else str(size)) + "ane"
-        self.molecular_formula = f"C{self.size}H{2 * self.size + 2}"
+        self.molecule = self.get_molecule()
+
+    def __repr__(self) -> str:
+        return f"name: {self.get_name()}\n" \
+               f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
+               f"combustion enthalpy: {self.calculate_combustion_enthalpy()}\n" \
+               f"lewis structure: \n{self.get_lewis()}"
 
     def __str__(self) -> str:
-        """Return information on the alkane"""
-        return f"name: {self.name}\n" \
-               f"molecular_formula: {self.molecular_formula}\n" \
-               f"number of isomers: {self.isomers()}\n" \
-               f"lewis structure: {self.lewis()}"
+        return self.__repr__()
 
-    def isomers(self) -> int:
+    def calculate_combustion_enthalpy(self) -> float:
+        """Determine the change in enthalpy of the combustion of this hydrocarbon"""
+        raise NotImplementedError
+
+    def get_lewis(self) -> str:
+        """Draw the basic lewis structure of this hydrocarbon"""
+        raise NotImplementedError
+
+    def get_molecule(self) -> 'Molecule':
+        """Determine the molecular formula of this hydrocarbon"""
+        raise NotImplementedError
+
+    def get_name(self) -> str:
+        """Determine the name of this hydrocarbon"""
+        raise NotImplementedError
+
+
+class Alkane(OrganicCompound):
+    """Hydrocarbon with the general formula CH"""
+
+    def __init__(self, size: int, configuration=None):
+        # TODO implement this for different isomer configuration as well
+        super().__init__(size)
+
+    def __repr__(self) -> str:
+        """Return information on the alkane"""
+        return f"name: {self.get_name()}\n" \
+               f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
+               f"number of isomers: {self.calculate_isomers()}\n" \
+               f"combustion enthalpy: {self.calculate_combustion_enthalpy()}\n" \
+               f"lewis structure: \n{self.get_lewis()}"
+
+    def calculate_isomers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
         if self.size <= 2:
             count = 1
@@ -485,13 +557,80 @@ class Alkane:
         # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
         return count
 
-    def lewis(self) -> str:
+    def calculate_combustion_enthalpy(self) -> float:
+        """Return the combustion enthalpy of this alkane"""
+        pass
+
+    def get_lewis(self) -> str:
         """Draw lewis structure of the basic alkane"""
         return '\n'.join([" " + "   H" * self.size,
                           " " + "   |" * self.size,
                           "H" + " - C" * self.size + " - H",
                           " " + "   |" * self.size,
                           " " + "   H" * self.size])  # looks quite pleasing ey? :)
+
+    def get_molecule(self) -> 'Molecule':
+        """Determine the molecular formula of this alkane"""
+        return Molecule({'sign': 0, 'C': self.size, 'H': 2 * self.size + 2})
+
+    def get_name(self) -> str:
+        """Determine the name of this alkane"""
+        return (OrganicCompound.names[self.size - 1] if self.size <= 10 else str(self.size) + '-') + "ane"
+
+
+class Alcohol(OrganicCompound):
+    """Implementation of alcohol in organic chemistry"""
+
+    def __init__(self, size: int, configuration=None):
+        super().__init__(size)
+        self.configuration = configuration
+
+    def calculate_combustion_enthalpy(self) -> float:
+        """Calculate the combustion enthalpy of this alcohol"""
+        # reactants
+        enthalpy_alcohol = \
+            get_bond_enthalpy('O', 'H') + get_bond_enthalpy('C', 'O') + 3 * get_bond_enthalpy('C', 'H') \
+            + (self.size - 1) * get_bond_enthalpy('C', 'C') + (self.size - 1) * 2 * get_bond_enthalpy('C', 'H')
+        enthalpy_oxygen = get_bond_enthalpy('O', 'O', bond="double bond")
+
+        # products
+        enthalpy_carbon_dioxide = 2 * get_bond_enthalpy('C', 'O', bond="double bond")
+        enthalpy_water = 2 * get_bond_enthalpy('H', 'O')
+
+        # Combustion reaction
+        coefficient_alcohol, coefficient_oxygen, coefficient_carbon_dioxide, coefficient_water = \
+            Equation(
+                [self.molecule.molecular_formula, {'O': 2}],
+                [{'C': 1, 'O': 2}, {'H': 2, 'O': 1}]
+            ).coefficients
+
+        enthalpy_reactants = (
+                             coefficient_alcohol * enthalpy_alcohol
+                             + coefficient_oxygen * enthalpy_oxygen
+                             ) / coefficient_alcohol
+        enthalpy_products = (
+                                coefficient_carbon_dioxide * enthalpy_carbon_dioxide
+                                + coefficient_water * enthalpy_water
+                            ) / coefficient_alcohol
+
+        return enthalpy_reactants - enthalpy_products
+
+    def get_molecule(self) -> 'Molecule':
+        """Determine the molecular formula of this alcohol"""
+        return Molecule({"sign": 0, 'C': self.size, 'H': 2 * self.size + 2, 'O': 1})
+
+    def get_name(self) -> str:
+        """Determine the name of this alcohol"""
+        return \
+            (OrganicCompound.names[self.size - 1] if self.size <= 10 else str(self.size) + '-') \
+            + "an" \
+            + ('-' + str(self.configuration) + '-' if self.configuration else '') \
+            + "ol"
+
+    def get_lewis(self) -> str:
+        """Determine the lewis structure of this alcohol
+        Accept an optional argument describing the position of OH"""
+        pass
 
 
 def debug():
@@ -506,7 +645,7 @@ def debug():
         # ---Debugging 3 - oxidation number
         {'Li': +1, 'Al': -5, 'H': +1} == Molecule.from_string("LiAlH4 ^ ").calculate_oxidation(),
         # ---Debugging 4 - alkane inspection: hexane
-        ("C6H14", 5) == (Alkane(6).molecular_formula, Alkane(6).isomers()),
+        ("C6H14", 5) == (Alkane(6).molecule.molecular_formula_string, Alkane(6).calculate_isomers()),
         # ---Debugging 5 - determine empirical formula
         {'K': 1, 'I': 1, 'O': 3} == Molecule.from_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}).molecular_formula
     ]

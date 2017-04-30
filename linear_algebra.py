@@ -22,6 +22,17 @@ def lcm_multiple(*args) -> int:
     return functools.reduce(lcm, args)
 
 
+def ext_euclid(a: int, b: int) -> tuple:
+    """Extended euclidean algorithm
+    Return the gcd of a and b, and pair of x and y such that ax + by = gcd(a, b)"""
+    if b == 0:
+        return 1, 0, a
+    else:
+        x, y, q = ext_euclid(b, a % b)
+        x, y = y, (x - (a // b) * y)
+        return x, y, q
+
+
 def partition(n, k) -> int:
     """return number of partitions of integer n into k strictly positive parts"""
     if n == k:
@@ -255,17 +266,13 @@ class SquareMatrix(Matrix):
 
 class Vector:
     """A (row) vector"""
-    def __init__(self, size: int):
-        self.dimension = size
-        self.vector = [0] * size
-
-    @classmethod
-    def from_list(cls, vector: list) -> 'Vector':
-        """Construct a (row) vector from a list"""
-        size = len(vector)
-        new_vector = Vector(size)
-        new_vector.vector = vector
-        return new_vector
+    def __init__(self, vector: list, size=2):
+        if vector:
+            self.dimension = len(vector)
+            self.vector = vector
+        elif size:
+            self.dimension = size
+            self.vector = [0] * size
 
     def __repr__(self) -> str:
         """Detailed representation of this vector"""
@@ -311,27 +318,21 @@ class Vector:
         if self.dimension != other.dimension:
             raise ValueError("Dimension of vectors must agree")
         else:
-            new_vector = Vector(self.dimension)
-            new_vector.vector = [self.vector[i] + other.vector[i] for i in range(self.dimension)]
-            return new_vector
+            return Vector([self.vector[i] + other.vector[i] for i in range(self.dimension)])
 
     def __sub__(self, other: 'Vector') -> 'Vector':
         """Vector subtractions"""
         if self.dimension != other.dimension:
             raise ValueError("Dimension of vectors must agree")
         else:
-            new_vector = Vector(self.dimension)
-            new_vector.vector = [self.vector[i] - other.vector[i] for i in range(self.dimension)]
-            return new_vector
+            return Vector([self.vector[i] - other.vector[i] for i in range(self.dimension)])
 
     def __mul__(self, other: float) -> 'Vector':
         """Scalar multiplication: vector * scalar"""
         if isinstance(other, Vector):
             raise TypeError("Maybe you meant .dot_product")
         else:
-            new_vector = Vector(self.dimension)
-            new_vector.vector = [entry * other for entry in self.vector]
-            return new_vector
+            return Vector([entry * other for entry in self.vector])
 
     def __rmul__(self, other: float):
         """Scalar multiplication: scalar * vector"""
@@ -339,15 +340,15 @@ class Vector:
 
     def __iadd__(self, other: 'Vector'):
         """Vector addition with overriding"""
-        self.vector = self.__add__(other)
+        self.vector = self.__add__(other).vector
 
     def __isub__(self, other: 'Vector'):
         """Vector subtraction with overriding"""
-        self.vector = self.__sub__(other)
+        self.vector = self.__sub__(other).vector
 
     def __imul__(self, other: float):
         """Scalar multiplication with overriding"""
-        self.vector = self.__mul__(other)
+        self.vector = self.__mul__(other).vector
 
 
 class Line2D:
@@ -456,11 +457,28 @@ class Segment2D:
         return tuple((point1[i] + point2[i]) / 2 for i in range(2))
 
 
+class Quadratic2D:
+    """A quadratic curve in 2D"""
+    def __init__(self, a: float, b: float, c: float):
+        self.equation = a, b, c
+        self.discrimination = b ** 2 - 4 * a * c
+
+    @classmethod
+    def from_vertex_and_point(cls, vertex: (float, float), point: (float, float)) -> 'Quadratic2D':
+        """Construct a quadratic curve from the coordinates of a vertex and a point"""
+        pass
+
+    def calculate_x_intercept(self):
+        pass
+
+    def calculate_y_intercept(self):
+        pass
+
 if __name__ == "__main__":
     # > Humbert
     print("Zis you ask Humbert")
-    v = Vector.from_list([47, 140])
-    w = Vector.from_list([1, 3])
+    v = Vector([47, 140])
+    w = Vector([1, 3])
     distance = w - w.dot_product(v.unit()) * v.unit()
     # TODO find *w* to minimize distance.norm()
     print(distance.norm())
