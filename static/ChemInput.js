@@ -209,7 +209,11 @@ function renderResult(result) {
     } else if (mode == "empirical") {
         // TODO this and fix float point issues
     } else if (mode == "alkane") {
-
+        for (var key in result) {
+            if (key != 'info' && key != 'mode' && key != 'syntax') {
+                $('td#' + key).html(result[key])
+            }
+        }
     }
 }
 

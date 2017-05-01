@@ -33,6 +33,11 @@ body {
     padding-left: 2.5px;
 }
 
+/*
+==========
+ TOP BAR
+==========
+*/
 #mainField { /* form */
     padding: 10px;
     display: flex;
@@ -43,6 +48,7 @@ body {
     background-color: white;
     margin: 0 10px 0 10px;
 }
+
 #enter {
     border-radius: 25px;
     background-color: aquamarine;
@@ -179,6 +185,12 @@ body {
     opacity: 1;
 }
 
+/*
+=========
+ Content
+=========
+*/
+
 #mode, #infos {
     position: relative;
     height: 512px;
@@ -193,6 +205,7 @@ body {
     display: none;
 }
 
+/* intro */
 #info-this {
     background-color: ghostwhite;
 }
@@ -252,65 +265,6 @@ body {
     background-color: #FCF3CF;
 }
 
-/* Equation info */
-
-#info-equation > table {
-    width: 100%;
-    height: 100%;
-}
-
-#info-equation > table, #info-equation > table th, #info-equation > table td {
-    border: 1px gray solid;
-    border-collapse: collapse;
-}
-
-#info-equation > table tr {
-    background: mintcream;
-}
-
-#info-equation > table th {
-    width: 15%;
-    text-align: justify;
-    background-color: azure;
-    padding-left: 10px;
-    border-radius: 2.5px;
-}
-
-#info-equation > table td {
-    text-align: center;
-}
-
-#info-equation > table td.left_is_reactants_right_is_products {
-    background-color: darkgray;
-    border-bottom: 1px darkgray solid;
-}
-
-#info-equation > table td.trivial {
-    background-color: lightgray;
-    border-bottom: 1px lightgray solid;
-}
-
-.error {
-    color: red;
-    font-family: menlo;
-}
-
-#info-equation > table .nil {
-    color: gray;
-}
-
-
-#info-equation > table .number {
-    color: red;
-    font-family: courier;
-};
-
-#info-equation > table td > span.sub_field {
-    width: 32px;
-    background-color: black;
-    color: yellow;
-}
-
 
 /* Molecule info */
 
@@ -319,14 +273,13 @@ table {
 }
 
 #info-molecule {
-    padding: 2px;
     height: 100%;
 }
 
 #info-molecule table {
     border-collapse: collapse;
     width: 100%;
-    height: 100%;
+    height: 100.6%;
     padding-right: 2px;  /* fix table issues (n'est-ce pas mr absolute) */
     padding-bottom: 11px;
 }
@@ -341,10 +294,11 @@ table {
 }
 
 #info-molecule table th {
-    vertical-align: center;
+    text-align: center;
     font-weight: bold;
     width: 15%;
     background-color: azure;
+    padding: 10px;
 }
 
 
@@ -367,7 +321,6 @@ table {
 }
 
 /* precision slider */
-
 #info-molecule table td:last-child {
     border-width: 0 0 0 1px;
 }
@@ -421,3 +374,93 @@ input[type=range]::-moz-range-thumb {
     cursor: pointer;
 }
 */
+
+/* Equation info */
+
+#info-equation > table {
+    width: 100%;
+    height: 98.5%;
+}
+
+#info-equation > table, #info-equation > table th, #info-equation > table td {
+    border: 1px gray solid;
+    border-collapse: collapse;
+}
+
+#info-equation > table tr {
+    background: mintcream;
+}
+
+#info-equation > table th {
+    width: 15%;
+    text-align: center;
+    background-color: azure;
+    padding: 10px;
+    border-radius: 2.5px;
+}
+
+#info-equation > table td {
+    text-align: center;
+}
+
+#info-equation > table td.left_is_reactants_right_is_products {
+    background-color: darkgray;
+    border-bottom: 1px darkgray solid;
+}
+
+#info-equation > table td.trivial {
+    background-color: lightgray;
+    border-bottom: 1px lightgray solid;
+}
+
+.error {
+    color: red;
+    font-family: menlo;
+}
+
+#info-equation > table .nil {
+    color: gray;
+}
+
+
+#info-equation > table .number {
+    color: red;
+    font-family: courier;
+};
+
+#info-equation > table td > span.sub_field {
+    width: 32px;
+    background-color: black;
+    color: yellow;
+}
+
+/* Determine Empirical Formula */
+/* TODO */
+
+/* Alkanes */
+
+#info-alkane > table {
+    border-collapse: collapse;
+    width: 100%;
+    height: 100.6%;
+    padding-right: 2px;  /* fix table issues (n'est-ce pas mr absolute) */
+    padding-bottom: 11px;
+}
+
+
+#info-alkane table, #info-alkane table th, #info-alkane table td {
+    border: 1px gray solid;
+}
+
+#info-alkane table td {
+    padding: 10px;
+    background-color: mintcream;
+}
+
+#info-alkane table th {
+    vertical-align: center;
+    font-weight: bold;
+    width: 15%;
+    background-color: azure;
+    padding: 10px;
+}

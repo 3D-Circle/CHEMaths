@@ -467,7 +467,7 @@ class Equation:
         """Determine the reaction type based on the given lists of reactants and products
         Outputs one of the following string:
         combustion, neutralisation, single displacement, double displacement, decomposition, synthesis, redox"""
-        reaction_type = "$DEFAULT"  # TODO remove this
+        reaction_type = "$DEFAULT"  # TODO remove this ya ya ya 丫丫丫
         # Remove reactants / products with coefficient equal to 0
         reactants, products = self.reactants.copy(), self.products.copy()
         for i, coefficient in enumerate(self.coefficients):
@@ -491,7 +491,6 @@ class Equation:
 
 class Enthalpy:
     """Utility class to facilitate enthalpy data retrieval"""
-
     def __init__(self):
         pass
 
@@ -567,7 +566,7 @@ class Alkane(OrganicCompound):
                           " " + "   |" * self.size,
                           "H" + " - C" * self.size + " - H",
                           " " + "   |" * self.size,
-                          " " + "   H" * self.size])  # looks quite pleasing ey? :)
+                          " " + "   H" * self.size])  # looks quite pleasing ey? :) ey ey !
 
     def get_molecule(self) -> 'Molecule':
         """Determine the molecular formula of this alkane"""
@@ -605,13 +604,12 @@ class Alcohol(OrganicCompound):
             ).coefficients
 
         enthalpy_reactants = (
-                             coefficient_alcohol * enthalpy_alcohol
-                             + coefficient_oxygen * enthalpy_oxygen
-                             ) / coefficient_alcohol
+            coefficient_alcohol * enthalpy_alcohol + coefficient_oxygen * enthalpy_oxygen
+        ) / coefficient_alcohol
+
         enthalpy_products = (
-                                coefficient_carbon_dioxide * enthalpy_carbon_dioxide
-                                + coefficient_water * enthalpy_water
-                            ) / coefficient_alcohol
+            coefficient_carbon_dioxide * enthalpy_carbon_dioxide + coefficient_water * enthalpy_water
+        ) / coefficient_alcohol
 
         return enthalpy_reactants - enthalpy_products
 

@@ -2,7 +2,7 @@
 """Web version for CHEMaths"""
 from flask import Flask, jsonify, render_template, request
 from latex_parser import latex_valid, determine_mode
-from CHEMaths import Molecule
+from CHEMaths import Molecule, Alkane
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -61,6 +61,19 @@ def live_process():
             'coefficients': coefficients,
             'error': error
         })
+    elif mode == 'alkane':
+        current_alkane = Alkane(int(latex.split('::')[-1]))
+        return jsonify({
+            'info': str(current_alkane),
+            'alkane-name': current_alkane.get_name().capitalize(),
+            'molecular-formula': current_alkane.molecule.molecular_formula_string,
+            'isomers-number': current_alkane.calculate_isomers(),
+            'combustion-enthalpy': current_alkane.calculate_combustion_enthalpy(),
+            'lewis-structure': current_alkane.get_lewis(),
+            'mode': mode,
+            'syntax': syntax_check[0]
+        })
+
     else:
         return jsonify({
             'mode': mode,
