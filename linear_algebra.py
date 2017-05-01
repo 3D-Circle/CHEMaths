@@ -198,7 +198,7 @@ class Matrix:
             row_count += 1
         return self.size[0]
 
-    def solve(self, homogeneous=True, integer_minimal=False):
+    def solve(self, homogeneous=True):
         """Solve for X taking this matrix as the coefficient matrix"""
         if homogeneous:
             # avoid side effects
@@ -218,12 +218,6 @@ class Matrix:
                     local_solution_list[independent_variable] = fractions.Fraction(1)
 
                     solution_lists.append(local_solution_list)
-                if integer_minimal:
-                    integer_solution_list = [
-                        sum([solution_list[i] for solution_list in solution_lists]) for i in range(self.size[1])
-                    ]
-                    common_multiplier = lcm_multiple(*[entry.denominator for entry in integer_solution_list])
-                    return [integer_solution_list[i] * common_multiplier for i in range(self.size[1])]
                 return solution_lists
 
     def null_space(self) -> list:
@@ -241,7 +235,7 @@ class Matrix:
         kernel = []
         for r_index in range(A_T.size[0]):
             if all([B_T[r_index][c_index] == 0 for c_index in range(A_T.size[1])]):
-                kernel.append(C_T.matrix[r_index])
+                kernel.append(Vector(C_T.matrix[r_index]))
         return kernel
 
 
@@ -276,9 +270,10 @@ class Vector:
 
     def __repr__(self) -> str:
         """Detailed representation of this vector"""
-        return f"Vector: {'[' + '  '.join(self.vector) + ']'}" \
-               f"Norm: {str(self.norm())}" \
-               f"Unit vector: {'[' + ' '.join(self.unit().vector) + ']' if self else 'undefined'}"
+        return f"Vector: {'[' + '  '.join([str(entry) for entry in self.vector]) + ']'}\n" \
+               f"Norm: {str(self.norm())}\n" \
+               f"Unit vector: " \
+               f"{'[' + ' '.join(str(entry) for entry in self.unit().vector) + ']' if self else 'undefined'}"
 
     def __str__(self) -> str:
         """Short representation of this vector"""
@@ -333,6 +328,10 @@ class Vector:
             raise TypeError("Maybe you meant .dot_product")
         else:
             return Vector([entry * other for entry in self.vector])
+
+    def __radd__(self, other: 'Vector') -> 'Vector':
+        """Vector additions"""
+        return self.__add__(other)
 
     def __rmul__(self, other: float):
         """Scalar multiplication: scalar * vector"""

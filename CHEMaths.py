@@ -13,8 +13,8 @@ import time
 import json
 import re
 import latex_parser
-from linear_algebra import Matrix, ext_euclid, gcd_multiple, lcm_multiple, partition
 from ast import literal_eval
+from linear_algebra import Matrix, ext_euclid, gcd_multiple, lcm_multiple, partition
 
 with open("static/data.json") as data:
     data_dict = json.loads(data.read())
@@ -385,8 +385,16 @@ class Equation:
                 else:
                     products_list_copy.remove(molecule)
                 matrix.assign_new_value(i, j, sign * atom_count)
-        solution = matrix.solve(homogeneous=True, integer_minimal=True)
+        # list of linearly independent variables as solutions
+        solution_vectors = matrix.null_space()
 
+        if len(solution_vectors) != 1:
+            raise ArithmeticError("not one single reaction")
+
+        # smallest integer solution
+        solution_vector = solution_vectors[0]
+        least_common_multiple = lcm_multiple(*[coefficient.denominator for coefficient in solution_vector.vector])
+        solution = [int(coefficient) for coefficient in (least_common_multiple * solution_vector).vector]
         # trivial solution: infeasible reaction
         if any(entry <= 0 for entry in solution):
             raise ValueError("equation not feasible")
@@ -489,19 +497,15 @@ class Equation:
         return reaction_type
 
 
-class Enthalpy:
-    """Utility class to facilitate enthalpy data retrieval"""
-    def __init__(self):
-        pass
-
-
 class OrganicCompound:
     """Base formula for hydrocarbon"""
     names = ["meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"]
 
-    def __init__(self, size: int):
+    def __init__(self, size: int, configuration=None):
         """Init takes one argument, size, equal to the number of carbons"""
         self.size = size
+        self.configuration = configuration
+
         self.molecule = self.get_molecule()
 
     def __repr__(self) -> str:
@@ -517,7 +521,7 @@ class OrganicCompound:
         """Determine the change in enthalpy of the combustion of this hydrocarbon"""
         raise NotImplementedError
 
-    def get_lewis(self) -> str:
+    def get_lewis(self, sep='\n') -> str:
         """Draw the basic lewis structure of this hydrocarbon"""
         raise NotImplementedError
 
@@ -560,9 +564,9 @@ class Alkane(OrganicCompound):
         """Return the combustion enthalpy of this alkane"""
         pass
 
-    def get_lewis(self) -> str:
+    def get_lewis(self, sep='\n') -> str:
         """Draw lewis structure of the basic alkane"""
-        return '\n'.join([" " + "   H" * self.size,
+        return sep.join([" " + "   H" * self.size,
                           " " + "   |" * self.size,
                           "H" + " - C" * self.size + " - H",
                           " " + "   |" * self.size,
@@ -581,8 +585,7 @@ class Alcohol(OrganicCompound):
     """Implementation of alcohol in organic chemistry"""
 
     def __init__(self, size: int, configuration=None):
-        super().__init__(size)
-        self.configuration = configuration
+        super().__init__(size, configuration)
 
     def calculate_combustion_enthalpy(self) -> float:
         """Calculate the combustion enthalpy of this alcohol"""
@@ -625,7 +628,7 @@ class Alcohol(OrganicCompound):
             + ('-' + str(self.configuration) + '-' if self.configuration else '') \
             + "ol"
 
-    def get_lewis(self) -> str:
+    def get_lewis(self, sep='\n') -> str:
         """Determine the lewis structure of this alcohol
         Accept an optional argument describing the position of OH"""
         pass

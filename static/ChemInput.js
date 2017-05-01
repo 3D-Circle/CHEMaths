@@ -211,7 +211,13 @@ function renderResult(result) {
     } else if (mode == "alkane") {
         for (var key in result) {
             if (key != 'info' && key != 'mode' && key != 'syntax') {
-                $('td#' + key).html(result[key])
+                var display_information
+                if (key == 'lewis-structure') {
+                    display_information = '<pre>' + result[key] + '</pre>';
+                } else {
+                    display_information = result[key];
+                }
+                $('td#' + key).html(display_information);
             }
         }
     }

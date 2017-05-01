@@ -51,7 +51,6 @@ def live_process():
         reaction_type, reactants, products, coefficients = None, None, None, None
         if not error:
             reactants, products, coefficients, reaction_type = syntax_check[1]
-            coefficients = [f'{fraction.numerator}' for fraction in coefficients]
         return jsonify({
             'mode': mode,
             'syntax': syntax_check[0],
@@ -69,7 +68,7 @@ def live_process():
             'molecular-formula': current_alkane.molecule.molecular_formula_string,
             'isomers-number': current_alkane.calculate_isomers(),
             'combustion-enthalpy': current_alkane.calculate_combustion_enthalpy(),
-            'lewis-structure': current_alkane.get_lewis(),
+            'lewis-structure': current_alkane.get_lewis(sep='<br/>'),
             'mode': mode,
             'syntax': syntax_check[0]
         })

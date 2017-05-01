@@ -63,6 +63,8 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                         products_parsed.append(molecule_check[1])
             try:
                 equation = CHEMaths.Equation(reactants_parsed, products_parsed)
+            except ArithmeticError:
+                return False, "Arithmetic Error: this is not one single equation"
             except ValueError:
                 return False, "Value Error: equation not feasible"
             else:
