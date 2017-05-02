@@ -25,7 +25,7 @@ with open("static/data.json") as data:
     ]
 
 
-def get_bond_enthalpy(element1: str, element2: str, bond='single bond') -> float:
+def get_bond_enthalpy(element1: str, element2: str, bond='single bond') -> int:
     """Utility function that retrieves the bond enthalpy between element1 and element2 (regardless or order)
     An optional argument, bond, describing the bond (single, double, triple) could be specified
     If not specified, bond defaults to 'single'
@@ -524,9 +524,36 @@ class FunctionalGroup:
     def __str__(self) -> str:
         return self.__repr__()
 
-    def calculate_combustion_enthalpy(self) -> float:
-        """Determine the change in enthalpy of the combustion of this hydrocarbon"""
+    def calculate_bond_enthalpy(self) -> int:
+        """Calculate the bond enthalpy of this organic compound"""
         raise NotImplementedError
+
+    def calculate_combustion_enthalpy(self):
+        """Calculate the combustion enthalpy of this organic compound"""
+        # reactants
+        enthalpy_organic_compound = self.calculate_bond_enthalpy()
+        enthalpy_oxygen = get_bond_enthalpy('O', 'O', bond="double bond")
+
+        # products
+        enthalpy_carbon_dioxide = 2 * get_bond_enthalpy('C', 'O', bond="double bond")
+        enthalpy_water = 2 * get_bond_enthalpy('H', 'O')
+
+        # Combustion reaction
+        coefficient_organic_compound, coefficient_oxygen, coefficient_carbon_dioxide, coefficient_water = \
+            Equation(
+                [self.molecule.molecular_formula, {'O': 2}],
+                [{'C': 1, 'O': 2}, {'H': 2, 'O': 1}]
+            ).coefficients
+
+        enthalpy_reactants = (
+            coefficient_organic_compound * enthalpy_organic_compound + coefficient_oxygen * enthalpy_oxygen
+        ) / coefficient_organic_compound
+
+        enthalpy_products = (
+            coefficient_carbon_dioxide * enthalpy_carbon_dioxide + coefficient_water * enthalpy_water
+        ) / coefficient_organic_compound
+
+        return enthalpy_reactants - enthalpy_products
 
     def calculate_isomer_numbers(self) -> int:
         """calculate the number of isomers"""
@@ -548,6 +575,11 @@ class FunctionalGroup:
 class Alkane(FunctionalGroup):
     """Hydrocarbon with the general formula CH"""
 
+    def calculate_bond_enthalpy(self) -> int:
+        """Calculate the bond enthalpy of this organic compound"""
+        return (self.size * 2 + 2) * get_bond_enthalpy('C', 'H') \
+            + (self.size - 1) * get_bond_enthalpy('C', 'C')
+
     def calculate_isomer_numbers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
         if self.size <= 2:
@@ -558,10 +590,6 @@ class Alkane(FunctionalGroup):
         # equivalent to number of partitions of n + k into k non-zero parts
         # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
         return count
-
-    def calculate_combustion_enthalpy(self) -> float:
-        """Return the combustion enthalpy of this alkane"""
-        pass
 
     def get_lewis(self, sep='\n') -> str:
         """Draw lewis structure of the basic alkane"""
@@ -583,34 +611,13 @@ class Alkane(FunctionalGroup):
 class Alcohol(FunctionalGroup):
     """Implementation of alcohol in organic chemistry"""
 
-    def calculate_combustion_enthalpy(self) -> float:
-        """Calculate the combustion enthalpy of this alcohol"""
-        # reactants
-        enthalpy_alcohol = \
-            get_bond_enthalpy('O', 'H') + get_bond_enthalpy('C', 'O') + 3 * get_bond_enthalpy('C', 'H') \
-            + (self.size - 1) * get_bond_enthalpy('C', 'C') + (self.size - 1) * 2 * get_bond_enthalpy('C', 'H')
-        enthalpy_oxygen = get_bond_enthalpy('O', 'O', bond="double bond")
-
-        # products
-        enthalpy_carbon_dioxide = 2 * get_bond_enthalpy('C', 'O', bond="double bond")
-        enthalpy_water = 2 * get_bond_enthalpy('H', 'O')
-
-        # Combustion reaction
-        coefficient_alcohol, coefficient_oxygen, coefficient_carbon_dioxide, coefficient_water = \
-            Equation(
-                [self.molecule.molecular_formula, {'O': 2}],
-                [{'C': 1, 'O': 2}, {'H': 2, 'O': 1}]
-            ).coefficients
-
-        enthalpy_reactants = (
-            coefficient_alcohol * enthalpy_alcohol + coefficient_oxygen * enthalpy_oxygen
-        ) / coefficient_alcohol
-
-        enthalpy_products = (
-            coefficient_carbon_dioxide * enthalpy_carbon_dioxide + coefficient_water * enthalpy_water
-        ) / coefficient_alcohol
-
-        return enthalpy_reactants - enthalpy_products
+    def calculate_bond_enthalpy(self) -> int:
+        """Calculate the bond enthalpy of this organic compound"""
+        return get_bond_enthalpy('O', 'H')\
+            + get_bond_enthalpy('C', 'O')\
+            + 3 * get_bond_enthalpy('C', 'H') \
+            + (self.size - 1) * get_bond_enthalpy('C', 'C')\
+            + (self.size - 1) * 2 * get_bond_enthalpy('C', 'H')
 
     def calculate_isomer_numbers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
