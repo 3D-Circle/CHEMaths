@@ -20,17 +20,17 @@
 </head>
 
 <body>
-    <div id="top-bar">
-        <div id="input-wrapper">
-            <form action="/results" method="POST" id="mainField">
-                <div id="syntax_check_status"></div>
-                <span id='input'></span>
-                <input type="submit" value="Maths!" id="enter"/>
-            </form>
-        </div>
+<div id="top-bar">
+    <div id="input-wrapper">
+        <form action="/results" method="POST" id="mainField">
+            <div id="syntax_check_status"></div>
+            <span id='input'></span>
+            <input type="submit" value="Maths!" id="enter"/>
+        </form>
+    </div>
 
-        <!--Buttons for input field-->
-        <div id="buttons" class="row">
+    <!--Buttons for input field-->
+    <div id="buttons" class="row">
         <button id='rightarrow'>&rarr;</button>
         <button id='sup'>^</button>
         <button id='sub'>_</button>
@@ -54,7 +54,7 @@
                     Information on Molecule
                 </p>
             </div>
-            
+
             <!--Equation-->
             <div class="status" id="equation">
                 &rarr;
@@ -62,7 +62,7 @@
                     Balance Equation
                 </p>
             </div>
-            
+
             <!--Empirical-->
             <div class="status" id="empirical">
                 g
@@ -70,7 +70,7 @@
                     Determine Empirical Formula
                 </p>
             </div>
-       
+
             <!--Organic-->
             <div class="status" id="organic">
                 CH
@@ -79,14 +79,15 @@
                 </p>
             </div>
         </div>
-        
+
         <!--Details-->
         <div class="col-10" id="infos">
             <div class="panel" id="info-this">
                 <h1>
                     <span id="yellow">CHE</span><span id="green">M</span><span id="blue">aths</span>
                 </h1>
-                <p id="authors">By <a href="https://github.com/JingjieYang">Jingjie</a> and <a href="https://github.com/TrakJohnson">Théo</a>.</p>
+                <p id="authors">By <a href="https://github.com/JingjieYang">Jingjie</a> and <a
+                        href="https://github.com/TrakJohnson">Théo</a>.</p>
                 <h3>
                     Chemistry with Mathematics<br/>
                     High-School-Level Chemistry Calculator
@@ -99,43 +100,43 @@
             <div class="panel" id="info-molecule">
                 <table>
                     <tbody>
-                        <tr>
-                            <th>Molecular formula</th>
-                            <td id="molecular_formula"></td>
-                            <td></td>  <!--Last element is necessary for using :last-child-->
-                        </tr>
-                        <tr>
-                            <th>Name</th>
-                            <td id="name"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th>Molar mass</th>
-                            <td id="molar_mass"></td>
-                            <td>
-                                <input type="range"
-                                       name="molar_mass_precision"
-                                       id="molar_mass_precision"
-                                       class="precision"
-                                       min="0" max="5">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Components</th>
-                            <td id="components"></td>
-                            <td>
-                                <input type="range"
-                                       name="components_precision"
-                                       id="components_precision"
-                                       class="precision"
-                                       min="0" max="5">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Oxidation</th>
-                            <td id="oxidation"></td>
-                            <td></td>
-                        </tr>
+                    <tr>
+                        <th>Molecular formula</th>
+                        <td id="molecular_formula"></td>
+                        <td></td>  <!--Last element is necessary for using :last-child-->
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <td id="name"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>Molar mass</th>
+                        <td id="molar_mass"></td>
+                        <td>
+                            <input type="range"
+                                   name="molar_mass_precision"
+                                   id="molar_mass_precision"
+                                   class="precision"
+                                   min="0" max="5">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Components</th>
+                        <td id="components"></td>
+                        <td>
+                            <input type="range"
+                                   name="components_precision"
+                                   id="components_precision"
+                                   class="precision"
+                                   min="0" max="5">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Oxidation</th>
+                        <td id="oxidation"></td>
+                        <td></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -194,5 +195,6 @@
 
         </div>
     </div>
+</div>
 </body>
 </html>
