@@ -211,13 +211,14 @@ function renderResult(result) {
     } else if (mode == "alkane") {
         for (var key in result) {
             if (key != 'info' && key != 'mode' && key != 'syntax') {
-                var display_information
                 if (key == 'lewis-structure') {
-                    display_information = '<pre>' + result[key] + '</pre>';
+                    $('td#' + key).html('<pre>' + result[key] + '</pre>');
+                } else if (key == 'molecular-formula') {
+                    alkane_molecule_display = MQ.StaticMath($('td#' + key + '>span')[0]);
+                    alkane_molecule_display.latex(result[key]);
                 } else {
-                    display_information = result[key];
+                    $('td#' + key).html(result[key]);
                 }
-                $('td#' + key).html(display_information);
             }
         }
     }

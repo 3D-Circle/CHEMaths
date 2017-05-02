@@ -65,7 +65,7 @@ def live_process():
         return jsonify({
             'info': str(current_alkane),
             'alkane-name': current_alkane.get_name().capitalize(),
-            'molecular-formula': current_alkane.molecule.molecular_formula_string,
+            'molecular-formula': current_alkane.molecule.latex_molecular_formula,
             'isomers-number': current_alkane.calculate_isomers(),
             'combustion-enthalpy': current_alkane.calculate_combustion_enthalpy(),
             'lewis-structure': current_alkane.get_lewis(sep='<br/>'),

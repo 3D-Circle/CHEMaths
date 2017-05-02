@@ -45,6 +45,7 @@ class Molecule:
     def __init__(self, molecular_formula: dict, raw_string='', mass=None, mole=None):
         self.formula_string = raw_string
         self.molecular_formula = molecular_formula
+        self.latex_molecular_formula = ''.join(f'{i}_{{{j}}}' for i, j in molecular_formula.items() if i != 'sign')
 
         self.elements = self.get_elements()
 
