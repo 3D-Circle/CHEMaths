@@ -357,8 +357,8 @@ class Line2D:
         ax + by + c = 0"""
         self.equation = (a, b, c)
 
-        self.slope = -a / b
-        self.y_intercept = -c / b
+        self.slope = -a / b if b != 0 else float("Inf")
+        self.y_intercept = -c / b if b != 0 else float("Inf")
 
         self.general_form = \
             f"{a}x {('+ ' if b >=0 else '- ') + str(abs(b))}y {('+ ' if c >= 0 else '- ') + str(abs(c))} = 0"
@@ -392,7 +392,7 @@ class Line2D:
         return '\n'.join((self.general_form, self.slope_intercept_form))
 
     def __str__(self) -> str:
-        return self.__repr__()
+        return self.general_form
 
     def x_calculate(self, y: float) -> float:
         """Calculate x for the given x"""
@@ -459,19 +459,54 @@ class Segment2D:
 class Quadratic2D:
     """A quadratic curve in 2D"""
     def __init__(self, a: float, b: float, c: float):
+        """quadratic curve of formula y = ax ** 2 + bx + c"""
+        assert a != 0, "not a quadratic curve!"
         self.equation = a, b, c
-        self.discrimination = b ** 2 - 4 * a * c
+        self.discriminant = b ** 2 - 4 * a * c
+
+    def __str__(self) -> str:
+        a, b, c = self.equation
+        return f"y = {a}x^2 {('+' if b > 0 else '-') + str(b)}x {('+' if b > 0 else '-') + str(c)}"
+
+    def __repr__(self) -> str:
+        a, b, c = self.equation
+        return f"equation: y = {a}x^2 {('+' if b > 0 else '') + str(b)}x {('+' if b > 0 else '') + str(c)}\n" \
+               f"discriminant: {self.discriminant}\n" \
+               f"vertex: {self.calculate_vertex()}\n" \
+               f"axis of symmetry: {Line2D(1, 0, b / (2 * a))}\n" \
+               f"x-intercept: {'; '.join(str(x_intercept) for x_intercept in self.calculate_x_intercept())}\n" \
+               f"y-intercept: {self.calculate_y_intercept()}\n"
 
     @classmethod
     def from_vertex_and_point(cls, vertex: (float, float), point: (float, float)) -> 'Quadratic2D':
         """Construct a quadratic curve from the coordinates of a vertex and a point"""
         pass
 
-    def calculate_x_intercept(self):
-        pass
+    def calculate_vertex(self) -> (float, float):
+        """Calculate the coordinates of the vertex"""
+        a, b, c = self.equation
+        Δ = self.discriminant
+        return -b / (2 * a), -Δ / (4 * a)
 
-    def calculate_y_intercept(self):
-        pass
+    def calculate_x_intercept(self) -> tuple:
+        """Calculate the x-intercept(s) (if any) of this curve"""
+        if self.discriminant < 0:
+            return ()
+        else:
+            return tuple((x_intercept, 0) for x_intercept in self.calculate_root())
+
+    def calculate_y_intercept(self) -> (float, float):
+        """Calculate the y-intercept of this curve"""
+        _, _, c = self.equation
+        return 0, c
+
+    def calculate_root(self) -> tuple:
+        """Calculate the roots of this quadratic expression, i.e. find for x when y = 0"""
+        a, b, c = self.equation
+        Δ = self.discriminant
+        if Δ < 0:
+            print("Complex root is involved")
+        return tuple((-b + sign * math.sqrt(Δ)) / (2 * a) for sign in [-1, 1])
 
 if __name__ == "__main__":
     # > Humbert

@@ -498,12 +498,17 @@ class Equation:
         return reaction_type
 
 
-class OrganicCompound:
+class FunctionalGroup:
     """Base formula for hydrocarbon"""
-    names = ["meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"]
+    names = [
+        "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec",
+        "undec", "dodec", "tridec", "tetradec", "pentadec", "hexadec", "heptadec", "octadec", "nonadec", "icos"
+    ]
 
     def __init__(self, size: int, configuration=None):
         """Init takes one argument, size, equal to the number of carbons"""
+        if size < 0:
+            raise ValueError("Negative sizes are not allowed")
         self.size = size
         self.configuration = configuration
 
@@ -512,6 +517,7 @@ class OrganicCompound:
     def __repr__(self) -> str:
         return f"name: {self.get_name()}\n" \
                f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
+               f"number of isomers: {self.calculate_isomer_numbers()}\n" \
                f"combustion enthalpy: {self.calculate_combustion_enthalpy()}\n" \
                f"lewis structure: \n{self.get_lewis()}"
 
@@ -520,6 +526,10 @@ class OrganicCompound:
 
     def calculate_combustion_enthalpy(self) -> float:
         """Determine the change in enthalpy of the combustion of this hydrocarbon"""
+        raise NotImplementedError
+
+    def calculate_isomer_numbers(self) -> int:
+        """calculate the number of isomers"""
         raise NotImplementedError
 
     def get_lewis(self, sep='\n') -> str:
@@ -535,22 +545,10 @@ class OrganicCompound:
         raise NotImplementedError
 
 
-class Alkane(OrganicCompound):
+class Alkane(FunctionalGroup):
     """Hydrocarbon with the general formula CH"""
 
-    def __init__(self, size: int, configuration=None):
-        # TODO implement this for different isomer configuration as well
-        super().__init__(size)
-
-    def __repr__(self) -> str:
-        """Return information on the alkane"""
-        return f"name: {self.get_name()}\n" \
-               f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
-               f"number of isomers: {self.calculate_isomers()}\n" \
-               f"combustion enthalpy: {self.calculate_combustion_enthalpy()}\n" \
-               f"lewis structure: \n{self.get_lewis()}"
-
-    def calculate_isomers(self) -> int:
+    def calculate_isomer_numbers(self) -> int:
         """Return the number of different structural isomers of the alkane"""
         if self.size <= 2:
             count = 1
@@ -568,10 +566,10 @@ class Alkane(OrganicCompound):
     def get_lewis(self, sep='\n') -> str:
         """Draw lewis structure of the basic alkane"""
         return sep.join([" " + "   H" * self.size,
-                          " " + "   |" * self.size,
-                          "H" + " - C" * self.size + " - H",
-                          " " + "   |" * self.size,
-                          " " + "   H" * self.size])  # looks quite pleasing ey? :) ey ey !
+                         " " + "   |" * self.size,
+                         "H" + " - C" * self.size + " - H",
+                         " " + "   |" * self.size,
+                         " " + "   H" * self.size])  # looks quite pleasing ey? :) ey ey !
 
     def get_molecule(self) -> 'Molecule':
         """Determine the molecular formula of this alkane"""
@@ -579,14 +577,11 @@ class Alkane(OrganicCompound):
 
     def get_name(self) -> str:
         """Determine the name of this alkane"""
-        return (OrganicCompound.names[self.size - 1] if self.size <= 10 else str(self.size) + '-') + "ane"
+        return (FunctionalGroup.names[self.size - 1] if self.size <= 20 else str(self.size) + '-') + "ane"
 
 
-class Alcohol(OrganicCompound):
+class Alcohol(FunctionalGroup):
     """Implementation of alcohol in organic chemistry"""
-
-    def __init__(self, size: int, configuration=None):
-        super().__init__(size, configuration)
 
     def calculate_combustion_enthalpy(self) -> float:
         """Calculate the combustion enthalpy of this alcohol"""
@@ -617,6 +612,10 @@ class Alcohol(OrganicCompound):
 
         return enthalpy_reactants - enthalpy_products
 
+    def calculate_isomer_numbers(self) -> int:
+        """Return the number of different structural isomers of the alkane"""
+        pass
+
     def get_molecule(self) -> 'Molecule':
         """Determine the molecular formula of this alcohol"""
         return Molecule({"sign": 0, 'C': self.size, 'H': 2 * self.size + 2, 'O': 1})
@@ -624,7 +623,7 @@ class Alcohol(OrganicCompound):
     def get_name(self) -> str:
         """Determine the name of this alcohol"""
         return \
-            (OrganicCompound.names[self.size - 1] if self.size <= 10 else str(self.size) + '-') \
+            (FunctionalGroup.names[self.size - 1] if self.size <= 20 else str(self.size) + '-') \
             + "an" \
             + ('-' + str(self.configuration) + '-' if self.configuration else '') \
             + "ol"

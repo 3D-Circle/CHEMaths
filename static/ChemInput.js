@@ -1,5 +1,5 @@
 var modes = [
-    "this", "molecule", "equation", "empirical", "alkane"
+    "this", "molecule", "equation", "empirical", "organic"
 ];
 var currentMode = "equation";
 var MQ = MathQuill.getInterface(2);
@@ -208,18 +208,23 @@ function renderResult(result) {
         }
     } else if (mode == "empirical") {
         // TODO this and fix float point issues
-    } else if (mode == "alkane") {
-        for (var key in result) {
-            if (key != 'info' && key != 'mode' && key != 'syntax') {
-                if (key == 'lewis-structure') {
-                    $('td#' + key).html('<pre>' + result[key] + '</pre>');
-                } else if (key == 'molecular-formula') {
-                    alkane_molecule_display = MQ.StaticMath($('td#' + key + '>span')[0]);
-                    alkane_molecule_display.latex(result[key]);
-                } else {
-                    $('td#' + key).html(result[key]);
-                }
+    } else if (mode == "organic") {
+        var error = result.error;
+        if (error) {
+            $('#organic-name').html('<p class=error>' + error + '</p>');
+        } else {
+            for (var key in result) {
+                if (key != 'mode' && key != 'syntax') {
+                    if (key == 'lewis-structure') {
+                        $('td#' + key).html('<pre>' + result[key] + '</pre>');
+                    } else if (key == 'molecular-formula') {
+                        alkane_molecule_display = MQ.StaticMath($('td#' + key + '>span')[0]);
+                        alkane_molecule_display.latex(result[key]);
+                    } else {
+                        $('td#' + key).html(result[key]);
+                    }
             }
+        }
         }
     }
 }
@@ -372,7 +377,7 @@ $(document).ready(function () {
             case "empirical":
                 text = "K: 1.82, I: 5.93, O: 2.24";
                 break;
-            case "alkane":
+            case "organic":
                 text = "alkane::5";
                 break;
             default:

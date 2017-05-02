@@ -74,8 +74,22 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
     else:
         if mode == "empirical":
             pass
-        if mode == "alkane":
-            pass
+        if mode == "organic":
+            if len(latex.split("::")) != 2:
+                return False, "Syntax error: separator '::' not found or too many found"
+            else:
+                organic_mode, size = latex.split("::")  # TODO support eval, perhaps?
+                if not re.findall(r"^[1-9]\d*$", size):
+                    return False, f"{size}: Size should contain integer only"
+                else:
+                    if organic_mode == "alcohol":
+                        return True, CHEMaths.Alcohol(int(size))
+                    elif organic_mode == "alkane":
+                        return True, CHEMaths.Alkane(int(size))
+                    else:
+                        return False, f"{organic_mode}: unsupported functional group " \
+                                      f"(not matched by 'alcohol' or 'alkane')"
+
         return True, ""
 
 
@@ -234,9 +248,9 @@ def jingjie_latex2chem(latex: str) -> dict:
 def determine_mode(latex: str) -> str:
     """Determine the mode (i.e. functionality) the server should use to process the given latex string
     Return one of the following strings:
-    this (default case), molecule, equation, empirical, alkane"""
-    if "alkane" in latex.lower():
-        return "alkane"
+    this (default case), molecule, equation, empirical, organic"""
+    if "::" in latex:
+        return "organic"
     elif ":" in latex:
         return "empirical"
     elif latex:

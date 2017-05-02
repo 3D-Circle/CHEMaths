@@ -30,13 +30,7 @@ def live_process():
             'error': syntax_check[1]  # more like a welcoming note than an error :)
         })
     elif mode == 'molecule':
-        if error:
-            return jsonify({
-                'error': error,
-                'mode': mode,
-                'syntax': syntax_check[0]
-            })
-        else:
+        if not error:
             parsed_molecule = syntax_check[1]
             molecule = Molecule(parsed_molecule, raw_string=latex)
             print(molecule.calculate_percentages())
@@ -48,36 +42,34 @@ def live_process():
                 'info': {'mr': molecule.mr, 'element_percentages': molecule.calculate_percentages()}
             })
     elif mode == 'equation':
-        reaction_type, reactants, products, coefficients = None, None, None, None
         if not error:
             reactants, products, coefficients, reaction_type = syntax_check[1]
-        return jsonify({
-            'mode': mode,
-            'syntax': syntax_check[0],
-            'reaction_type': reaction_type,
-            'reactants': reactants,
-            'products': products,
-            'coefficients': coefficients,
-            'error': error
-        })
-    elif mode == 'alkane':
-        current_alkane = Alkane(int(latex.split('::')[-1]))
-        return jsonify({
-            'info': str(current_alkane),
-            'alkane-name': current_alkane.get_name().capitalize(),
-            'molecular-formula': current_alkane.molecule.latex_molecular_formula,
-            'isomers-number': current_alkane.calculate_isomers(),
-            'combustion-enthalpy': current_alkane.calculate_combustion_enthalpy(),
-            'lewis-structure': current_alkane.get_lewis(sep='<br/>'),
-            'mode': mode,
-            'syntax': syntax_check[0]
-        })
-
-    else:
-        return jsonify({
-            'mode': mode,
-            'syntax': syntax_check[0]
-        })
+            return jsonify({
+                'mode': mode,
+                'syntax': syntax_check[0],
+                'reaction_type': reaction_type,
+                'reactants': reactants,
+                'products': products,
+                'coefficients': coefficients,
+                'error': error
+            })
+    elif mode == 'organic':
+        if not error:
+            functional_group = syntax_check[1]
+            return jsonify({
+                'organic-name': functional_group.get_name().capitalize(),
+                'molecular-formula': functional_group.molecule.latex_molecular_formula,
+                'isomers-number': functional_group.calculate_isomer_numbers(),
+                'combustion-enthalpy': functional_group.calculate_combustion_enthalpy(),
+                'lewis-structure': functional_group.get_lewis(sep='<br/>'),
+                'mode': mode,
+                'syntax': syntax_check[0]
+            })
+    return jsonify({
+        'error': error,
+        'mode': mode,
+        'syntax': syntax_check[0]
+    })
 
 
 @app.route('/round', methods=['GET', 'POST'])
