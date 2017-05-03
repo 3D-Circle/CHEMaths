@@ -33,13 +33,19 @@ def live_process():
         if not error:
             parsed_molecule = syntax_check[1]
             molecule = Molecule(parsed_molecule, raw_string=latex)
-            print(molecule.calculate_percentages())
             return jsonify({
                 'error': error,
                 'mode': mode,
                 'syntax': syntax_check[0],
                 'molecule': parsed_molecule,
-                'info': {'mr': molecule.mr, 'element_percentages': molecule.calculate_percentages()}
+                'info': {
+                    'mr': molecule.mr,
+                    'element_percentages': molecule.calculate_percentages(),
+                    'oxidation': {
+                        element: str(molecule.calculate_oxidation()[element])
+                        for element in molecule.calculate_oxidation().keys()
+                    }
+                }
             })
     elif mode == 'equation':
         if not error:

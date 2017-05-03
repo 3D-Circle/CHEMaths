@@ -68,8 +68,11 @@ function renderResult(result) {
                 for (var i = 0; i < sorted_elements.length; i++) {
                     element = sorted_elements[i];
                     percentage = rounded_array.result[i];
-                    $('#components').append('<div class="component" id="'+ element + '">' + element +
-                    '<br><i><div>' + percentage +'</div>%</i></div>');
+                    $('#components').append(
+                        '<div class="component" id="' + element + '">'
+                        + element + '<br><i><div>' + percentage
+                        + '</div>%</i></div>'
+                    );
                 }
                 // check for multiple ids and remove duplicates
                 var dup_id;
@@ -89,7 +92,19 @@ function renderResult(result) {
             });
 
             // Oxidation
-            $('#oxidation').html(result.info.oxidation);
+            $("#info-molecule > table").find(".component").remove();
+            var oxidation = result.info.oxidation;
+            for (var element in oxidation) {
+                if (oxidation.hasOwnProperty(element)) {  // typical js
+                    var oxidation_number = oxidation[element];
+                    $('#oxidation').append(
+                        '<div class=component>'
+                        + element
+                        + '<br/><i>' + oxidation_number + '</i>'
+                        + "</div>"
+                    );
+                }
+            }
 
             // Set all precision range inputs to 2
             $.makeArray($('.precision')).map(function (slider) {
