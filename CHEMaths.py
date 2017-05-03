@@ -518,7 +518,7 @@ class FunctionalGroup:
         return f"name: {self.get_name()}\n" \
                f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
                f"number of isomers: {self.calculate_isomer_numbers()}\n" \
-               f"combustion enthalpy: {self.calculate_combustion_enthalpy()}\n" \
+               f"combustion enthalpy: {self.calculate_combustion_enthalpy()} kJ / mol\n" \
                f"lewis structure: \n{self.get_lewis()}"
 
     def __str__(self) -> str:
@@ -653,7 +653,7 @@ def debug():
         # ---Debugging 3 - oxidation number
         {'Li': +1, 'Al': -5, 'H': +1} == Molecule.from_string("LiAlH4 ^ ").calculate_oxidation(),
         # ---Debugging 4 - alkane inspection: hexane
-        ("C6H14", 5) == (Alkane(6).molecule.molecular_formula_string, Alkane(6).calculate_isomers()),
+        ("C6H14", 5) == (Alkane(6).molecule.molecular_formula_string, Alkane(6).calculate_isomer_numbers()),
         # ---Debugging 5 - determine empirical formula
         {'K': 1, 'I': 1, 'O': 3} == Molecule.from_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}).molecular_formula
     ]
