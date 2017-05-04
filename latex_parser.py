@@ -68,9 +68,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
             except ValueError:
                 return False, "Value Error: equation not feasible"
             else:
-                result = equation.balance()
-                reaction_type = equation.get_reaction_type()
-                return True, (reactants, products, result, reaction_type)
+                return True, (reactants, products, equation)
     else:
         if mode == "empirical":
             pass
@@ -95,8 +93,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
 
 def eval_latex(latex: str) -> float:
     """Evaluates the input latex string"""
-    print(latex)
-    return 0.1
+    return float(latex)
 
 
 def latex2chem(latex: str) -> dict:

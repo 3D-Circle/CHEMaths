@@ -45,7 +45,9 @@ class Molecule:
     def __init__(self, molecular_formula: dict, raw_string='', mass=None, mole=None):
         self.formula_string = raw_string
         self.molecular_formula = molecular_formula
-        self.latex_molecular_formula = ''.join(f'{i}_{{{j}}}' for i, j in molecular_formula.items() if i != 'sign')
+        self.latex_molecular_formula = ''.join(
+            f'{i}_{{{j}}}' if j != 1 else i for i, j in molecular_formula.items() if i != 'sign'
+        )
 
         self.elements = self.get_elements()
 
@@ -432,6 +434,10 @@ class Equation:
         return self.convert_mole_to_mass(
             self.calculate_moles_from_extent(extent)
         )
+
+    def calculate_relative_formula_masses(self) -> list:
+        """Calculate the relative formula masses of the chemicals participating in this reaction"""
+        return [Molecule(self[i]).mr for i in range(self.size)]
 
     def convert_mass_to_mole(self, masses: list) -> list:
         """Convert the input masses to moles"""

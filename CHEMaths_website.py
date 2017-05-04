@@ -49,14 +49,15 @@ def live_process():
             })
     elif mode == 'equation':
         if not error:
-            reactants, products, coefficients, reaction_type = syntax_check[1]
+            reactants, products, equation = syntax_check[1]
             return jsonify({
                 'mode': mode,
                 'syntax': syntax_check[0],
-                'reaction_type': reaction_type,
+                'reaction_type': equation.get_reaction_type(),
                 'reactants': reactants,
                 'products': products,
-                'coefficients': coefficients,
+                'coefficients': equation.balance(),
+                'mr': equation.calculate_relative_formula_masses(),
                 'error': error
             })
     elif mode == 'organic':
@@ -95,6 +96,12 @@ def process():
 
     return render_template('index.html', name="homepage")
     # return redirect('index.html', code=302, Response=None)  # TODO render results
+
+
+@app.route("/equation_mass2mole", methods=['POST'])
+def equation_mass_to_mole():
+    """Convert """
+    masses_array = request.values.get('masses')
 
 if __name__ == "__main__":
     app.run()

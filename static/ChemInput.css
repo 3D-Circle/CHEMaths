@@ -428,7 +428,8 @@ input[type=range]::-moz-range-thumb {
     font-family: courier;
 };
 
-#info-equation > table td > span.sub_field {
+/* TODO why are you not working petit css? */
+.sub_field {
     width: 32px;
     background-color: black;
     color: yellow;

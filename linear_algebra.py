@@ -473,7 +473,7 @@ class Quadratic2D:
         return f"equation: y = {a}x^2 {('+' if b > 0 else '') + str(b)}x {('+' if b > 0 else '') + str(c)}\n" \
                f"discriminant: {self.discriminant}\n" \
                f"vertex: {self.calculate_vertex()}\n" \
-               f"axis of symmetry: {Line2D(1, 0, b / (2 * a))}\n" \
+               f"axis of symmetry: x = {-b / (2 * a)}\n" \
                f"x-intercept: {'; '.join(str(x_intercept) for x_intercept in self.calculate_x_intercept())}\n" \
                f"y-intercept: {self.calculate_y_intercept()}\n"
 

@@ -78,7 +78,7 @@ function renderResult(result) {
                 var dup_id;
                 $('[id]').each(function(){
                     var ids = $('[id="'+this.id+'"]');
-                    if(ids.length>1 && ids[0]==this) {
+                    if(ids.length > 1 && ids[0] == this) {
                         dup_id = this.id;
                     }
                 });
@@ -119,6 +119,7 @@ function renderResult(result) {
         var reactants = result.reactants;
         var products = result.products;
         var coefficients = result.coefficients;
+        var relative_formula_mass = result.mr;
 
         // remove old data
         $("#info-equation > table").find("td").remove();
@@ -128,9 +129,34 @@ function renderResult(result) {
         } else {
             var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
             $("<td colspan=" + total_length + "><b>" + reaction_type + "</b></td>").appendTo("#info-equation > table #reaction_type");
+
+            var local_input_config = {
+                spaceBehavesLikeTab: true,
+                handlers: {  // TODO change this
+                    edit: function () {
+                        // update render
+
+
+                        // ajax request
+                        console.log("HELLO");
+//                        $.ajax({
+//                            url: "/live_preview",
+//                            type: "post",
+//                            data: {
+//                                "latex": latex
+//                            },
+//                            success: function(response){
+//                                renderResult(response);
+//                            }
+//                        });
+                    }
+                }
+            }
+
             for (var i = 0; i < total_length; i++) {
                 var molecule = "";
                 var coefficient = "";
+                var mr = "";
                 var mole_index = null;
                 var mass_index = null;
                 if (i < 2 * reactants.length - 1) {
@@ -138,6 +164,7 @@ function renderResult(result) {
                         var index = i / 2;
                         molecule = reactants[index];
                         coefficient = coefficients[index];
+                        mr = relative_formula_mass[index];
                         mole_index = index;
                         mass_index = index;
                     } else {
@@ -150,6 +177,7 @@ function renderResult(result) {
                         var index = (i - 2 * reactants.length) / 2;
                         molecule = products[index];
                         coefficient = coefficients[reactants.length + index];
+                        mr = relative_formula_mass[reactants.length + index];
                         mole_index = reactants.length + index;
                         mass_index = reactants.length + index;
                     } else {
@@ -159,15 +187,21 @@ function renderResult(result) {
                 // create <td>'s
                 var molecule_id = "equation-formula" + i;
                 var coefficient_id = "equation-coefficient" + i;
+                var mr_id = "equation-mr" + i;
                 var mole_id = "equation-mole" + i;
                 var mass_id = "equation-mass" + i;
+                var mole_reaction_id = "equation-reaction-mole" + i;
+                var mass_reaction_id = "equation-reaction-mass" + i;
 
                 var molecule_span_html = "<span id='" + molecule_id + "'>" + molecule + "</span>"; // just in case
                 var coefficient_span_html = "<span class='number'>" + coefficient + "</span>";
+                var mr_span_html = "<span id='" + mr_id + "'>" + mr + "</span>";
                 var mole_span_html = "<span id='" + mole_id + "'></span>";
                 var mass_span_html = "<span id='" + mass_id + "'></span>";
+                var mole_reaction_span_html = "<span id='" + mole_reaction_id + "'>";
+                var mass_reaction_span_html = "<span id='" + mass_reaction_id + "'>"
 
-                if (coefficient != 1) {
+                if (coefficient > 1) {
                     molecule_span_html = coefficient_span_html + molecule_span_html;
                 }
 
@@ -175,22 +209,11 @@ function renderResult(result) {
                 var data_table = "#info-equation > table ";
                 $("<td>" + molecule_span_html + "</td>").appendTo(data_table + "#formula");
                 $("<td id='" + coefficient_id + "'>" + coefficient_span_html + "</td>").appendTo(data_table + "#coefficient");
+                $("<td>" + mr_span_html + "</td>").appendTo(data_table + "#mr");
                 $("<td>" + mole_span_html + "</td>").appendTo(data_table + "#mole");
                 $("<td>" + mass_span_html + "</td>").appendTo(data_table + "#mass");
-
-                // add color themes
-                var trivial = false;
-                if (coefficient == "0") {
-                    $("#" + molecule_id).addClass("nil");
-                    if (i != 0 || i != 2 * reactants.length) {
-                        $("#" + "equation-formula" + (i - 1)).addClass("nil");
-                    }
-                    $("#" + molecule_id).parent().addClass("trivial");
-                    $("#" + coefficient_id).addClass("trivial");
-                    $("#" + mole_id).parent().addClass("trivial");
-                    $("#" + mass_id).parent().addClass("trivial");
-                    trivial = true;
-                }
+                $("<td>" + mole_reaction_span_html + "</td>").appendTo(data_table + "#reaction-mole");
+                $("<td>" + mass_reaction_span_html + "</td>").appendTo(data_table + "#reaction-mass");
 
                 var color_theme_class = "";
                 switch (molecule) {
@@ -203,21 +226,25 @@ function renderResult(result) {
 
                 $("#" + molecule_id).parent().addClass(color_theme_class);
                 $("#" + coefficient_id).addClass(color_theme_class);
+                $("#" + mr_id).parent().addClass(color_theme_class)
                 $("#" + mole_id).parent().addClass(color_theme_class);
                 $("#" + mass_id).parent().addClass(color_theme_class);
+                $("#" + mole_reaction_id).parent().addClass(color_theme_class);
+                $("#" + mass_reaction_id).parent().addClass(color_theme_class);
 
                 // render latex
                 var molecule_span = $("#" + molecule_id)[0];
                 molecule_display = MQ.StaticMath(molecule_span);
                 molecule_display.latex(molecule);
 
-                if ((mole_index !== null && mass_index !== null) && !trivial) {
+                if (mole_index !== null && mass_index !== null) {
                     var mole_span = $("#" + mole_id)[0];
                     var mass_span = $("#" + mass_id)[0];
                     $(mole_span).addClass("sub_field");
                     $(mass_span).addClass("sub_field");
-                    mole_input = MQ.MathField(mole_span);
-                    mass_input = MQ.MathField(mass_span);  // TODO add config and ajax
+
+                    mole_input = MQ.MathField(mole_span, local_input_config);
+                    mass_input = MQ.MathField(mass_span, local_input_config);  // TODO fix this
                 }
             }
         }
@@ -295,7 +322,6 @@ $(document).ready(function () {
     // set up input box
     var inputBox = $('#input')[0];
     var mainField = MQ.MathField(inputBox, {
-        supSubsRequireOperand: true,
 //        spaceBehavesLikeTab: true,
         supSubsRequireOperand: true,
         charsThatBreakOutOfSupSub: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
