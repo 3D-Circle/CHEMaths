@@ -578,8 +578,8 @@ class FunctionalGroup:
         raise NotImplementedError
 
 
-class Alkane(FunctionalGroup):
-    """Hydrocarbon with the general formula CH"""
+class StraightChainAlkane(FunctionalGroup):
+    """Implementation of straight-chain alkanes (hydrocarbon with general formula CH)"""
 
     def calculate_bond_enthalpy(self) -> int:
         """Calculate the bond enthalpy of this organic compound"""
@@ -614,8 +614,8 @@ class Alkane(FunctionalGroup):
         return (FunctionalGroup.names[self.size - 1] if self.size <= 20 else str(self.size) + '-') + "ane"
 
 
-class Alcohol(FunctionalGroup):
-    """Implementation of alcohol in organic chemistry"""
+class MonohydricAlcohol(FunctionalGroup):
+    """Implementation of monohydric alcohol in organic chemistry"""
 
     def calculate_bond_enthalpy(self) -> int:
         """Calculate the bond enthalpy of this organic compound"""
@@ -664,7 +664,7 @@ def debug():
         # ---Debugging 3 - oxidation number
         {'Li': +1, 'Al': -5, 'H': +1} == Molecule.from_string("LiAlH4 ^ ").calculate_oxidation(),
         # ---Debugging 4 - alkane inspection: hexane
-        ("C6H14", 5) == (Alkane(6).molecule.molecular_formula_string, Alkane(6).calculate_isomer_numbers()),
+        ("C6H14", 5) == (StraightChainAlkane(6).molecule.molecular_formula_string, StraightChainAlkane(6).calculate_isomer_numbers()),
         # ---Debugging 5 - determine empirical formula
         {'K': 1, 'I': 1, 'O': 3} == Molecule.from_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}).molecular_formula
     ]
@@ -711,7 +711,7 @@ def launch_shell():
                 print("expected input format: 'Alkane: <size>'")
             else:
                 size = int(formula.split(":")[1])
-                alkane = Alkane(size)
+                alkane = StraightChainAlkane(size)
                 print(alkane)
         elif formula:
             mass_input = input("Mass (g): ")

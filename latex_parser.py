@@ -81,9 +81,9 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                     return False, f"{size}: Size should contain integer only"
                 else:
                     if organic_mode == "alcohol":
-                        return True, CHEMaths.Alcohol(int(size))
+                        return True, CHEMaths.MonohydricAlcohol(int(size))
                     elif organic_mode == "alkane":
-                        return True, CHEMaths.Alkane(int(size))
+                        return True, CHEMaths.StraightChainAlkane(int(size))
                     else:
                         return False, f"{organic_mode}: unsupported functional group " \
                                       f"(not matched by 'alcohol' or 'alkane')"

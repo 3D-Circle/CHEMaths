@@ -2,7 +2,7 @@
 """Web version for CHEMaths"""
 from flask import Flask, jsonify, render_template, request
 from latex_parser import latex_valid, determine_mode
-from CHEMaths import Molecule, Alkane
+from CHEMaths import Molecule
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
