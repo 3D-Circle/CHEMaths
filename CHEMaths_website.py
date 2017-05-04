@@ -68,7 +68,7 @@ def live_process():
                 'molecular-formula': functional_group.molecule.latex_molecular_formula,
                 'isomers-number': functional_group.calculate_isomer_numbers(),
                 'combustion-enthalpy': str(functional_group.calculate_combustion_enthalpy()) + " kJ mol<sup>-1</sup>",
-                'lewis-structure': functional_group.get_lewis(sep='<br/>'),
+                'lewis-structure': functional_group.get_primary_lewis(sep='<br/>'),
                 'mode': mode,
                 'syntax': syntax_check[0]
             })

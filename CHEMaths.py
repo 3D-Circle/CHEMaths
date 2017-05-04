@@ -525,7 +525,7 @@ class FunctionalGroup:
                f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
                f"number of isomers: {self.calculate_isomer_numbers()}\n" \
                f"combustion enthalpy: {self.calculate_combustion_enthalpy()} kJ / mol\n" \
-               f"lewis structure: \n{self.get_lewis()}"
+               f"lewis structure: \n{self.get_primary_lewis()}"
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -565,8 +565,8 @@ class FunctionalGroup:
         """calculate the number of isomers"""
         raise NotImplementedError
 
-    def get_lewis(self, sep='\n') -> str:
-        """Draw the basic lewis structure of this hydrocarbon"""
+    def get_primary_lewis(self, sep='\n') -> str:
+        """Draw the lewis structure of (the primary type of) this hydrocarbon"""
         raise NotImplementedError
 
     def get_molecule(self) -> 'Molecule':
@@ -597,8 +597,8 @@ class Alkane(FunctionalGroup):
         # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
         return count
 
-    def get_lewis(self, sep='\n') -> str:
-        """Draw lewis structure of the basic alkane"""
+    def get_primary_lewis(self, sep='\n') -> str:
+        """Draw lewis structure of the primary alkane"""
         return sep.join([" " + "   H" * self.size,
                          " " + "   |" * self.size,
                          "H" + " - C" * self.size + " - H",
@@ -641,10 +641,15 @@ class Alcohol(FunctionalGroup):
             + ('-' + str(self.configuration) + '-' if self.configuration else '') \
             + "ol"
 
-    def get_lewis(self, sep='\n') -> str:
-        """Determine the lewis structure of this alcohol
-        Accept an optional argument describing the position of OH"""
-        pass
+    def get_primary_lewis(self, sep='\n') -> str:
+        """Determine the lewis structure of this alcohol (primary type)"""
+        return sep.join([
+            " " + "   H" * self.size,
+            " " + "   |" * self.size,
+            "H" + " - C" * self.size + " - O - H",
+            " " + "   |" * self.size,
+            " " + "   H" * self.size
+        ])  # yes yes I did copy paste ... so to make it not so obvious I did a little formatting :D
 
 
 def debug():
