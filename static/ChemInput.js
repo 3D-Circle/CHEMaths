@@ -106,6 +106,61 @@ function renderResult(result) {
                 }
             }
 
+            // Mass and mole
+            var current_molecule = MQ.MathField($('#input')[0]).latex()
+
+            var molecule_mole_entry = MQ.MathField($('#molecule_mole_entry')[0], {
+                handlers: {
+                    edit: function () {
+                        if ($('#molecule_mole_entry').hasClass('mq-focused')) {
+                            $.ajax({
+                                url: "/mass_mole",
+                                type: "post",
+                                data: {
+                                    "molecule_latex": current_molecule,
+                                    "mole": molecule_mole_entry.latex()
+                                },
+                                success: function (data) {
+                                    // set the other one to calculated value
+                                    if (data['mass']) {
+                                        molecule_mass_entry.latex(data['mass']);
+                                    } else {
+                                        molecule_mass_entry.latex('0')
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            })
+            molecule_mole_entry.latex('');
+
+            var molecule_mass_entry = MQ.MathField($('#molecule_mass_entry')[0], {
+                handlers: {
+                    edit: function () {
+                        if ($('#molecule_mass_entry').hasClass('mq-focused')) {
+                            $.ajax({
+                                url: "/mass_mole",
+                                type: "post",
+                                data: {
+                                    "molecule_latex": current_molecule,
+                                    "mass": molecule_mass_entry.latex()
+                                },
+                                success: function (data) {
+                                    // set the other one to calculated value
+                                    if (data['mole']) {
+                                        molecule_mole_entry.latex(data['mole']);
+                                    } else {
+                                        molecule_mole_entry.latex('0')
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            })
+            molecule_mass_entry.latex('');
+
             // Set all precision range inputs to 2
             $.makeArray($('.precision')).map(function (slider) {
                     return $(slider).val(2);
@@ -127,7 +182,9 @@ function renderResult(result) {
         if (error) {
             $("<td><span class='error'>" + error + "</span><td>").appendTo("#info-equation > table #reaction_type");
         } else {
-            var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
+            // ARCHIVE FOR READABILITY
+            // var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
+            var total_length = 2 * reactants.length + 2 * products.length - 1;
             $("<td colspan=" + total_length + "><b>" + reaction_type + "</b></td>").appendTo("#info-equation > table #reaction_type");
 
             var local_input_config = {
