@@ -81,7 +81,7 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
                     return False, f"{size}: Size should contain integer only"
                 else:
                     if organic_mode == "alcohol":
-                        return True, CHEMaths.MonohydricAlcohol(int(size))
+                        return True, CHEMaths.StraightChainPrimaryAlcohol(int(size))
                     elif organic_mode == "alkane":
                         return True, CHEMaths.StraightChainAlkane(int(size))
                     else:

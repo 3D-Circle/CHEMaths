@@ -522,10 +522,11 @@ class FunctionalGroup:
 
     def __repr__(self) -> str:
         return f"name: {self.get_name()}\n" \
-               f"molecular_formula: {self.molecule.molecular_formula_string}\n" \
+               f"molecular formula: {self.molecule.molecular_formula_string}\n" \
+               f"condensed structural formula: {self.get_condensed_structural_formula()}\n" \
                f"number of isomers: {self.calculate_isomer_numbers()}\n" \
                f"combustion enthalpy: {self.calculate_combustion_enthalpy()} kJ / mol\n" \
-               f"lewis structure: \n{self.get_primary_lewis()}"
+               f"lewis structure: \n{self.get_lewis()}"
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -565,8 +566,12 @@ class FunctionalGroup:
         """calculate the number of isomers"""
         raise NotImplementedError
 
-    def get_primary_lewis(self, sep='\n') -> str:
-        """Draw the lewis structure of (the primary type of) this hydrocarbon"""
+    def get_condensed_structural_formula(self) -> str:
+        """Return the condensed structural formula"""
+        raise NotImplementedError
+
+    def get_lewis(self, sep='\n') -> str:
+        """Draw the lewis structure"""
         raise NotImplementedError
 
     def get_molecule(self) -> 'Molecule':
@@ -597,8 +602,12 @@ class StraightChainAlkane(FunctionalGroup):
         # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
         return count
 
-    def get_primary_lewis(self, sep='\n') -> str:
-        """Draw lewis structure of the primary alkane"""
+    def get_condensed_structural_formula(self) -> str:
+        """Return a string of the condensed structural formula"""
+        pass  # TODO: this
+
+    def get_lewis(self, sep='\n') -> str:
+        """Draw lewis structure of the alkane"""
         return sep.join([" " + "   H" * self.size,
                          " " + "   |" * self.size,
                          "H" + " - C" * self.size + " - H",
@@ -614,7 +623,7 @@ class StraightChainAlkane(FunctionalGroup):
         return (FunctionalGroup.names[self.size - 1] if self.size <= 20 else str(self.size) + '-') + "ane"
 
 
-class MonohydricAlcohol(FunctionalGroup):
+class StraightChainPrimaryAlcohol(FunctionalGroup):
     """Implementation of monohydric alcohol in organic chemistry"""
 
     def calculate_bond_enthalpy(self) -> int:
@@ -629,6 +638,10 @@ class MonohydricAlcohol(FunctionalGroup):
         """Return the number of different structural isomers of the alkane"""
         pass
 
+    def get_condensed_structural_formula(self) -> str:
+        """Return a string of the condensed structural formula"""
+        pass  # TODO: this
+
     def get_molecule(self) -> 'Molecule':
         """Determine the molecular formula of this alcohol"""
         return Molecule({"sign": 0, 'C': self.size, 'H': 2 * self.size + 2, 'O': 1})
@@ -641,8 +654,8 @@ class MonohydricAlcohol(FunctionalGroup):
             + ('-' + str(self.configuration) + '-' if self.configuration else '') \
             + "ol"
 
-    def get_primary_lewis(self, sep='\n') -> str:
-        """Determine the lewis structure of this alcohol (primary type)"""
+    def get_lewis(self, sep='\n') -> str:
+        """Determine the lewis structure of this alcohol"""
         return sep.join([
             " " + "   H" * self.size,
             " " + "   |" * self.size,
