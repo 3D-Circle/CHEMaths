@@ -259,7 +259,7 @@ function renderResult(result) {
                 if (key != 'mode' && key != 'syntax') {
                     if (key == 'lewis-structure') {
                         $('td#' + key).html('<pre>' + result[key] + '</pre>');
-                    } else if (key == 'molecular-formula') {
+                    } else if (key == 'molecular-formula' || key == 'condensed-structural-formula') {
                         alkane_molecule_display = MQ.StaticMath($('td#' + key + '>span')[0]);
                         alkane_molecule_display.latex(result[key]);
                     } else {

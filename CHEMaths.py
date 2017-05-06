@@ -596,7 +596,7 @@ class StraightChainAlkane(FunctionalGroup):
         if self.size <= 2:
             count = 1
         else:
-            count = sum([partition(self.size - 2, k + 1) for k in range(self.size - 2)])
+            count = sum([partition(self.size - 2, k + 1) for k in range(self.size - 2)])  # TODO correct this
         # the number of partitions of n into k non-negative (including zero) parts is
         # equivalent to number of partitions of n + k into k non-zero parts
         # where n, k = self.size - s - 3, s + 1 (hence n + k = self.size - 2)
@@ -604,7 +604,7 @@ class StraightChainAlkane(FunctionalGroup):
 
     def get_condensed_structural_formula(self) -> str:
         """Return a string of the condensed structural formula"""
-        pass  # TODO: this
+        return "CH_4" if self.size == 1 else f"CH_3{'CH_2' * (self.size - 2)}CH_3"
 
     def get_lewis(self, sep='\n') -> str:
         """Draw lewis structure of the alkane"""
@@ -640,7 +640,7 @@ class StraightChainPrimaryAlcohol(FunctionalGroup):
 
     def get_condensed_structural_formula(self) -> str:
         """Return a string of the condensed structural formula"""
-        pass  # TODO: this
+        return f"CH_3{'CH_2' * (self.size - 1)}OH"
 
     def get_molecule(self) -> 'Molecule':
         """Determine the molecular formula of this alcohol"""
@@ -677,7 +677,10 @@ def debug():
         # ---Debugging 3 - oxidation number
         {'Li': +1, 'Al': -5, 'H': +1} == Molecule.from_string("LiAlH4 ^ ").calculate_oxidation(),
         # ---Debugging 4 - alkane inspection: hexane
-        ("C6H14", 5) == (StraightChainAlkane(6).molecule.molecular_formula_string, StraightChainAlkane(6).calculate_isomer_numbers()),
+        ("C6H14", 5) == (
+            StraightChainAlkane(6).molecule.molecular_formula_string,
+            StraightChainAlkane(6).calculate_isomer_numbers()
+        ),
         # ---Debugging 5 - determine empirical formula
         {'K': 1, 'I': 1, 'O': 3} == Molecule.from_ratio({'K': 1.82, 'I': 5.93, 'O': 2.24}).molecular_formula
     ]

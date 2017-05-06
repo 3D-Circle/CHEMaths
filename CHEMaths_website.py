@@ -66,6 +66,7 @@ def live_process():
             return jsonify({
                 'organic-name': functional_group.get_name().capitalize(),
                 'molecular-formula': functional_group.molecule.latex_molecular_formula,
+                'condensed-structural-formula': functional_group.get_condensed_structural_formula(),
                 'isomers-number': functional_group.calculate_isomer_numbers(),
                 'combustion-enthalpy': str(functional_group.calculate_combustion_enthalpy()) + " kJ mol<sup>-1</sup>",
                 'lewis-structure': functional_group.get_lewis(sep='<br/>'),

@@ -1,5 +1,6 @@
 # coding=utf-8
-"""Implementation of matrices, along with other maths utilities"""
+"""Implementation of matrices, along with other maths utilities
+Compared to numpy, this is merely my sketch trying to generalize mathematical concepts"""
 import fractions
 import functools
 import itertools
