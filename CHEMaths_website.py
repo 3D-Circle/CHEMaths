@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
 from flask import Flask, jsonify, render_template, request
-from latex_parser import latex_valid, determine_mode
-from CHEMaths import Molecule
+from latex_parser import latex_valid, determine_mode, eval_latex
+from CHEMaths import Molecule, StraightChainAlkane
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -91,10 +91,26 @@ def python_round():
     })
 
 
+@app.route('/mass_mole', methods=['POST'])
+def mass_mole_calculation():
+    mole = request.form.get('mole')
+    mass = request.form.get('mass')
+    molecule_latex = request.form.get('molecule_latex')
+    m = Molecule.from_latex(molecule_latex)
+    result = {
+        'mass': None,
+        'mole': None
+    }
+    if mole:
+        result['mass'] = m.calculate_mass(eval_latex(mole))
+    elif mass:
+        result['mole'] = m.calculate_mole(eval_latex(mass))
+    return jsonify(result)
+
+
 @app.route("/results", methods=['POST'])
 def process():
     """processes input from home page and redirect to result tab"""
-
     return render_template('index.html', name="homepage")
     # return redirect('index.html', code=302, Response=None)  # TODO render results
 

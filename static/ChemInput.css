@@ -268,10 +268,6 @@ body {
 
 /* Molecule info */
 
-table {
-    /*very required ! we have no idea why*/
-}
-
 #info-molecule {
     height: 100%;
 }
@@ -318,6 +314,23 @@ table {
 
 #molar_mass div, .component div {
     display: inline;
+}
+
+/* molar mass and mol inputs / outputs */
+#mole_mass_wrapper {
+    display: flex;
+}
+
+#mole_mass_wrapper > * {
+    text-align: center;
+}
+
+#molecule_mass_wrapper {
+    flex-grow: 1;
+}
+
+#molecule_mole_wrapper {
+    flex-grow: 1;
 }
 
 /* precision slider */
