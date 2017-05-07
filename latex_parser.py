@@ -4,7 +4,7 @@ import collections
 import re
 import string
 import CHEMaths
-
+from simpleeval import simple_eval
 
 def latex_valid(latex: str, mode: str) -> (bool, str):
     """Check if there is any syntax error in the given latex string depending on given mode
@@ -92,8 +92,13 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
 
 
 def eval_latex(latex: str) -> float:
-    """Evaluates the input latex string"""
-    return float(latex)
+    """Evaluates the input latex string. ERRORS ARE HANDLED *OUTSIDE* (for now)"""
+    clean = latex.replace('\\cdot', '*').replace('}', ' ').replace('{', '').replace('^', '**')
+    for c in clean:
+        if c in string.ascii_letters:
+            raise ValueError
+
+    return float(simple_eval(clean))
 
 
 def latex2chem(latex: str) -> dict:
@@ -116,6 +121,7 @@ def latex2chem(latex: str) -> dict:
          Parses single expression and add element to result_dict
          Ex: CH_3(C_2O)_2  ->  {'C': 5, 'H': 3, 'O': 2}
          We run this recursively for nested parentheses
+         Nothing is returned, everything is saved to the `result_dict`
        """
         exp = input_expression
         while exp:
@@ -149,7 +155,7 @@ def latex2chem(latex: str) -> dict:
                         # single element
                         result_dict[element] += top_level_coefficient
                     else:
-                        # element with coeficient
+                        # element with coefficient
                         result_dict[element.split('_')[0]] += int(element.split('_')[1]) * top_level_coefficient
                 exp = ''
 

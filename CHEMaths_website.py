@@ -3,6 +3,7 @@
 from flask import Flask, jsonify, render_template, request
 from latex_parser import latex_valid, determine_mode, eval_latex
 from CHEMaths import Molecule, StraightChainAlkane
+import string
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -93,18 +94,30 @@ def python_round():
 
 @app.route('/mass_mole', methods=['POST'])
 def mass_mole_calculation():
+    accepted_characters = '0123456789'
     mole = request.form.get('mole')
     mass = request.form.get('mass')
     molecule_latex = request.form.get('molecule_latex')
+
     m = Molecule.from_latex(molecule_latex)
     result = {
         'mass': None,
-        'mole': None
+        'mole': None,
+        'error': None,
+        'correct': None
     }
     if mole:
-        result['mass'] = m.calculate_mass(eval_latex(mole))
+        try:
+            result['mass'] = m.calculate_mass(eval_latex(mole))
+        except ValueError:  # invalid character(s)
+            result['correct'] = ''.join([i for i in mole if i not in string.ascii_letters])
+            result['error'] = 'Invalid character in mole input'
     elif mass:
-        result['mole'] = m.calculate_mole(eval_latex(mass))
+        try:
+            result['mole'] = m.calculate_mole(eval_latex(mass))
+        except ValueError:
+            result['correct'] = ''.join([i for i in mass if i not in string.ascii_letters])
+            result['error'] = 'Invalid character in mass input'
     return jsonify(result)
 
 

@@ -112,17 +112,30 @@ function renderResult(result) {
             var molecule_mole_entry = MQ.MathField($('#molecule_mole_entry')[0], {
                 handlers: {
                     edit: function () {
+                        if (molecule_mole_entry.latex().includes('*')) {
+                            molecule_mole_entry.blur()
+                            $.when(molecule_mole_entry.latex(
+                                molecule_mole_entry.latex().replace('*', '\\times')
+                            )).then(molecule_mole_entry.focus());
+                        }
+
                         if ($('#molecule_mole_entry').hasClass('mq-focused')) {
                             $.ajax({
                                 url: "/mass_mole",
                                 type: "post",
                                 data: {
                                     "molecule_latex": current_molecule,
-                                    "mole": molecule_mole_entry.latex()
+                                    "mole": molecule_mole_entry.latex(),
                                 },
                                 success: function (data) {
                                     // set the other one to calculated value
-                                    if (data['mass']) {
+                                    console.log(data)
+                                    if (data['error']) {
+                                        console.warn(data['error'])
+                                        molecule_mole_entry.blur()
+                                        $.when(molecule_mole_entry.latex(data['correct'])).then(molecule_mole_entry.focus());
+                                        //molecule_mole_entry.focus()
+                                    } else if (data['mass']) {
                                         molecule_mass_entry.latex(data['mass']);
                                     } else {
                                         molecule_mass_entry.latex('0')
@@ -138,17 +151,31 @@ function renderResult(result) {
             var molecule_mass_entry = MQ.MathField($('#molecule_mass_entry')[0], {
                 handlers: {
                     edit: function () {
+
+                        if (molecule_mass_entry.latex().includes('*')) {
+                            molecule_mass_entry.blur()
+                            $.when(molecule_mass_entry.latex(
+                                molecule_mass_entry.latex().replace('*', '\\times')
+                            )).then(molecule_mass_entry.focus());
+                        }
+
                         if ($('#molecule_mass_entry').hasClass('mq-focused')) {
                             $.ajax({
                                 url: "/mass_mole",
                                 type: "post",
                                 data: {
                                     "molecule_latex": current_molecule,
-                                    "mass": molecule_mass_entry.latex()
+                                    "mass": molecule_mass_entry.latex(),
                                 },
                                 success: function (data) {
                                     // set the other one to calculated value
-                                    if (data['mole']) {
+                                    console.log(data)
+                                    if (data['error']) {
+                                        console.warn(data['error'])
+                                        molecule_mass_entry.blur()
+                                        $.when(molecule_mass_entry.latex(data['correct'])).then(molecule_mass_entry.focus());
+                                        //molecule_mole_entry.focus()
+                                    } else if (data['mole']) {
                                         molecule_mole_entry.latex(data['mole']);
                                     } else {
                                         molecule_mole_entry.latex('0')

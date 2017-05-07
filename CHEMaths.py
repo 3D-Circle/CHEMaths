@@ -13,7 +13,7 @@ import time
 import json
 import re
 import latex_parser
-from ast import literal_eval
+from simpleeval import simple_eval
 from linear_algebra import Matrix, ext_euclid, gcd_multiple, lcm_multiple, partition
 
 with open("static/data.json") as data:
@@ -705,9 +705,9 @@ def launch_shell():
                     mass_input = input(f"Mass (g) of {chemical}: ")
                     if not mass_input:
                         mole_input = input(f"Mole (mol) of {chemical}: ")
-                        mole = literal_eval(mole_input) if mole_input else None
+                        mole = simple_eval(mole_input) if mole_input else None
                     else:
-                        mass = literal_eval(mass_input)
+                        mass = simple_eval(mass_input)
                         mole = Molecule(
                             equation[index],
                             mass=mass
@@ -735,8 +735,8 @@ def launch_shell():
             if not mass_input:
                 mole_input = input("Mole (mol): ")
             start = time.process_time()
-            mass = literal_eval(mass_input) if mass_input else None
-            mole = literal_eval(mole_input) if mole_input else None
+            mass = simple_eval(mass_input) if mass_input else None
+            mole = simple_eval(mole_input) if mole_input else None
             molecule = Molecule.from_string(formula, mass=mass, mole=mole)
             print(molecule)
         else:
@@ -747,7 +747,7 @@ def launch_shell():
                 if ele == '':
                     break
                 weight = input(ele + " (" + str(relative_atomic_mass[ele]) + "): ")
-                elements[ele] = literal_eval(weight)
+                elements[ele] = simple_eval(weight)
             start = time.process_time()
             result = Molecule.from_ratio(elements)
             print(result)
