@@ -10,7 +10,7 @@ function renderResult(result) {
     render(mode);
     var syntax = result.syntax;
     var error = result.error;
-    if (syntax == true) {
+    if (syntax === true) {
         $("#syntax_check_status").removeClass("syntax_error");
         $("#syntax_check_error_text").text("No problems found :)")
     } else {
@@ -19,16 +19,16 @@ function renderResult(result) {
     if (error) {
         $("#syntax_check_error_text").html(error);
     }
-    if (mode == "molecule") {
+    if (mode === "molecule") {
         if (error) {
             // There are problems, so nothing will be rendered
             $('#molecular_formula').html('<p class=error>' + error + '</p>');
-        } else  {
+        } else {
             // Molecular formula
             var molecular_formula = '';
             for (key in result.molecule) {
-                if (key != 'sign') {
-                    if (result.molecule[key] == 1) {
+                if (key !== 'sign') {
+                    if (result.molecule[key] === 1) {
                         molecular_formula += key;
                     } else {
                         molecular_formula += key + '_{' + result.molecule[key] + '}';
@@ -46,23 +46,23 @@ function renderResult(result) {
 
             // Molar mass TODO: add option to change units ?
             $('#molar_mass').html('<div></div> g / mol')
-            $('#molar_mass>div').data('fullfloat', result.info['mr']);
-            python_round([result.info['mr']], $('input#molar_mass_precision').val(), function (response) {
+            $('#molar_mass>div').data('fullfloat', result.info.mr);
+            python_round([result.info.mr], $('input#molar_mass_precision').val(), function (response) {
                 $('#molar_mass>div').html(response.result);
-            })
+            });
 
             // Components & percentages
             var composition = result.info.element_percentages;
             // this sorts dict keys according to concentration (http://stackoverflow.com/a/16794116/4489998)
-            var sorted_elements = Object.keys(composition).sort(function(a,b){
-                return composition[a]-composition[b]
+            var sorted_elements = Object.keys(composition).sort(function (a, b) {
+                return composition[a] - composition[b];
             }).reverse();
-            var array_to_round = sorted_elements.map(function(x) {
+            var array_to_round = sorted_elements.map(function (x) {
                 return composition[x];
             });
             $("#components").html('');  //clean up components
             var precision = $('#components_precision').val();
-            python_round(array_to_round, precision, function(rounded_array) {
+            python_round(array_to_round, precision, function (rounded_array) {
                 var element;
                 var percentage;
                 for (var i = 0; i < sorted_elements.length; i++) {
@@ -202,6 +202,52 @@ function renderResult(result) {
         var products = result.products;
         var coefficients = result.coefficients;
         var relative_formula_mass = result.mr;
+        // for reconstruction of Equation
+        var parsed = result.parsed;
+        
+        var masses_input = [];
+        var masses_display = [];
+        
+        var moles_input = [];
+        var masses_display = [];
+        
+        var local_MQ_config = {
+            spaceBehavesLikeTab: true,
+            supSubsRequireOperand: true,
+            handlers: {
+                edit: function(mathField) {
+                    var mass_array_latex = [];
+                    var mole_array_latex = [];
+                    masses_input.forEach(function (MQinput, _, _) {
+                        mass_array_latex.push(MQinput.latex());
+                    });
+                    moles_input.forEach(function (MQinput, _, _) {
+                        mole_array_latex.push(MQinput.latex());
+                    });
+
+                    $.ajax({
+                        url: "/mass_mole_equation",
+                        type: "post",
+                        data: JSON.stringify({
+                                'components': parsed,
+                                'mass_array': mass_array_latex,
+                                'mole_array': mole_array_latex
+
+                        }),
+                        success: function (data) {
+                            console.log(data);
+                            reaction_masses = data.reaction_masses;
+                            reaction_moles = data.reaction_moles;
+                            for (var i = 0; i < reaction_masses.length; i++) {
+                                index = i * 2;
+                                $('#equation-reaction-mass' + index).text(reaction_masses[i]);
+                                $('#equation-reaction-mole' + index).text(reaction_moles[i]);
+                            }
+                        }
+                    })
+                },
+            }
+        };
 
         // remove old data
         $("#info-equation > table").find("td").remove();
@@ -213,29 +259,6 @@ function renderResult(result) {
             // var total_length = 2 * reactants.length - 1 + 1 + 2 * products.length - 1;
             var total_length = 2 * reactants.length + 2 * products.length - 1;
             $("<td colspan=" + total_length + "><b>" + reaction_type + "</b></td>").appendTo("#info-equation > table #reaction_type");
-
-            var local_input_config = {
-                spaceBehavesLikeTab: true,
-                handlers: {  // TODO change this
-                    edit: function () {
-                        // update render
-
-
-                        // ajax request
-                        console.log("HELLO");
-//                        $.ajax({
-//                            url: "/live_preview",
-//                            type: "post",
-//                            data: {
-//                                "latex": latex
-//                            },
-//                            success: function(response){
-//                                renderResult(response);
-//                            }
-//                        });
-                    }
-                }
-            }
 
             for (var i = 0; i < total_length; i++) {
                 var molecule = "";
@@ -318,7 +341,7 @@ function renderResult(result) {
 
                 // render latex
                 var molecule_span = $("#" + molecule_id)[0];
-                molecule_display = MQ.StaticMath(molecule_span);
+                var molecule_display = MQ.StaticMath(molecule_span);
                 molecule_display.latex(molecule);
 
                 if (mole_index !== null && mass_index !== null) {
@@ -326,9 +349,15 @@ function renderResult(result) {
                     var mass_span = $("#" + mass_id)[0];
                     $(mole_span).addClass("sub_field");
                     $(mass_span).addClass("sub_field");
-
-                    mole_input = MQ.MathField(mole_span, local_input_config);
-                    mass_input = MQ.MathField(mass_span, local_input_config);  // TODO fix this
+                    
+                    var local_MQ_config1 = $.extend({}, local_MQ_config);  // VERY REQUIRED
+                    var local_MQ_config2 = $.extend({}, local_MQ_config);  // VERY REQUIRED
+                    
+                    var mole_input = MQ.MathField(mole_span, local_MQ_config1);  // if removed, this will not work
+                    var mass_input = MQ.MathField(mass_span, local_MQ_config2);  // if removed, this will not work
+                    
+                    masses_input.push(mass_input);
+                    moles_input.push(mole_input);
                 }
             }
         }

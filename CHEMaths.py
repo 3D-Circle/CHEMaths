@@ -535,7 +535,7 @@ class FunctionalGroup:
         """Calculate the bond enthalpy of this organic compound"""
         raise NotImplementedError
 
-    def calculate_combustion_enthalpy(self):
+    def calculate_combustion_enthalpy(self) -> float:
         """Calculate the combustion enthalpy of this organic compound"""
         # reactants
         enthalpy_organic_compound = self.calculate_bond_enthalpy()
@@ -586,7 +586,7 @@ class FunctionalGroup:
 class StraightChainAlkane(FunctionalGroup):
     """Implementation of straight-chain alkanes (hydrocarbon with general formula CH)"""
 
-    def calculate_bond_enthalpy(self) -> int:
+    def calculate_bond_enthalpy(self) -> float:
         """Calculate the bond enthalpy of this organic compound"""
         return (self.size * 2 + 2) * get_bond_enthalpy('C', 'H') \
             + (self.size - 1) * get_bond_enthalpy('C', 'C')
@@ -626,7 +626,7 @@ class StraightChainAlkane(FunctionalGroup):
 class StraightChainPrimaryAlcohol(FunctionalGroup):
     """Implementation of monohydric alcohol in organic chemistry"""
 
-    def calculate_bond_enthalpy(self) -> int:
+    def calculate_bond_enthalpy(self) -> float:
         """Calculate the bond enthalpy of this organic compound"""
         return get_bond_enthalpy('O', 'H')\
             + get_bond_enthalpy('C', 'O')\

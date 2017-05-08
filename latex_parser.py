@@ -6,6 +6,7 @@ import string
 import CHEMaths
 from simpleeval import simple_eval
 
+
 def latex_valid(latex: str, mode: str) -> (bool, str):
     """Check if there is any syntax error in the given latex string depending on given mode
     Return True and an empty string if nothing is wrong, else return False with error message"""
@@ -68,7 +69,10 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
             except ValueError:
                 return False, "Value Error: equation not feasible"
             else:
-                return True, (reactants, products, equation)
+                return True, (
+                    [reactants_parsed, products_parsed],
+                    reactants, products, equation
+                )
     else:
         if mode == "empirical":
             pass

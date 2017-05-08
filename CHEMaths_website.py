@@ -2,8 +2,9 @@
 """Web version for CHEMaths"""
 from flask import Flask, jsonify, render_template, request
 from latex_parser import latex_valid, determine_mode, eval_latex
-from CHEMaths import Molecule, StraightChainAlkane
+from CHEMaths import Molecule, Equation
 import string
+import json
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -50,10 +51,11 @@ def live_process():
             })
     elif mode == 'equation':
         if not error:
-            reactants, products, equation = syntax_check[1]
+            parsed, reactants, products, equation = syntax_check[1]
             return jsonify({
                 'mode': mode,
                 'syntax': syntax_check[0],
+                'parsed': parsed,
                 'reaction_type': equation.get_reaction_type(),
                 'reactants': reactants,
                 'products': products,
@@ -94,7 +96,7 @@ def python_round():
 
 @app.route('/mass_mole', methods=['POST'])
 def mass_mole_calculation():
-    accepted_characters = '0123456789'
+    """mole <-> mass calculation for Molecule"""
     mole = request.form.get('mole')
     mass = request.form.get('mass')
     molecule_latex = request.form.get('molecule_latex')
@@ -128,10 +130,26 @@ def process():
     # return redirect('index.html', code=302, Response=None)  # TODO render results
 
 
-@app.route("/equation_mass2mole", methods=['POST'])
-def equation_mass_to_mole():
-    """Convert """
-    masses_array = request.values.get('masses')
+@app.route("/mass_mole_equation", methods=['POST'])
+def mass_mole_calculation_equation():
+    """mass <-> mole calculation for Equation"""
+    (json_data,) = request.form.to_dict().keys()  # pff flask c'est pas possible hein
+    data = json.loads(json_data)  # just sending a simple json TOOK ME FREAKING 3 HOURS
+
+    reactants, products = data['components']
+    masses_array = data['mass_array']
+    moles_array = data['mole_array']
+
+    masses = [eval_latex(mass) if mass else None for mass in masses_array]
+    moles = [eval_latex(mole) if mole else None for mole in moles_array]
+
+    reaction = Equation(reactants, products)
+    extent = reaction.calculate_extent_from_moles(moles if any(moles) else masses)
+    return jsonify({
+        'reaction_masses': reaction.calculate_masses_from_extent(extent),
+        'reaction_moles': reaction.calculate_moles_from_extent(extent)
+    })
+
 
 if __name__ == "__main__":
     app.run()
