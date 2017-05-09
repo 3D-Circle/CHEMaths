@@ -97,7 +97,14 @@ def latex_valid(latex: str, mode: str) -> (bool, str):
 
 def eval_latex(latex: str) -> float:
     """Evaluates the input latex string. ERRORS ARE HANDLED *OUTSIDE* (for now)"""
-    clean = latex.replace('\\cdot', '*').replace('}', ' ').replace('{', '').replace('^', '**')
+    to_replace = {
+        '\\cdot': '*',
+        '{': '',
+        '}': ' ',
+        '^': '**'
+    }
+    print(latex)
+    clean = replace_all_strings(latex, to_replace)
     for c in clean:
         if c in string.ascii_letters:
             raise ValueError
@@ -168,10 +175,17 @@ def latex2chem(latex: str) -> dict:
     return dict(result_dict)
 
 
-def remove_string(s, *args):
+def remove_string(s: str, *args) -> str:
     """removes each arg in s"""
     for arg in args:
         s = s.replace(arg, '')
+    return s
+
+
+def replace_all_strings(s: str, replace_dict: dict) -> str:
+    """chains .replace()"""
+    for i, j in replace_dict.items():
+        s = s.replace(i, j)
     return s
 
 

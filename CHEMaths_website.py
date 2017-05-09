@@ -133,9 +133,7 @@ def process():
 @app.route("/mass_mole_equation", methods=['POST'])
 def mass_mole_calculation_equation():
     """mass <-> mole calculation for Equation"""
-    (json_data,) = request.form.to_dict().keys()  # pff flask c'est pas possible hein
-    data = json.loads(json_data)  # just sending a simple json TOOK ME FREAKING 3 HOURS
-
+    data = request.get_json()
     reactants, products = data['components']
     masses_array = data['mass_array']
     moles_array = data['mole_array']

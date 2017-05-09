@@ -129,7 +129,6 @@ function renderResult(result) {
                                 },
                                 success: function (data) {
                                     // set the other one to calculated value
-                                    console.log(data)
                                     if (data['error']) {
                                         console.warn(data['error'])
                                         molecule_mole_entry.blur()
@@ -169,7 +168,6 @@ function renderResult(result) {
                                 },
                                 success: function (data) {
                                     // set the other one to calculated value
-                                    console.log(data)
                                     if (data['error']) {
                                         console.warn(data['error'])
                                         molecule_mass_entry.blur()
@@ -227,13 +225,14 @@ function renderResult(result) {
 
                     $.ajax({
                         url: "/mass_mole_equation",
-                        type: "post",
+                        type: "POST",
                         data: JSON.stringify({
                                 'components': parsed,
                                 'mass_array': mass_array_latex,
                                 'mole_array': mole_array_latex
-
                         }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
                         success: function (data) {
                             console.log(data);
                             reaction_masses = data.reaction_masses;
