@@ -199,7 +199,7 @@ class Matrix:
             row_count += 1
         return self.size[0]
 
-    def solve(self, homogeneous=True):
+    def solve(self, homogeneous=True, coefficient_matrix=None):
         """Solve for X taking this matrix as the coefficient matrix"""
         if homogeneous:
             # avoid side effects
@@ -220,6 +220,8 @@ class Matrix:
 
                     solution_lists.append(local_solution_list)
                 return solution_lists
+        elif coefficient_matrix:
+            pass  # TODO implement this
 
     def null_space(self) -> list:
         """Determine the basis of kernel / null space of this matrix
