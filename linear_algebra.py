@@ -199,29 +199,26 @@ class Matrix:
             row_count += 1
         return self.size[0]
 
-    def solve(self, homogeneous=True, coefficient_matrix=None):
+    def solve(self):
         """Solve for X taking this matrix as the coefficient matrix"""
-        if homogeneous:
-            # avoid side effects
-            A = self.__copy__()
-            pivots = A.rref(override=True, return_pivots=True)  # pivots list
-            independent_variables = A.size[1] - A.rank(pre_processed=True)
-            if independent_variables == 0:  # no independent variable -> zero solution
-                return [0] * self.size[1]
-            else:  # one or more independent variable
-                solution_lists = []
-                independent_variables_list = set([i for i in range(A.size[1])]) - set([pivot[1] for pivot in pivots])
+        # avoid side effects
+        A = self.__copy__()
+        pivots = A.rref(override=True, return_pivots=True)  # pivots list
+        independent_variables = A.size[1] - A.rank(pre_processed=True)
+        if independent_variables == 0:  # no independent variable -> zero solution
+            return [0] * self.size[1]
+        else:  # one or more independent variable
+            solution_lists = []
+            independent_variables_list = set([i for i in range(A.size[1])]) - set([pivot[1] for pivot in pivots])
 
-                for independent_variable in independent_variables_list:
-                    local_solution_list = [fractions.Fraction(0)] * A.size[1]
-                    for pivot in pivots:
-                        local_solution_list[pivot[1]] = -A.matrix[pivot[0]][independent_variable]
-                    local_solution_list[independent_variable] = fractions.Fraction(1)
+            for independent_variable in independent_variables_list:
+                local_solution_list = [fractions.Fraction(0)] * A.size[1]
+                for pivot in pivots:
+                    local_solution_list[pivot[1]] = -A.matrix[pivot[0]][independent_variable]
+                local_solution_list[independent_variable] = fractions.Fraction(1)
 
-                    solution_lists.append(local_solution_list)
-                return solution_lists
-        elif coefficient_matrix:
-            pass  # TODO implement this
+                solution_lists.append(local_solution_list)
+            return solution_lists
 
     def null_space(self) -> list:
         """Determine the basis of kernel / null space of this matrix
@@ -473,7 +470,9 @@ class Quadratic2D:
 
     def __repr__(self) -> str:
         a, b, c = self.equation
-        return f"equation: y = {a}x^2 {('+' if b > 0 else '') + str(b)}x {('+' if b > 0 else '') + str(c)}\n" \
+        return f"standard form: {self.__str__()}\n" \
+               f"vertex form: {self.get_vertex_form()}\n" \
+               f"x-intercept form: {self.get_x_intercept_form()}\n" \
                f"discriminant: {self.discriminant}\n" \
                f"vertex: {self.calculate_vertex()}\n" \
                f"axis of symmetry: x = {-b / (2 * a)}\n" \
@@ -481,9 +480,22 @@ class Quadratic2D:
                f"y-intercept: {self.calculate_y_intercept()}\n"
 
     @classmethod
+    def from_vertex_form(cls, a: float, h: float, k: float) -> 'Quadratic2D':
+        """Construct a quadratic curve from y = a(x - h) ^ 2 + k """
+        return Quadratic2D(a, -2 * a * h, h ** 2 + k)
+
+    @classmethod
+    def from_x_intercept_form(cls, a: float, p: float, q: float) -> 'Quadratic2D':
+        """Construct a quadratic curve from y = a(x - p)(x - q)"""
+        return Quadratic2D(a, -a * (p + q), a * p * q)
+
+    @classmethod
     def from_vertex_and_point(cls, vertex: (float, float), point: (float, float)) -> 'Quadratic2D':
-        """Construct a quadratic curve from the coordinates of a vertex and a point"""
-        pass
+        """Construct a quadratic curve from the coordinates of a vertex and a point (that is not the vertex)"""
+        h, k = vertex
+        x, y = vertex
+        a = (y - k) / (x - h) ** 2
+        return Quadratic2D.from_vertex_form(a, h, k)
 
     def calculate_vertex(self) -> (float, float):
         """Calculate the coordinates of the vertex"""
@@ -510,6 +522,25 @@ class Quadratic2D:
         if Δ < 0:
             print("Complex root is involved")
         return tuple((-b + sign * math.sqrt(Δ)) / (2 * a) for sign in [-1, 1])
+
+    def get_vertex_form(self) -> str:
+        """Return the vertex form of this quadratic curve as a string
+        y = a(x - h) + k"""
+        vertex = self.calculate_vertex()
+        h, k = vertex
+        a, _, _ = self.equation
+        return f"y = {a}(x - {h}) ^ 2 + {k}"  # TODO match with sign
+
+    def get_x_intercept_form(self) -> str:
+        """Return the x-intercept form of this quadratic curve as a string
+        y = a(x - p)(x - q)"""
+        x_intercepts = self.get_x_intercept_form()
+        if not x_intercepts:
+            return "No x-intercept"
+        a, _, _ = self.equation
+        p, q = [x_intercept[0] for x_intercept in x_intercepts]
+        return f"{a}(x - {p})(x - {q}"  # TODO match with sign
+
 
 if __name__ == "__main__":
     # > Humbert
