@@ -103,7 +103,6 @@ def eval_latex(latex: str) -> float:
         '}': ' ',
         '^': '**'
     }
-    print(latex)
     clean = replace_all_strings(latex, to_replace)
     for c in clean:
         if c in string.ascii_letters:
@@ -285,9 +284,3 @@ def determine_mode(latex: str) -> str:
             return "molecule"
     else:
         return "this"
-
-
-if __name__ == '__main__':
-    expression = '(CH_2)'
-    print(latex2chem(expression))
-    print(jingjie_latex2chem(expression))

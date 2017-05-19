@@ -107,11 +107,12 @@ function renderResult(result) {
             }
 
             // Mass and mole
-            var current_molecule = MQ.MathField($('#input')[0]).latex()
 
             var molecule_mole_entry = MQ.MathField($('#molecule_mole_entry')[0], {
                 handlers: {
                     edit: function () {
+                        var current_molecule = mainField.latex();
+
                         if (molecule_mole_entry.latex().includes('*')) {
                             molecule_mole_entry.blur()
                             $.when(molecule_mole_entry.latex(
@@ -150,6 +151,7 @@ function renderResult(result) {
             var molecule_mass_entry = MQ.MathField($('#molecule_mass_entry')[0], {
                 handlers: {
                     edit: function () {
+                        var current_molecule = mainField.latex();
 
                         if (molecule_mass_entry.latex().includes('*')) {
                             molecule_mass_entry.blur()
@@ -430,10 +432,11 @@ function python_round(num_array, precision, callback) {
 }
 
 
+var mainField;  // global variable
 $(document).ready(function () {
     // set up input box
     var inputBox = $('#input')[0];
-    var mainField = MQ.MathField(inputBox, {
+    mainField = MQ.MathField(inputBox, {
 //        spaceBehavesLikeTab: true,
         supSubsRequireOperand: true,
         charsThatBreakOutOfSupSub: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",

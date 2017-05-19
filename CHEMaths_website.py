@@ -142,7 +142,9 @@ def mass_mole_calculation_equation():
     moles = [eval_latex(mole) if mole else None for mole in moles_array]
 
     reaction = Equation(reactants, products)
-    extent = reaction.calculate_extent_from_moles(moles if any(moles) else masses)
+    extent = reaction.calculate_extent_from_moles(moles) \
+        if any(moles) \
+        else reaction.calculate_extent_from_masses(masses)
     return jsonify({
         'reaction_masses': reaction.calculate_masses_from_extent(extent),
         'reaction_moles': reaction.calculate_moles_from_extent(extent)
