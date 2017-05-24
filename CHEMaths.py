@@ -396,7 +396,9 @@ class Equation:
 
         # smallest integer solution
         solution_vector = solution_vectors[0]
-        least_common_multiple = lcm_multiple(*[coefficient.denominator for coefficient in solution_vector.vector])
+        least_common_multiple = lcm_multiple(
+            *[fractions.Fraction(coefficient).denominator for coefficient in solution_vector.vector]
+        )
         solution = [int(coefficient) for coefficient in (least_common_multiple * solution_vector).vector]
         # trivial solution: infeasible reaction
         if any(entry <= 0 for entry in solution):

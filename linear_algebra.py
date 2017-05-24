@@ -159,8 +159,8 @@ class Matrix:
                     continue
             pivot_list.append((row, col))
             if isinstance(juxtaposed, Matrix):
-                juxtaposed.multiply_row(row, fractions.Fraction(1, pivot))
-            A.multiply_row(row, fractions.Fraction(1, pivot))
+                juxtaposed.multiply_row(row, 1 / pivot)
+            A.multiply_row(row, 1 / pivot)
             for row_to_subtract in range(row + 1, m):
                 if A.matrix[row_to_subtract][col] != 0:
                     if isinstance(juxtaposed, Matrix):
@@ -466,7 +466,7 @@ class Quadratic2D:
 
     def __str__(self) -> str:
         a, b, c = self.equation
-        return f"y = {a}x^2 {('+' if b > 0 else '-') + str(b)}x {('+' if b > 0 else '-') + str(c)}"
+        return f"y = {a}x^2 {('+' if b > 0 else '-') + str(abs(b))}x {('+' if b > 0 else '-') + str(abs(c))}"
 
     def __repr__(self) -> str:
         a, b, c = self.equation
@@ -496,6 +496,20 @@ class Quadratic2D:
         x, y = vertex
         a = (y - k) / (x - h) ** 2
         return Quadratic2D.from_vertex_form(a, h, k)
+
+    @classmethod
+    def from_three_points(cls, p1: (float, float), p2: (float, float), p3: (float, float)) -> 'Quadratic2D':
+        """Construct a quadratic curve from the coordinates of three points"""
+        constant = Matrix.from_nested_list([[p1[1]], [p2[1]], [p3[1]]])
+        coefficient = Matrix.from_nested_list([
+            [p1[0] ** 2, p1[0], 1],
+            [p2[0] ** 2, p2[0], 1],
+            [p3[0] ** 2, p3[0], 1]
+        ])
+        coefficient.rref(juxtaposed=constant)
+        a, b, c = [constant_list[0] for constant_list in constant.matrix]
+
+        return Quadratic2D(a, b, c)
 
     def calculate_vertex(self) -> (float, float):
         """Calculate the coordinates of the vertex"""
