@@ -1,23 +1,54 @@
 var modes = [
     "this", "molecule", "equation", "empirical", "organic"
 ];
-var currentMode = "equation";
+var count = 0;  // keep record of how many times render_results is called
 var MQ = MathQuill.getInterface(2);
+var mainField;  // global variable
+var molecule_mass_entry, molecule_mole_entry, masses_input, moles_input;
+var currentMode = 'this';
+var urlData;  // pre-written in index.html
+
+
+function retrieveUrlData() {
+    var data = {
+        'mode': currentMode,
+        'Input': mainField.latex(),
+    };
+
+    var sub_inputs = {};
+
+    if (currentMode == 'molecule') {
+        var mass = molecule_mass_entry.latex();
+        var mole = molecule_mole_entry.latex();
+
+        sub_inputs.mass = mass;
+        sub_inputs.mole = mole;
+    }
+    if (currentMode == 'equation') {
+        sub_inputs.masses = [];
+        sub_inputs.moles = [];
+
+        for (var i = 0; i < masses_input.length; i++) {
+            sub_inputs.masses.push(masses_input[i].latex());
+            sub_inputs.moles.push(moles_input[i].latex());
+        }
+    }
+
+    data.inputs = JSON.stringify(sub_inputs);
+
+    return $.param(data);
+}
 
 
 function renderResult(result) {
-    var mode = result.mode;
+    var mode = currentMode = result.mode;
     render(mode);
     var syntax = result.syntax;
     var error = result.error;
     if (syntax === true) {
         $("#syntax_check_status").removeClass("syntax_error");
-        $("#syntax_check_error_text").text("No problems found :)")
     } else {
         $("#syntax_check_status").addClass("syntax_error");
-    }
-    if (error) {
-        $("#syntax_check_error_text").html(error);
     }
     if (mode === "molecule") {
         if (error) {
@@ -108,7 +139,7 @@ function renderResult(result) {
 
             // Mass and mole
 
-            var molecule_mole_entry = MQ.MathField($('#molecule_mole_entry')[0], {
+            molecule_mole_entry = MQ.MathField($('#molecule_mole_entry')[0], {
                 handlers: {
                     edit: function () {
                         var current_molecule = mainField.latex();
@@ -146,9 +177,9 @@ function renderResult(result) {
                     }
                 }
             })
-            molecule_mole_entry.latex('');
+            molecule_mole_entry.latex(urlData.inputs.mole ? urlData.inputs.mole : '');
 
-            var molecule_mass_entry = MQ.MathField($('#molecule_mass_entry')[0], {
+            molecule_mass_entry = MQ.MathField($('#molecule_mass_entry')[0], {
                 handlers: {
                     edit: function () {
                         var current_molecule = mainField.latex();
@@ -186,7 +217,7 @@ function renderResult(result) {
                     }
                 }
             })
-            molecule_mass_entry.latex('');
+            molecule_mass_entry.latex(urlData.inputs.mass ? urlData.inputs.mass : '');
 
             // Set all precision range inputs to 2
             $.makeArray($('.precision')).map(function (slider) {
@@ -205,12 +236,9 @@ function renderResult(result) {
         // for reconstruction of Equation
         var parsed = result.parsed;
         
-        var masses_input = [];
-        var masses_display = [];
-        
-        var moles_input = [];
-        var masses_display = [];
-        
+        masses_input = [];
+        moles_input = [];
+
         var local_MQ_config = {
             spaceBehavesLikeTab: true,
             supSubsRequireOperand: true,
@@ -361,6 +389,10 @@ function renderResult(result) {
                     moles_input.push(mole_input);
                 }
             }
+            for (var i = 0; i < masses_input.length; i++) {
+                masses_input[i].latex(urlData.inputs.masses[i] ? urlData.inputs.masses[i] : '');
+                moles_input[i].latex(urlData.inputs.moles[i] ? urlData.inputs.moles[i] : '');
+            }
         }
     } else if (mode == "empirical") {
         // TODO this and fix float point issues
@@ -383,6 +415,7 @@ function renderResult(result) {
         }
         }
     }
+    count++;
 }
 
 // update render
@@ -432,7 +465,6 @@ function python_round(num_array, precision, callback) {
 }
 
 
-var mainField;  // global variable
 $(document).ready(function () {
     // set up input box
     var inputBox = $('#input')[0];
@@ -466,21 +498,17 @@ $(document).ready(function () {
     });
 
     mainField.focus();
-    renderResult({'mode': "this", "syntax": true, "error": "Welcome! Feed me chemistry :)"});
+    mainField.latex(urlData.Input);
 
-    // confirm input
-    $('#mainField').submit(function (e) {
-        $('<input />').attr('type', 'hidden')
-            .attr('name', 'input')
-            .attr('value', currentMode + '||' + mainField.latex())
-            .appendTo(this);
-        return true;
-    });
-    $('#input').keypress(function (e) {
-        // submit form when enter is pressed
-        if (e.which == 13) {
-            $('#mainField').submit();
-            return false;
+    $('#enter').hover(function () {
+        $('#enter')[0].href = '?' + retrieveUrlData();
+    })
+
+    $(document).keypress(function(e) {
+        if(e.which == 13) {
+            $('#enter')[0].href = '?' + retrieveUrlData();
+
+            $('#enter')[0].click();
         }
     });
 

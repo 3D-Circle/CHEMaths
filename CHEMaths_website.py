@@ -1,19 +1,26 @@
 # -*- coding: utf-8 -*-
 """Web version for CHEMaths"""
+from ast import literal_eval
 from flask import Flask, jsonify, render_template, request
 from latex_parser import latex_valid, determine_mode, eval_latex
 from CHEMaths import Molecule, Equation
 import string
-import json
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def home():
     """renders home page of CHEMaths"""
-    return render_template('index.html', name="homepage")
+    raw_data = request.args
+    data = {
+        'mode': raw_data.get('mode', 'this'),
+        'Input': raw_data.get('Input', ''),
+        'inputs': raw_data.get('inputs', {}, literal_eval)
+    }
+    print(data)
+    return render_template('index.html', name="homepage", data=data)
 
 
 @app.route("/live_preview", methods=['POST'])
@@ -121,13 +128,6 @@ def mass_mole_calculation():
             result['correct'] = ''.join([i for i in mass if i not in string.ascii_letters])
             result['error'] = 'Invalid character in mass input'
     return jsonify(result)
-
-
-@app.route("/results", methods=['POST'])
-def process():
-    """processes input from home page and redirect to result tab"""
-    return render_template('index.html', name="homepage")
-    # return redirect('index.html', code=302, Response=None)  # TODO render results
 
 
 @app.route("/mass_mole_equation", methods=['POST'])

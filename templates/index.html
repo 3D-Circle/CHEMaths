@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="description" content="Doing Chemistry with Maths"/>
     <meta name="keywords" content="Chemistry,Maths,Calculator"/>
     <meta name="author" content="Jingjie YANG (j.yang19@ejm.org), Théo Takla (t.takla19@ejm.org)"/>
@@ -10,12 +10,14 @@
     <title>CHEMaths</title>
     <!--  Styles & images -->
     <link rel="stylesheet" href="/static/MathQuill/mathquill.min.css"/>
+    <link rel="stylesheet" href="/static/Hover/hover-min.css"/>
     <link rel="stylesheet" href="/static/ChemInput.css"/>
     <link rel="shortcut icon" type="image/png" href="/static/icon.png"/>
     <!--  Scripts  -->
     <script src="/static/jQuery/jquery-3.2.1.min.js"></script>
     <script src="/static/MathQuill/mathquill.min.js"></script>
     <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+    <script>var urlData = {{ data|tojson }};</script>
     <script src="/static/ChemInput.js"></script>
 </head>
 
@@ -25,7 +27,9 @@
         <form action="/results" method="POST" id="mainField">
             <div id="syntax_check_status"></div>
             <span id='input'></span>
-            <input type="submit" value="Maths!" id="enter"/>
+            <a href="#" id="enter" class="hvr-wobble-bottom">
+                <img src="/static/icon.png" width="32"/>
+            </a>
         </form>
     </div>
 
