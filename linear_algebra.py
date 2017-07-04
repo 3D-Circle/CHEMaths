@@ -44,6 +44,11 @@ def partition(n, k) -> int:
         return partition(n - k, k) + partition(n - 1, k - 1)
 
 
+def sf(number: float):
+    """Significant figure"""  # TODO this; will save time for next year
+    pass
+
+
 class Matrix:
     """Implementation of matrices in mathematics
     constructs a zero matrix of size m * n by default"""
@@ -548,12 +553,12 @@ class Quadratic2D:
     def get_x_intercept_form(self) -> str:
         """Return the x-intercept form of this quadratic curve as a string
         y = a(x - p)(x - q)"""
-        x_intercepts = self.get_x_intercept_form()
+        x_intercepts = self.calculate_x_intercept()
         if not x_intercepts:
             return "No x-intercept"
         a, _, _ = self.equation
         p, q = [x_intercept[0] for x_intercept in x_intercepts]
-        return f"{a}(x - {p})(x - {q}"  # TODO match with sign
+        return f"{a}(x - {p})(x - {q})"  # TODO match with sign
 
 
 if __name__ == "__main__":

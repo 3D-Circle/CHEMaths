@@ -667,6 +667,46 @@ class StraightChainPrimaryAlcohol(FunctionalGroup):
         ])  # yes yes I did copy paste ... so to make it not so obvious I did a little formatting :D
 
 
+class Solution:  # TODO: refactor this. totally wrong
+    """A homogeneous mixture of one (or more, but not supported ]:) ) solute"""
+    def __init__(self, volume: float, solute: Molecule, concentration: float, unit='mL'):
+        """Initiate a solution of `volume` mL with `solute` of `concentration` dissolved"""
+        self.volume = self.convert_to_ml(unit, volume)
+        self.solute = [solute, concentration * self.volume]
+
+    @classmethod
+    def from_volume_and_solute_mass(cls, volume: float, solute: Molecule, mass: float, unit='mL') -> 'Solution':
+        """Initiate a solution of `volume` mL with `mass` grams of `solute` dissolved"""
+        mole = solute.calculate_mole(mass)
+        return cls.from_volume_and_solute_mole(volume, solute, mole, unit=unit)
+
+    @classmethod
+    def from_volume_and_solute_mole(cls, volume: float, solute: Molecule, mole: float, unit='mL') -> 'Solution':
+        """Initiate a solution of `volume` mL with `mole` moles of `solute` dissolved"""
+        S = cls(volume, solute, 0, unit=unit)
+        S.solute[1] = mole
+        return S
+
+    @staticmethod
+    def convert_to_ml(unit: string, value: float) -> float:
+        """Convert the value in the given unit to millilitres (mL)"""
+        return value * {
+            'mL': 1,
+            'L': 1000,
+            'cm^3': 0.001,
+            'dm^3': 1,
+            'm^3': 1000
+        }[unit]
+
+    def calculate_concentration_mol_per_decimeter_cubed(self) -> float:
+        """Calculate the concentration of the solute in mol dm^-3"""
+        return self.solute[1] / self.volume
+
+    def calculate_concentration_gram_per_decimeter_cubed(self) -> float:
+        """Calculate the concentration of the solute in mol dm^-3"""
+        return self.solute[0].calculate_mass(self.solute[1]) / self.volume
+
+
 def debug():
     """Test the functionality of functions"""
     valid = [
