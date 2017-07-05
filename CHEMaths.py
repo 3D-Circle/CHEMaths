@@ -387,7 +387,7 @@ class Equation:
                     reactants_list_copy.remove(molecule)
                 else:
                     products_list_copy.remove(molecule)
-                matrix.assign_new_value(i, j, sign * atom_count)
+                matrix.assign_new_value(i, j, fractions.Fraction(sign * atom_count))
         # list of linearly independent variables as solutions
         solution_vectors = matrix.null_space()
 

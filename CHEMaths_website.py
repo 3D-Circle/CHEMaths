@@ -36,7 +36,7 @@ def live_process():
         return jsonify({
             'mode': mode,
             'syntax': syntax_check[0],
-            'error': syntax_check[1]  # more like a welcoming note than an error :)
+            'error': syntax_check[1]
         })
     elif mode == 'molecule':
         if not error:
