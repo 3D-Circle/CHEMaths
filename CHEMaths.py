@@ -346,7 +346,7 @@ class Equation:
         assert isinstance(self.coefficients, list), "Reaction not feasible"
 
     @classmethod
-    def from_string(cls, equation: string) -> 'Equation':
+    def from_string(cls, equation: str) -> 'Equation':
         """Construct an raw, unprocessed string"""
         equation_split = equation.split('->')
         if len(equation_split) != 2:
@@ -688,7 +688,7 @@ class Solution:  # TODO: refactor this. totally wrong
         return S
 
     @staticmethod
-    def convert_to_ml(unit: string, value: float) -> float:
+    def convert_to_ml(unit: str, value: float) -> float:
         """Convert the value in the given unit to millilitres (mL)"""
         return value * {
             'mL': 1,
