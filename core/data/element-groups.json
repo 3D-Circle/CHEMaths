@@ -1,0 +1,44 @@
+{
+  "alkali metals": [
+    "Li",
+    "Na",
+    "K",
+    "Rb",
+    "Cs",
+    "Fr"
+  ],
+  "alkali earth metals": [
+    "Be",
+    "Mg",
+    "Ca",
+    "Sr",
+    "Ba",
+    "Ra"
+  ],
+  "halogens": [
+    "F",
+    "Cl",
+    "Br",
+    "I",
+    "At"
+  ],
+  "non-metals": [
+    "H",
+    "He",
+    "C",
+    "N",
+    "O",
+    "F",
+    "Ne",
+    "P",
+    "S",
+    "Cl",
+    "Ar",
+    "Se",
+    "Br",
+    "Kr",
+    "I",
+    "Xe",
+    "Rn"
+  ]
+}

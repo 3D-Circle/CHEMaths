@@ -11,10 +11,7 @@ import string
 import fractions
 import time
 import json
-import re
-import latex_parser
-from simpleeval import simple_eval
-from linear_algebra import Matrix, ext_euclid, gcd_multiple, lcm_multiple, partition
+import numpy as np
 
 with open("static/data.json") as data:
     data_dict = json.loads(data.read())
