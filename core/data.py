@@ -19,7 +19,7 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
     :param element1: an element
     :param element2: another element (order does not matter)
     :param bond_type: 'single', 'double', or 'triple'
-    :return: the bond enthalpy between the two elements
+    :return: the bond enthalpy between the two elements (in kJ / mol by default)
     :raise KeyError: when the bond enthalpy cannot be found in the data file
     """
     bonds = bond_enthalpies[f'{bond_type} bond']
@@ -72,11 +72,11 @@ def is_non_metal(element: str) -> bool:
 
 def get_relative_atomic_mass(element: str) -> float:
     """
-    Get the relative atmoic mass of the element.
+    Get the relative atomic mass of the element.
 
     :param element: an element
-    :return: the relative atomic mass
-    :raise KeyError: when the element is not recognized
+    :return: the relative atomic mass (in g / mol by default)
+    :raise KeyError: when the element is not recognized in the data file
     """
     return relative_atomic_mass[element]  # TODO unit
 
