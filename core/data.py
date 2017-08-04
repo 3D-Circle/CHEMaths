@@ -6,6 +6,7 @@ for example, you can refer to selenium as 'Se', but not 'se' or 'sE'.
 """
 import json
 import os.path
+import core.units
 
 MODULE_PATH = os.path.dirname(__file__)
 
@@ -23,13 +24,29 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
     :param bond_type: 'single', 'double', or 'triple'
     :return: the bond enthalpy between the two elements (in kJ / mol by default)
     :raise KeyError: when the bond enthalpy cannot be found in the data file
+
+    >>> get_bond_enthalpy('C', 'H')
+
+    >>> get_bond_enthalpy('H', 'C')
+
+    >>> get_bond_enthalpy('C', 'C')
+
+    >>> get_bond_enthalpy('C', 'C', bond_type='double')
+
+    >>> get_bond_enthalpy('C', 'C (benzene)', bond_type='double')
+
+    >>> get_bond_enthalpy('C', 'C', bond_type='triple')
+
+    >>> get_bond_enthalpy('C', 'UnrecordedElement')
+    Traceback (most recent call last):
+    KeyError: 'Cannot find single bond between C and UnrecordedElement in bond-enthalpies.json'
     """
     bonds = bond_enthalpies[f'{bond_type} bond']
     if element1 in bonds and element2 in bonds[element1]:
         return bonds[element1][element2]
     if element2 in bonds and element1 in bonds[element2]:
         return bonds[element2][element1]  # TODO unit
-    raise KeyError
+    raise KeyError(f'Cannot find {bond_type} bond between {element1} and {element2} in bond-enthalpies.json')
 
 
 def is_alkali_metals(element: str) -> bool:
@@ -81,5 +98,3 @@ def get_relative_atomic_mass(element: str) -> float:
     :raise KeyError: when the element is not recognized in the data file
     """
     return relative_atomic_mass[element]  # TODO unit
-
-
