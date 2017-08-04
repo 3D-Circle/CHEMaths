@@ -5,11 +5,13 @@ Elements in this module are represented as (case sensitive) strings:
 for example, you can refer to selenium as 'Se', but not 'se' or 'sE'.
 """
 import json
+import os.path
 
+MODULE_PATH = os.path.dirname(__file__)
 
-bond_enthalpies = json.load(open('data/bond-enthalpies.json'))
-element_groups = json.load(open('data/element-groups.json'))
-relative_atomic_mass = json.load(open('data/relative-atomic-mass.json'))
+bond_enthalpies = json.load(open(os.path.join(MODULE_PATH, 'data/bond-enthalpies.json')))
+element_groups = json.load(open(os.path.join(MODULE_PATH, 'data/element-groups.json')))
+relative_atomic_mass = json.load(open(os.path.join(MODULE_PATH, 'data/relative-atomic-mass.json')))
 
 
 def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
