@@ -26,17 +26,17 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
     :raise KeyError: when the bond enthalpy cannot be found in the data file
 
     >>> get_bond_enthalpy('C', 'H')
-
+    414
     >>> get_bond_enthalpy('H', 'C')
-
+    414
     >>> get_bond_enthalpy('C', 'C')
-
+    346
     >>> get_bond_enthalpy('C', 'C', bond_type='double')
-
+    614
     >>> get_bond_enthalpy('C', 'C (benzene)', bond_type='double')
-
+    507
     >>> get_bond_enthalpy('C', 'C', bond_type='triple')
-
+    839
     >>> get_bond_enthalpy('C', 'UnrecordedElement')
     Traceback (most recent call last):
     KeyError: 'Cannot find single bond between C and UnrecordedElement in bond-enthalpies.json'
@@ -52,9 +52,25 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
 def is_alkali_metals(element: str) -> bool:
     """
     Determine if the element is an alkali metal.
+    (Alkali metals: Li, Na, K, Rb, Cs, Fr)
 
     :param element: an element
     :return: True if the element is an alkali metal and False otherwise
+
+    >>> is_alkali_metals('Li')
+    True
+    >>> is_alkali_metals('Na')
+    True
+    >>> is_alkali_metals('K')
+    True
+    >>> is_alkali_metals('Rb')
+    True
+    >>> is_alkali_metals('Cs')
+    True
+    >>> is_alkali_metals('Fr')
+    True
+    >>> is_alkali_metals('AnyOtherElement')
+    False
     """
     return element in element_groups['alkali metals']
 
@@ -62,9 +78,25 @@ def is_alkali_metals(element: str) -> bool:
 def is_alkali_earth_metals(element: str) -> bool:
     """
     Determine if the element in an alkali earth metal.
+    (Alkali earth metals: Be, Mg, Ca, Sr, Ba, Ra)
 
     :param element: an element
     :return: True if the element is an alkali earth metal and False otherwise
+
+    >>> is_alkali_earth_metals('Be')
+    True
+    >>> is_alkali_earth_metals('Mg')
+    True
+    >>> is_alkali_earth_metals('Ca')
+    True
+    >>> is_alkali_earth_metals('Sr')
+    True
+    >>> is_alkali_earth_metals('Ba')
+    True
+    >>> is_alkali_earth_metals('Ra')
+    True
+    >>> is_alkali_earth_metals('AnyOtherElement')
+    False
     """
     return element in element_groups['alkali earth metals']
 
@@ -72,19 +104,71 @@ def is_alkali_earth_metals(element: str) -> bool:
 def is_halogen(element: str) -> bool:
     """
     Determine if the element is a halogen.
+    (halogens: F, Cl, Br, I, At)
 
     :param element: an element
     :return: True if the element is a halogen and False otherwise
+
+    >>> is_halogen('F')
+    True
+    >>> is_halogen('Cl')
+    True
+    >>> is_halogen('Br')
+    True
+    >>> is_halogen('I')
+    True
+    >>> is_halogen('At')
+    True
+    >>> is_halogen('AnyOtherElement')
+    False
     """
-    return element in element_groups['halogen']
+    return element in element_groups['halogens']
 
 
 def is_non_metal(element: str) -> bool:
     """
     Determine if the element is a non-metal.
+    (non-metals: H, He, C, N, O, F, Ne, P, S, Cl, Ar, Se, Br, Kr, I, Xe, Rn)
 
     :param element: an element
     :return: True if the element is a non-metal and false otherwise
+
+    >>> is_non_metal('H')
+    True
+    >>> is_non_metal('He')
+    True
+    >>> is_non_metal('C')
+    True
+    >>> is_non_metal('N')
+    True
+    >>> is_non_metal('O')
+    True
+    >>> is_non_metal('F')
+    True
+    >>> is_non_metal('Ne')
+    True
+    >>> is_non_metal('P')
+    True
+    >>> is_non_metal('S')
+    True
+    >>> is_non_metal('Cl')
+    True
+    >>> is_non_metal('Ar')
+    True
+    >>> is_non_metal('Se')
+    True
+    >>> is_non_metal('Br')
+    True
+    >>> is_non_metal('Kr')
+    True
+    >>> is_non_metal('I')
+    True
+    >>> is_non_metal('Xe')
+    True
+    >>> is_non_metal('Rn')
+    True
+    >>> is_non_metal('AnyOtherElement')
+    False
     """
     return element in element_groups['non-metals']
 
@@ -96,5 +180,15 @@ def get_relative_atomic_mass(element: str) -> float:
     :param element: an element
     :return: the relative atomic mass (in g / mol by default)
     :raise KeyError: when the element is not recognized in the data file
+
+    >>> get_relative_atomic_mass('H')
+    1.01
+    >>> get_relative_atomic_mass('He')
+    4.0
+    >>> get_relative_atomic_mass('Uuo')
+    294
+    >>> get_relative_atomic_mass('NotAnElement')
+    Traceback (most recent call last):
+    KeyError: 'NotAnElement'
     """
     return relative_atomic_mass[element]  # TODO unit
