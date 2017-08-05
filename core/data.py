@@ -6,7 +6,7 @@ for example, you can refer to selenium as 'Se', but not 'se' or 'sE'.
 """
 import json
 import os.path
-import core.units
+from core.units import Quantity, KILOJOULE_PER_MOLE, GRAM_PER_MOLE
 
 MODULE_PATH = os.path.dirname(__file__)
 
@@ -15,7 +15,7 @@ element_groups = json.load(open(os.path.join(MODULE_PATH, 'data/element-groups.j
 relative_atomic_mass = json.load(open(os.path.join(MODULE_PATH, 'data/relative-atomic-mass.json')))
 
 
-def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
+def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> Quantity:
     """
     Get the bold enthalpy between two elements.
 
@@ -26,27 +26,27 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> int:
     :raise KeyError: when the bond enthalpy cannot be found in the data file
 
     >>> get_bond_enthalpy('C', 'H')
-    414
+    Quantity<414 kJ/mol>
     >>> get_bond_enthalpy('H', 'C')
-    414
+    Quantity<414 kJ/mol>
     >>> get_bond_enthalpy('C', 'C')
-    346
+    Quantity<346 kJ/mol>
     >>> get_bond_enthalpy('C', 'C', bond_type='double')
-    614
+    Quantity<614 kJ/mol>
     >>> get_bond_enthalpy('C', 'C (benzene)', bond_type='double')
-    507
+    Quantity<507 kJ/mol>
     >>> get_bond_enthalpy('C', 'C', bond_type='triple')
-    839
+    Quantity<839 kJ/mol>
     >>> get_bond_enthalpy('C', 'UnrecordedElement')
     Traceback (most recent call last):
-    KeyError: 'Cannot find single bond between C and UnrecordedElement in bond-enthalpies.json'
+    KeyError: 'single bond between C and UnrecordedElement'
     """
     bonds = bond_enthalpies[f'{bond_type} bond']
     if element1 in bonds and element2 in bonds[element1]:
-        return bonds[element1][element2]
+        return Quantity(bonds[element1][element2], KILOJOULE_PER_MOLE)
     if element2 in bonds and element1 in bonds[element2]:
-        return bonds[element2][element1]  # TODO unit
-    raise KeyError(f'Cannot find {bond_type} bond between {element1} and {element2} in bond-enthalpies.json')
+        return Quantity(bonds[element2][element1], KILOJOULE_PER_MOLE)
+    raise KeyError(f'{bond_type} bond between {element1} and {element2}')
 
 
 def is_alkali_metals(element: str) -> bool:
@@ -173,7 +173,7 @@ def is_non_metal(element: str) -> bool:
     return element in element_groups['non-metals']
 
 
-def get_relative_atomic_mass(element: str) -> float:
+def get_relative_atomic_mass(element: str) -> Quantity:
     """
     Get the relative atomic mass of the element.
 
@@ -182,13 +182,13 @@ def get_relative_atomic_mass(element: str) -> float:
     :raise KeyError: when the element is not recognized in the data file
 
     >>> get_relative_atomic_mass('H')
-    1.01
+    Quantity<1.01 g/mol>
     >>> get_relative_atomic_mass('He')
-    4.0
+    Quantity<4.0 g/mol>
     >>> get_relative_atomic_mass('Uuo')
-    294
+    Quantity<294 g/mol>
     >>> get_relative_atomic_mass('NotAnElement')
     Traceback (most recent call last):
     KeyError: 'NotAnElement'
     """
-    return relative_atomic_mass[element]  # TODO unit
+    return Quantity(relative_atomic_mass[element], GRAM_PER_MOLE)
