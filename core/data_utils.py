@@ -10,9 +10,13 @@ from core.units import Quantity, KILOJOULE_PER_MOLE, GRAM_PER_MOLE
 
 MODULE_PATH = os.path.dirname(__file__)
 
-bond_enthalpies = json.load(open(os.path.join(MODULE_PATH, 'data/bond-enthalpies.json')))
-element_groups = json.load(open(os.path.join(MODULE_PATH, 'data/element-groups.json')))
-relative_atomic_mass = json.load(open(os.path.join(MODULE_PATH, 'data/relative-atomic-mass.json')))
+file_handles = [
+    open(os.path.join(MODULE_PATH, 'data', f'{filename}.json'))
+    for filename in ['bond-enthalpies', 'element-groups', 'relative-atomic-mass']
+]
+
+bond_enthalpies, element_groups, relative_atomic_mass = [json.load(i) for i in file_handles]
+[i.close() for i in file_handles]
 
 
 def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> Quantity:
