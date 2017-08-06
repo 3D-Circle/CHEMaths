@@ -39,6 +39,7 @@ def get_bond_enthalpy(element1: str, element2: str, bond_type='single') -> Quant
     Quantity<839 kJ/mol>
     >>> get_bond_enthalpy('C', 'UnrecordedElement')
     Traceback (most recent call last):
+        ...
     KeyError: 'single bond between C and UnrecordedElement'
     """
     bonds = bond_enthalpies[f'{bond_type} bond']
@@ -189,6 +190,7 @@ def get_relative_atomic_mass(element: str) -> Quantity:
     Quantity<294 g/mol>
     >>> get_relative_atomic_mass('NotAnElement')
     Traceback (most recent call last):
+        ...
     KeyError: 'NotAnElement'
     """
     return Quantity(relative_atomic_mass[element], GRAM_PER_MOLE)

@@ -68,6 +68,7 @@ class Quantity:
         Quantity<3.57 g>
         >>> Quantity(1, CENTIMETRE_CUBED) + Quantity(2, DECIMETRE_CUBED)
         Traceback (most recent call last):
+            ...
         TypeError: Incompatible units (cm^3 and dm^3)
         """
         if self.unit == other.unit:
@@ -99,6 +100,7 @@ class Quantity:
         Quantity<2.02 g>
         >>> Quantity(1, LITRE) * Quantity(1, GRAM_PER_DECIMETRE_CUBED)
         Traceback (most recent call last):
+            ...
         TypeError: Incompatible units (L and g/dm^3)
         """
         # Scalar multiplication
@@ -141,6 +143,7 @@ class Quantity:
         Quantity<2.0 g/dm^3>
         >>> Quantity(3, GRAM) / Quantity(2, CENTIMETRE_CUBED)
         Traceback (most recent call last):
+            ...
         TypeError: Incompatible units (g and cm^3)
         >>> Quantity(3, GRAM) / Quantity(2000, CENTIMETRE_CUBED).as_(DECIMETRE_CUBED)
         Quantity<1.5 g/dm^3>
@@ -180,6 +183,10 @@ class Quantity:
         Quantity<1.0 dm^3>
         >>> Quantity(1, LITRE).as_(MILLILITRE).as_(DECIMETRE_CUBED)
         Quantity<1.0 dm^3>
+        >>> Quantity(1, LITRE).as_(GRAM)
+        Traceback (most recent call last):
+            ...
+        TypeError: L cannot be converted into g
         """
         if self.unit == new_unit:
             return self
