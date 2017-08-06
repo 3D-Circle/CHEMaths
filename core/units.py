@@ -75,6 +75,23 @@ class Quantity:
             return Quantity(self.value + other.value, self.unit)
         raise TypeError(f'Incompatible units ({self.unit} and {other.unit})')
 
+    def __sub__(self, other: 'Quantity'):
+        """
+        Inverse operation of __add__
+
+        :param other: the quantity to be subtracted
+        :return: the other quantity subtracted from this quantity
+        :raise TypeError: if the units are different
+
+        >>> Quantity(1.23, GRAM) - Quantity(.23, GRAM)
+        Quantity<1.0 g>
+        >>> Quantity(1.23, GRAM) - Quantity(.23, GRAM_PER_MOLE)
+        Traceback (most recent call last):
+            ...
+        TypeError: Incompatible units (g and g/mol)
+        """
+        return self + Quantity(-other.value, other.unit)
+
     def __mul__(self, other: Union[int, float, 'Quantity']) -> 'Quantity':
         """
         Multiply this quantity by a scalar, or by another quantity to create a new quantity with a new unit.
