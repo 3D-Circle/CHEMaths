@@ -1,10 +1,22 @@
-# Compiled source #
+# Python #
 ###################
+__pycache__/
 *.pyc
+
+# Javascript #
+##############
+/node_modules
+/coverage
+/build
+npm-debug.log*
 
 # OS generated files #
 ######################
 .DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 Icon
 
 # Pycharm profile #
