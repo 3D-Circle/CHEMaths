@@ -1,14 +1,13 @@
 # Python #
 ###################
 __pycache__/
-*.pyc
 
 # Javascript #
 ##############
-/node_modules
-/coverage
-/build
-npm-debug.log*
+web-app/node_modules
+web-app/coverage
+web-app/build
+web-app/npm-debug.log*
 
 # OS generated files #
 ######################
