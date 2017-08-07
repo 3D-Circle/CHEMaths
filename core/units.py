@@ -53,10 +53,10 @@ class Quantity:
         self.value = value
         self.unit = unit
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Quantity<{self.value} {self.unit}>"
 
-    def __add__(self, other: 'Quantity'):
+    def __add__(self, other: 'Quantity') -> 'Quantity':
         """
         Add this quantity with another quantity (of the same unit).
 
@@ -75,7 +75,7 @@ class Quantity:
             return Quantity(self.value + other.value, self.unit)
         raise TypeError(f'Incompatible units ({self.unit} and {other.unit})')
 
-    def __sub__(self, other: 'Quantity'):
+    def __sub__(self, other: 'Quantity') -> 'Quantity':
         """
         Inverse operation of __add__
 
