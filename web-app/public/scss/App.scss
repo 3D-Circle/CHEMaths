@@ -1,0 +1,106 @@
+// TODO replace relevant stuff with mixins to get maximum crossbrowsery
+//@mixin border-radius($radius) {
+//    -webkit-border-radius: $radius;
+//    -moz-border-radius: $radius;
+//    -ms-border-radius: $radius;
+//    border-radius: $radius;
+//}
+
+body {
+    margin: 0;
+}
+
+#root, #root > div {
+    //TODO: check how to remove this weird hack
+    height: 100vh;
+}
+
+#root > div {
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+  Header
+*/
+
+$overall_outer_margin: 10px;
+
+#input_wrapper {
+    padding: $overall_outer_margin;
+    display: flex;
+    justify-content: space-around;
+}
+
+// Item spacing in the header
+$header_items_spacing: 5px;
+#input_wrapper * {
+    margin: 0 $header_items_spacing;
+}
+
+#syntax_check_status {
+    background: green;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+}
+
+
+#main_input {
+    flex-grow: 10;
+    border: 2px solid lightgray;
+    border-radius: 2px;
+}
+
+
+// Submit button
+$button_radius: 40px;
+#submit_button {
+    width: $button_radius;
+    border-radius: $button_radius;
+    border: none;
+    background: url('../icon-96x96.png');
+    background-size: 40px;
+}
+
+/*
+   Content
+*/
+
+#content_wrapper {
+    margin: $overall_outer_margin + $header_items_spacing;
+    // This fills the remaining space with the content (flex is aweeesome)
+    flex: auto;
+    // Tab list to the right
+    display: flex;
+    flex-direction: column;
+}
+
+// Tabs
+
+#tab_list {
+    height: 33px;
+}
+
+.tab {
+    height: 100%;
+    background: lightgray;
+    display: inline-block;
+    padding: 8px 10px;
+    border-radius: 5px 5px 0 0;
+    width: 300px;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.current {
+    border-bottom: 2px solid blueviolet;
+}
+
+// Pane
+
+.pane {
+    background-color: lightblue;
+    flex: auto;
+    padding: 5px;
+}
