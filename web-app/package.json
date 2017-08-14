@@ -11,8 +11,9 @@
     "react-scripts": "1.0.10"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start-js": "react-scripts start",
+    "start": "npm-run-all -p watch-css start-js",
+    "build": "npm run build-css && react-scripts build",
     "build-css": "node-sass-chokidar public/scss/ -o public/scss/",
     "watch-css": "npm run build-css && node-sass-chokidar public/scss/ -o public/scss/ --watch --recursive",
     "test": "react-scripts test --env=jsdom",
