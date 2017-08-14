@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "gh-pages": "^1.0.0",
     "node-sass-chokidar": "0.0.3",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
@@ -16,6 +17,7 @@
     "build": "npm run build-css && react-scripts build",
     "build-css": "node-sass-chokidar public/scss/ -o public/scss/",
     "watch-css": "npm run build-css && node-sass-chokidar public/scss/ -o public/scss/ --watch --recursive",
+    "deploy": "npm run build-css && react-scripts build && node heroku-deploy.js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
