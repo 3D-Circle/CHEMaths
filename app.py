@@ -1,11 +1,10 @@
-from flask import Flask
+from flask import Flask, render_template
 
-app = Flask(__name__, static_folder='web-app/build')
+app = Flask(__name__, static_folder='web-app/build', static_url_path='')
 
-@app.route('/', methods=['GET'])
-def main_page:
-    return render_template('index.html', name="homepage")
-
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
 
 if __name__ == "__main__":
     app.run()
