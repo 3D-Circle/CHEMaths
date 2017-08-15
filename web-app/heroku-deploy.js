@@ -1,15 +1,14 @@
 const ghpages = require('gh-pages');
 
 ghpages.publish(
-    '../../CHEMaths_Release',
+    '../',
     {
+        push: false,
+        add: true,
         branch: 'heroku-app',
         src: [
             'core/**',
             'web-app/build/**',
-            'Procfile',
-            'requirements.txt',
-            'runtime.txt',
             'app.py',
         ]
     },

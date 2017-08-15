@@ -20,5 +20,8 @@
     "deploy": "npm run build-css && react-scripts build && node heroku-deploy.js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.0.0"
   }
 }
