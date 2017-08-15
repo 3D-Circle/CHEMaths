@@ -3,7 +3,6 @@ const ghpages = require('gh-pages');
 ghpages.publish(
     '../',
     {
-        /*push: false,*/
         add: true,
         branch: 'heroku-app',
         src: [
